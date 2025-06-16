@@ -9,11 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import {
-  fetchAllCategories,
-  fetchAllMeasurement,
-  fetchAllSubCategories,
-} from "@/lib/Redux/Slices/masterSlice";
+import { fetchAllCategories } from "@/lib/Redux/Slices/masterSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import {
@@ -41,26 +37,40 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Uploadfile } from "@/lib/API/Fileupload/Singlefile";
 import { Createcategory, Deletecategory } from "@/lib/API/Master/Master";
 import { useToast } from "@/components/ui/toast-provider";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function Categoriestable() {
   const { addToast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [loadingg, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const [formData, setFormData] = useState({
-    categoryName: "",
-    image: null,
+    name: "",
+    image: "",
+    description: "",
+    seasonalTrends: [],
+    isActive: true,
   });
-  const [imagePreview, setImagePreview] = useState(null);
+
+  const [newTrend, setNewTrend] = useState({ season: "", demand: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [deleteid, Setdeleteid] = useState("");
   const dispatch = useDispatch();
   const { categories, loading, error } = useSelector((state) => state.master);
   const [isDeleting, setIsDeleting] = useState(false);
+  const seasons = ["Spring", "Summer", "Fall", "Winter"];
+  const demandLevels = ["Low", "Medium", "High", "Very High"];
 
   useEffect(() => {
     dispatch(fetchAllCategories());
@@ -79,10 +89,10 @@ export function Categoriestable() {
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
+        setSelectedFile(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -93,50 +103,93 @@ export function Categoriestable() {
     setImagePreview(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async () => {
+  //   setIsSubmitting(true);
+
+  //   if (!formData.name) {
+  //     addToast({
+  //       title: `"Category Name Required`,
+  //       description: "Category field required",
+  //       variant: "destructive",
+  //       duration: 2000,
+  //     });
+  //   }
+
+  //   try {
+  //     await handleUpload();
+  //     const result = await Createcategory(formData);
+
+  //     if (result.success) {
+  //       setIsDialogOpen(false);
+  //       dispatch(fetchAllCategories());
+  //       addToast({
+  //         title: `Category created successfully!`,
+  //         description: `Category created successfully!`,
+  //         variant: "success",
+  //         duration: 5000,
+  //       });
+  //     } else {
+  //       addToast({
+  //         title: `"Error creating category`,
+  //         description: result.message,
+  //         variant: "destructive",
+  //         duration: 2000,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     addToast({
+  //       title: `"Error creating category`,
+  //       description: error,
+  //       variant: "destructive",
+  //       duration: 2000,
+  //     });
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    if (!formData.categoryName) {
+    if (!formData.name) {
       addToast({
         title: `"Category Name Required`,
         description: "Category field required",
         variant: "destructive",
         duration: 2000,
       });
-    }
-
-    if (!formData.image) {
-      addToast({
-        title: `"Image Required`,
-        description: "Image required",
-        variant: "destructive",
-        duration: 2000,
-      });
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-      let imageUrl = "";
-      if (formData.image) {
-        const uploadResult = await Uploadfile(formData.image);
-        if (uploadResult.status) {
-          imageUrl = uploadResult.data;
-        } else {
-          console.error("Image upload failed:", uploadResult.message);
-          return;
-        }
+      // Upload image
+      let uploadedImageUrl = formData.image;
+      if (selectedFile) {
+        const reader = new FileReader();
+        const base64 = await new Promise((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(selectedFile);
+        });
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ file: base64 }),
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error("Upload failed");
+        uploadedImageUrl = data.url;
       }
 
-      const categoryData = {
-        Categoryname: formData.categoryName,
-        Image: imageUrl,
-      };
+      const result = await Createcategory({
+        ...formData,
+        image: uploadedImageUrl,
+      });
 
-      const result = await Createcategory(categoryData);
-
-      if (result.status) {
-        setFormData({ categoryName: "", image: null });
-        setImagePreview(null);
+      if (result.success) {
         setIsDialogOpen(false);
         dispatch(fetchAllCategories());
         addToast({
@@ -156,7 +209,7 @@ export function Categoriestable() {
     } catch (error) {
       addToast({
         title: `"Error creating category`,
-        description: error,
+        description: error.message || error,
         variant: "destructive",
         duration: 2000,
       });
@@ -167,7 +220,6 @@ export function Categoriestable() {
 
   const resetForm = () => {
     setFormData({ categoryName: "", subcategoryName: "", image: null });
-    setImagePreview(null);
   };
 
   const handleDelete = async (deleteid) => {
@@ -176,7 +228,7 @@ export function Categoriestable() {
     try {
       const result = await Deletecategory(deleteid);
 
-      if (result.status) {
+      if (result.success) {
         dispatch(fetchAllCategories());
       } else {
       }
@@ -187,29 +239,32 @@ export function Categoriestable() {
     }
   };
 
-  const handleUpload = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result;
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file: base64 }),
-      });
+  const addSeasonalTrend = () => {
+    if (newTrend.season && newTrend.demand) {
+      setFormData((prev) => ({
+        ...prev,
+        seasonalTrends: [...prev.seasonalTrends, newTrend],
+      }));
+      setNewTrend({ season: "", demand: "" });
+    }
+  };
 
-      const data = await res.json();
-      if (data.success) {
-        console.log("Uploaded image URL:", data.url);
-      } else {
-        console.error("Upload failed");
-      }
-    };
-
-    reader.readAsDataURL(file);
+  const removeSeasonalTrend = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      seasonalTrends: prev.seasonalTrends.filter((_, i) => i !== index),
+    }));
   };
 
   return (
@@ -221,6 +276,7 @@ export function Categoriestable() {
               <CardTitle className="flex items-center gap-2">
                 <Tag className="h-5 w-5" />
                 Categories Management
+                {/* <input type="file" accept="image/*" onChange={handleUpload} /> */}
               </CardTitle>
               <CardDescription>Manage and view all categories</CardDescription>
             </div>
@@ -231,129 +287,168 @@ export function Categoriestable() {
                   Add New
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
+              <DialogContent className="sm:max-w-[600px] h-[95vh] overflow-hidden">
                 <DialogHeader>
                   <DialogTitle>Create New Category</DialogTitle>
-                  <DialogDescription>Add a new category</DialogDescription>
+                  <DialogDescription>
+                    {" "}
+                    Add a new category with all the necessary details and
+                    configurations.
+                  </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-4">
-                    {/* Category Name */}
-                    <div className="space-y-2">
-                      <Label htmlFor="categoryName">Category Name</Label>
-                      <Input
-                        id="categoryName"
-                        placeholder="Enter category name"
-                        value={formData.categoryName}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            categoryName: e.target.value,
-                          }))
-                        }
-                        required
-                      />
-                    </div>
+                <ScrollArea className={"h-[80vh] w-full"}>
+                  <Card className="border-0 w-full">
+                    <CardContent className="pb-8">
+                      <form className="space-y-6">
+                        {/* Basic Information */}
+                        <div className="grid grid-cols-1 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Category Name *</Label>
+                            <Input
+                              id="name"
+                              value={formData.name}
+                              onChange={(e) =>
+                                handleInputChange("name", e.target.value)
+                              }
+                              placeholder="Enter category name"
+                              required
+                            />
+                          </div>
+                        </div>
 
-                    {/* Subcategory Name */}
-                    {/* <div className="space-y-2">
-                      <Label htmlFor="subcategoryName">Subcategory Name</Label>
-                      <Input
-                        id="subcategoryName"
-                        placeholder="Enter subcategory name"
-                        value={formData.subcategoryName}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, subcategoryName: e.target.value }))}
-                        required
-                      />
-                    </div> */}
+                        {/* Image Upload */}
+                        <div className="space-y-2">
+                          <Label htmlFor="image">Category Image</Label>
+                          <div className="flex items-center gap-4">
+                            <Input type="file" onChange={handleFileChange} />
+                          </div>
+                        </div>
 
-                    {/* Image Upload */}
-                    <div className="space-y-2">
-                      <Label>Category Image</Label>
-                      <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
-                        {imagePreview ? (
-                          <div className="relative">
-                            <div className="relative h-32 w-full rounded-md overflow-hidden bg-muted">
-                              <Image
-                                src={imagePreview || "/placeholder.svg"}
-                                alt="Preview"
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                              onPress={removeImage}
+                        {/* Description */}
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea
+                            id="description"
+                            value={formData.description}
+                            onChange={(e) =>
+                              handleInputChange("description", e.target.value)
+                            }
+                            placeholder="Enter category description"
+                            className="min-h-[100px]"
+                          />
+                        </div>
+
+                        {/* Seasonal Trends */}
+                        <div className="space-y-4">
+                          <Label>Seasonal Trends</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+                            <Select
+                              value={newTrend.season}
+                              onValueChange={(value) =>
+                                setNewTrend((prev) => ({
+                                  ...prev,
+                                  season: value,
+                                }))
+                              }
                             >
-                              <X className="h-3 w-3" />
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select season" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {seasons.map((season) => (
+                                  <SelectItem key={season} value={season}>
+                                    {season}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Select
+                              value={newTrend.demand}
+                              onValueChange={(value) =>
+                                setNewTrend((prev) => ({
+                                  ...prev,
+                                  demand: value,
+                                }))
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select demand" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {demandLevels.map((level) => (
+                                  <SelectItem key={level} value={level}>
+                                    {level}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              className="bg-[#106C83] rounded-lg text-white h-9"
+                              type="button"
+                              onPress={addSeasonalTrend}
+                              size="sm"
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Trend
                             </Button>
                           </div>
-                        ) : (
-                          <div className="text-center flex justify-center items-center gap-2 flex-col">
-                            <Upload
-                              htmlFor="image-upload"
-                              className="mx-auto h-8 w-8 text-muted-foreground"
-                            />
-                            <div className="mt-2">
-                              <Label
-                                htmlFor="image-upload"
-                                className="cursor-pointer"
+                          <div className="space-y-2">
+                            {formData.seasonalTrends.map((trend, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-muted rounded-lg"
                               >
-                                <span className="text-sm text-center font-medium  bg-[#106C83] p-2 rounded-full text-white hover:text-primary/80">
-                                  Click to upload
+                                <span className="text-sm">
+                                  <strong>{trend.season}:</strong>{" "}
+                                  {trend.demand} demand
                                 </span>
-                              </Label>
-                              <Input
-                                id="image-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageChange}
-                              />
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              PNG, JPG, GIF up to 10MB
-                            </p>
+                                <X
+                                  className="w-4 h-4 cursor-pointer hover:text-red-500"
+                                  onClick={() => removeSeasonalTrend(index)}
+                                />
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                        </div>
 
-                  <DialogFooter>
+                        {/* Popularity Score and Status */}
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="isActive">Status</Label>
+                            <div className="flex items-center space-x-2 pt-2">
+                              <Switch
+                                id="isActive"
+                                checked={formData.isActive}
+                                onCheckedChange={(checked) =>
+                                  handleInputChange("isActive", checked)
+                                }
+                              />
+                              <Label htmlFor="isActive" className="text-sm">
+                                {formData.isActive ? "Active" : "Inactive"}
+                              </Label>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+                </ScrollArea>
+
+                <DialogFooter className="absolute bottom-0  w-full px-8 bg-white">
+                  <div className="flex justify-end gap-4 py-2">
+                  
                     <Button
-                      type="button"
-                      variant="outline"
-                      onPress={() => {
-                        resetForm();
-                        setIsDialogOpen(false);
-                      }}
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer"
+                      onPress={handleSubmit}
+                      className="bg-[#106C83] rounded-lg text-white h-9 w-44"
                     >
                       {isSubmitting ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Creating...
-                        </>
+                        <span className="loader"></span>
                       ) : (
-                        <>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create
-                        </>
+                        "Create Category"
                       )}
                     </Button>
-                  </DialogFooter>
-                </form>
+                  </div>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
@@ -396,8 +491,8 @@ export function Categoriestable() {
                         <TableCell>
                           <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted">
                             <Image
-                              src={subcategory?.Image}
-                              alt={subcategory?.Categoryname}
+                              src={subcategory?.image}
+                              alt={subcategory?.name}
                               fill
                               className="object-cover"
                             />
@@ -406,7 +501,7 @@ export function Categoriestable() {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">
-                              {subcategory?.Categoryname}
+                              {subcategory?.name}
                             </span>
                             <span className="text-sm text-muted-foreground">
                               ID: {subcategory?._id.slice(-8)}

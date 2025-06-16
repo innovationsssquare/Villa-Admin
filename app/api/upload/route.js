@@ -6,7 +6,6 @@ export const dynamic = "force-dynamic"
 export async function POST(req) {
   try {
     const { file } = await req.json() // base64 string
-
     if (!file) {
       return Response.json({ error: "No file provided" }, { status: 400 })
     }
