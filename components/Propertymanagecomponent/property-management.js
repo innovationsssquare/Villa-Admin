@@ -257,7 +257,7 @@ useEffect(() => {
             onClick={() => setisapproved("")}
             className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
-            Owner's Properties
+           {` Owner's Properties`}
           </TabsTrigger>
           <TabsTrigger
             value="active"
