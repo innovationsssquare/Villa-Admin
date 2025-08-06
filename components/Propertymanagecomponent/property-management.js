@@ -19,13 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import DocumentApprovalPage from "./document-approval";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { MapPin, Mail, Phone, Store, ChevronRight } from "lucide-react";
-import dashiconsstore from "@/public/Asset/dashiconsstore.png";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllPropertiesowner } from "@/lib/Redux/Slices/ownerSlice";
+import { fetchAllProperties } from "@/lib/Redux/Slices/sellarSlice";
 import {
   Pagination,
   PaginationContent,
@@ -35,46 +33,63 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
-import Profilecard from "./Profilecard";
 import { Badge } from "@/components/ui/badge";
 import { fetchAllCategories } from "@/lib/Redux/Slices/masterSlice";
 
 export default function SellersManagement() {
   const [selectedValue, setSelectedValue] = useState("");
   const [sortValue, setSortValue] = useState("sort-by");
-  const [isVerified, setisVerified] = useState();
-  const [Tab, setTab] = useState(false);
+  const [isapproved, setisapproved] = useState("");
+  const [Tab, setTab] = useState("applications");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
-  const { data, loading, error, datapagination } = useSelector(
-    (state) => state.owner
-  );
+  const { data, loading, error ,datapagination} = useSelector((state) => state.sellar);
   const [filteredData, setFilteredData] = useState([]);
+  const { analytics, loadinganalytics, analyticserror } = useSelector(
+    (state) => state.sellar
+  );
   const { categories } = useSelector((state) => state.master);
 
+  
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(
-      fetchAllPropertiesowner({
-        isVerified,
-        page: currentPage,
-        limit: itemsPerPage,
-      })
-    );
-  }, [dispatch, isVerified, itemsPerPage, currentPage]);
+  if (selectedValue) {
+      dispatch(
+        fetchAllProperties({
+          id: selectedValue,
+          isapproved,
+          page: currentPage,
+          limit: itemsPerPage,
+        })
+      );
+    }
+  }, [dispatch, selectedValue, isapproved,itemsPerPage,currentPage]);
 
   useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
 
-  const handletabchange = (value) => {
-    setTab(value);
-    setisVerified(value);
+useEffect(() => {
+  if (categories?.length > 0) {
+    setSelectedValue(categories[0]?._id); 
+  }
+}, [categories]);
+
+  const handleSelectChange = (value) => {
+    setSelectedValue(value);
   };
 
-  const handlePageChange = (newPage) => {
+
+
+  const handletabchange = (value) => {
+    setTab(value);
+  };
+
+
+
+ const handlePageChange = (newPage) => {
     const pagination = getCurrentPagination();
     if (
       pagination &&
@@ -88,7 +103,7 @@ export default function SellersManagement() {
 
   // Get current pagination data based on active tab
   const getCurrentPagination = () => {
-    return datapagination;
+    return datapagination
   };
 
   // Generate page numbers to display
@@ -137,7 +152,8 @@ export default function SellersManagement() {
   // Reset to page 1 when switching tabs
   useEffect(() => {
     setCurrentPage(1);
-  }, [isVerified]);
+  }, [isapproved]);
+
 
   const renderPaginationAlways = () => {
     const pagination = getCurrentPagination();
@@ -229,29 +245,86 @@ export default function SellersManagement() {
     );
   };
 
+
   return (
     <div className="w-full rounded-lg border h-full bg-white p-4">
       {/* Main Tabs */}
       <Tabs value={Tab} onValueChange={handletabchange} className="">
         <TabsList className="p-0 bg-transparent space-x-2 h-auto">
           <TabsTrigger
-            value={false}
-            onClick={() => setisVerified(false)}
+            value="applications"
+            onClick={() => setisapproved("")}
             className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
-            Unverified Owners
+            Owner's Properties
           </TabsTrigger>
           <TabsTrigger
-            value={true}
-            onClick={() => setisVerified(true)}
+            value="active"
+            onClick={() => setisapproved("approved")}
             className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
-            Verified Owners
+            Approved Properties
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={false}>
+        <TabsContent value="applications">
           {/* Profile Tabs and Filters */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="border-b border-gray-200 w-full">
+              <div className="flex -mb-px">
+                <button
+                  onClick={() => setisapproved("")}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                    isapproved === ""
+                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  All Properties
+                </button>
+                <button
+                  onClick={() => setisapproved("pending")}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                    isapproved === "pending"
+                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Pending for Approval
+                </button>
+                <button
+                  onClick={() => setisapproved("rejected")}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                    isapproved === "rejected"
+                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Rejected Properties
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 ml-4 shrink-0">
+              <Select value={selectedValue} onValueChange={handleSelectChange}>
+                <SelectTrigger className="h-full w-44 border rounded-l-md  focus:ring-0 focus:ring-offset-0">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.length > 0 ? (
+                    categories.map((Category) => (
+                      <SelectItem key={Category._id} value={Category._id}>
+                        {Category?.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-1 text-center text-sm">
+                      No Category available
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           {/* Table */}
           <div className=" rounded-md">
@@ -265,31 +338,19 @@ export default function SellersManagement() {
               </div>
             ) : data?.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No Owners available
+                No seller applications available
               </div>
             ) : (
               <Table>
                 <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
                   <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Owner Name
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Email
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Phone No
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Total Properties
-                    </TableHead>
-
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Action
-                    </TableHead>
+                     <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Owner</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Name</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Category</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Location</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Phone No</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Status</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -299,24 +360,27 @@ export default function SellersManagement() {
                       className="border-b border-gray-200 h-12"
                     >
                       <TableCell className="font-medium">
+                        {application?.owner?.name}
+                      </TableCell>
+                      <TableCell>
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.phone}</TableCell>
-                      <TableCell>{application?.properties?.length}</TableCell>
+                      <TableCell>{application?.category?.name}</TableCell>
+                      <TableCell>{application.location?.area}</TableCell>
+                      <TableCell>{application?.Number}</TableCell>
                       <TableCell>
                         <Badge
                           className={`font-medium ${
-                            application.isVerified === false
-                              ? "text-red-500 border-red-200 bg-red-50"
-                              : application.isVerified ===true
+                            application.isapproved === "pending"
+                              ? "text-amber-500 border-amber-200 bg-amber-50"
+                              : application.isapproved === "approved"
                               ? "text-green-500 border-green-200 bg-green-50"
-                              : application.isVerified === "rejected"
+                              : application.isapproved === "rejected"
                               ? "text-red-500"
                               : "text-gray-500"
                           }`}
                         >
-                          {application.isVerified?"Verified":"Not Verified"}
+                          {application.isapproved}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -352,8 +416,45 @@ export default function SellersManagement() {
           </div>
         </TabsContent>
 
-        <TabsContent value={true}>
-           <div className=" rounded-md">
+        <TabsContent value="active">
+          <div className="flex justify-between items-center mb-4">
+            <div className="border-b border-gray-200 w-full">
+              <div className="flex -mb-px">
+                <button
+                  onClick={() => setisapproved("approved")}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                    isapproved === "approved"
+                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  All Approved Properties
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 ml-4 shrink-0">
+              <Select value={selectedValue} onValueChange={handleSelectChange}>
+                <SelectTrigger className="h-full w-44 border rounded-l-md  focus:ring-0 focus:ring-offset-0">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.length > 0 ? (
+                    categories.map((location) => (
+                      <SelectItem key={location._id} value={location._id}>
+                        {location?.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-1 text-center text-sm">
+                      No Category available
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+         <div className=" rounded-md">
             {loading ? (
               <div className="flex items-center justify-center py-10 text-gray-500">
                 <span className="loader2 " />
@@ -364,31 +465,19 @@ export default function SellersManagement() {
               </div>
             ) : data?.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No Owners available
+                No seller applications available
               </div>
             ) : (
               <Table>
                 <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
                   <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Owner Name
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Email
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Phone No
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Total Properties
-                    </TableHead>
-
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      Action
-                    </TableHead>
+                     <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Owner</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Name</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Category</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Location</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Phone No</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Status</TableHead>
+                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -398,24 +487,27 @@ export default function SellersManagement() {
                       className="border-b border-gray-200 h-12"
                     >
                       <TableCell className="font-medium">
+                        {application?.owner?.name}
+                      </TableCell>
+                      <TableCell>
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.phone}</TableCell>
-                      <TableCell>{application?.properties?.length}</TableCell>
+                      <TableCell>{application?.category?.name}</TableCell>
+                      <TableCell>{application.location?.area}</TableCell>
+                      <TableCell>{application?.Number}</TableCell>
                       <TableCell>
                         <Badge
                           className={`font-medium ${
-                            application.isVerified === false
-                              ? "text-red-500 border-red-200 bg-red-50"
-                              : application.isVerified ===true
+                            application.isapproved === "pending"
+                              ? "text-amber-500 border-amber-200 bg-amber-50"
+                              : application.isapproved === "approved"
                               ? "text-green-500 border-green-200 bg-green-50"
-                              : application.isVerified === "rejected"
+                              : application.isapproved === "rejected"
                               ? "text-red-500"
                               : "text-gray-500"
                           }`}
                         >
-                          {application.isVerified?"Verified":"Not Verified"}
+                          {application.isapproved}
                         </Badge>
                       </TableCell>
                       <TableCell>

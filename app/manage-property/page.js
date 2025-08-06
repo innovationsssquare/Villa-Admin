@@ -1,14 +1,17 @@
-import Statcard from "@/components/Analyticscomponents/Statcard";
-import SellersManagement from "@/components/Productsellercomponents/sellers-management";
 import React from "react";
+import PropertyManagement from "@/components/Propertymanagecomponent/property-management";
+import Statcard from "@/components/Productsellercomponents/Statcard";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const page = () => {
   return (
-    <div className="p-4 bg-gray-50">
+    <ScrollArea className="pb-14 bg-gray-50 h-screen">
+     <section className="p-4">
       <Statcard/>
 
-      <SellersManagement />
-    </div>
+     <PropertyManagement />
+     </section>
+    </ScrollArea>
   );
 };
 

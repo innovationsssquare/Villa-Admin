@@ -6,31 +6,30 @@ import Dash2 from "@/public/Asset/Dash2.png";
 import Dash3 from "@/public/Asset/Dash3.png";
 import Dash4 from "@/public/Asset/Dash4.png";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllSellarscount } from "@/lib/Redux/Slices/sellarSlice";
+import { fetchAllownerscount } from "@/lib/Redux/Slices/ownerSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const Statcard = () => {
+const Ownerstats = () => {
   const { count, loadingcount, counterror } = useSelector(
-    (state) => state.sellar
+    (state) => state.owner
   );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllSellarscount());
+    dispatch(fetchAllownerscount());
   }, [dispatch]);
 
   // Default data if the loading state is active
   const data = {
-    productSellers: count?.totalProperties || 0,
-    serviceProviders: count?.pendingProperties || 0,
-    pendingApprovals: count?.approvedProperties || 0,
-    rejectedProfiles: count?.rejectedProperties || 0,
+    productSellers: count?.totalOwners || 0,
+    serviceProviders: count?.verifiedOwners || 0,
+    pendingApprovals: count?.notVerifiedOwners || 0,
   };
 
   return (
     <div className="overflow-auto">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         {/* Product Sellers Card */}
         <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
           <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
@@ -50,7 +49,7 @@ const Statcard = () => {
             ) : (
               <>
                 <p className="text-sm font-medium text-gray-600">
-                Total Properties
+                Total Owners
                 </p>
 
                 <p className="text-2xl font-bold text-[#106C83]">
@@ -80,7 +79,7 @@ const Statcard = () => {
             ) : (
               <>
                 <p className="text-sm font-medium text-gray-600">
-                 Pending Properties
+                Verified Owners
                 </p>
                 <p className="text-2xl font-bold text-[#106C83]">
                   {data?.serviceProviders}
@@ -109,7 +108,7 @@ const Statcard = () => {
             ) : (
               <>
                 <p className="text-sm font-medium text-gray-600">
-                 Approved Properties
+                 Not Verified Owners
                 </p>
                 <p className="text-2xl font-bold text-[#106C83]">
                   {data?.pendingApprovals}
@@ -120,36 +119,10 @@ const Statcard = () => {
         </div>
 
         {/* Rejected Profiles Card */}
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
-             {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />: <Image
-              src={Dash4}
-              alt="Rejected Profiles"
-              className="object-contain w-10 h-10"
-            />}
-          </div>
-          <div>
-            {loadingcount ? (
-              <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
-              </>
-            ) : (
-              <>
-                <p className="text-sm font-medium text-gray-600">
-                 Rejected Properties
-                </p>
-                <p className="text-2xl font-bold text-[#106C83]">
-                  {data?.rejectedProfiles}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
+       
       </div>
     </div>
   );
 };
 
-export default Statcard;
+export default Ownerstats;

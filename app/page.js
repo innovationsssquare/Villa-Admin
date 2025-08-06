@@ -5,7 +5,7 @@ import User from "@/public/Asset/User.png"
 
 import Statcard from "@/components/Productsellercomponents/Statcard"
 import RevenueOverview from "@/components/Analyticscomponents/revenue-overview"
-import SellerApplicationsTable from "@/components/Analyticscomponents/seller-applications-table"
+// import SellerApplicationsTable from "@/components/Analyticscomponents/seller-applications-table"
 export default function Dashboard() {
   return (
     <ScrollArea className=" bg-gray-50 h-screen pb-14">
@@ -82,7 +82,7 @@ export default function Dashboard() {
           </div>
 
           {/* Applications Table */}
-        <SellerApplicationsTable/>
+        {/* <SellerApplicationsTable/> */}
          
         </div>
      

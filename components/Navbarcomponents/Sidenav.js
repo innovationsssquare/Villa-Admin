@@ -33,30 +33,30 @@ const Sidenav = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const [userName, setUserName] = useState("")
-  const [userAvatar, setUserAvatar] = useState("")
+  const [userName, setUserName] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
 
- useEffect(() => {
+  useEffect(() => {
     // Fetch from localStorage on mount
-    const name = localStorage.getItem("fullName")
-    const avatar = localStorage.getItem("profilePic")
+    const name = localStorage.getItem("fullName");
+    const avatar = localStorage.getItem("profilePic");
 
-    setUserName(name || "Unknown User")
-    setUserAvatar(avatar || "/placeholder.svg")
-  }, [])
+    setUserName(name || "Unknown User");
+    setUserAvatar(avatar || "/placeholder.svg");
+  }, []);
 
   const currentDate = new Date().toLocaleDateString("en-GB", {
     weekday: "long",
     month: "short",
     day: "numeric",
     year: "numeric",
-  })
-
+  });
 
   const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/" },
     { label: "Property Owner", icon: PackageSearch, path: "/property-owner" },
     { label: "Manage Property", icon: Heart, path: "/manage-property" },
+    // { label: "Add Property", icon: Heart, path: "/addproperty" },
     { label: "Categories", icon: List, path: "/categories" },
     { label: "All Booking", icon: PackageCheck, path: "/booking" },
     {
@@ -95,20 +95,17 @@ const Sidenav = () => {
       <div className="p-0 sticky top-0 border-b w-full h-16 flex justify-between items-center px-4 transition-all duration-300 ease-in-out">
         {!isMinimized ? (
           <>
-           
-            <div
-              className="w-auto transform transition-all duration-500 ease-in-out"
-            ></div>
+            <div className="w-auto transform transition-all duration-500 ease-in-out"></div>
           </>
         ) : (
           <></>
         )}
 
         <Button
-          variant="ghost"
-          size="icon"
+          variant="light"
           onClick={toggleSidebar}
-          className="h-12 w-12 rounded-full hover:bg-gray-100 cursor-pointer"
+          isIconOnly={true}
+          className="h-12 w-12 rounded-full  hover:bg-gray-100 cursor-pointer"
         >
           {isMinimized ? (
             <PanelLeftOpen
@@ -143,6 +140,8 @@ const Sidenav = () => {
                   <Tooltip key={item.label}>
                     <TooltipTrigger asChild>
                       <Button
+                        variant="light"
+                        isIconOnly={true}
                         onPress={() => router.push(item.path)}
                         className={`w-full flex justify-center cursor-pointer items-center p-2 text-sm rounded-md transition-all duration-900 ${
                           isActive(item.path)
@@ -159,11 +158,12 @@ const Sidenav = () => {
                   </Tooltip>
                 ) : (
                   <Button
+                    variant="light"
                     key={item.label}
                     onPress={() => router.push(item.path)}
                     className={`w-56 flex justify-start cursor-pointer items-center px-4 py-2 text-sm rounded-md transition-all duration-300 ${
                       isActive(item.path)
-                        ? "bg-[#106C83] text-white"
+                        ? "bg-[#106C83] text-white hover:text-gray-700 hover:bg-[#106C83]"
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
@@ -194,10 +194,12 @@ const Sidenav = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      variant="light"
+                      isIconOnly={true}
                       onPress={() => router.push("/settings")}
                       className={`w-full cursor-pointer flex justify-center items-center p-2 text-sm rounded-md transition-all duration-300 ${
                         isActive("/settings")
-                          ? "bg-[#106C83] text-white"
+                          ? "bg-[#106C83] text-white hover:bg-[#106C83]"
                           : "text-gray-700 hover:bg-gray-100"
                       }`}
                     >
@@ -210,10 +212,11 @@ const Sidenav = () => {
                 </Tooltip>
               ) : (
                 <Button
+                  variant="light"
                   onPress={() => router.push("/settings")}
                   className={`w-56 flex justify-start cursor-pointer items-center px-4 py-2 text-sm rounded-md transition-all duration-300 ${
                     isActive("/settings")
-                      ? "bg-[#106C83] text-white"
+                      ? "bg-[#106C83] text-white hover:bg-[#106C83]"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
@@ -258,9 +261,7 @@ const Sidenav = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium">{userName}</p>
-                      <p className="text-xs text-white">
-                        {currentDate}
-                      </p>
+                      <p className="text-xs text-white">{currentDate}</p>
                     </div>
                   </div>
                   <Button
@@ -286,9 +287,7 @@ const Sidenav = () => {
               </div>
               <div className="flex-1 w-56">
                 <p className="text-sm font-medium">{userName}</p>
-                <p className="text-xs text-gray-500 truncate">
-                 {currentDate}
-                </p>
+                <p className="text-xs text-gray-500 truncate">{currentDate}</p>
               </div>
             </>
           )}
