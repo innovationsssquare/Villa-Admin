@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
-function page() {
+function Page() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (

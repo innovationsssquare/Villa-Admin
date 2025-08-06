@@ -33,6 +33,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis
 } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
 import Profilecard from "./Profilecard";
