@@ -321,29 +321,17 @@ export default function SellersManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {application.isapproved === "Approved" ? (
+                  
                           <span
                             onClick={() =>
                               router.push(
-                                `/product-seller/profile/${application?._id}`
+                                `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
                             className="text-[#106C83] cursor-pointer hover:underline font-medium"
                           >
                             View Profile
                           </span>
-                        ) : (
-                          <span
-                            onClick={() =>
-                              router.push(
-                                `/product-seller/profiledoc/${application?._id}`
-                              )
-                            }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Details
-                          </span>
-                        )}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -420,29 +408,18 @@ export default function SellersManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {application.isapproved === "Approved" ? (
+                      
                           <span
                             onClick={() =>
                               router.push(
-                                `/product-seller/profile/${application?._id}`
+                                `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
                             className="text-[#106C83] cursor-pointer hover:underline font-medium"
                           >
                             View Profile
                           </span>
-                        ) : (
-                          <span
-                            onClick={() =>
-                              router.push(
-                                `/product-seller/profiledoc/${application?._id}`
-                              )
-                            }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Details
-                          </span>
-                        )}
+                     
                       </TableCell>
                     </TableRow>
                   ))}

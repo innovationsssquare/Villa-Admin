@@ -31,7 +31,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationEllipsis
+  PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -46,17 +46,18 @@ export default function SellersManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
-  const { data, loading, error ,datapagination} = useSelector((state) => state.sellar);
+  const { data, loading, error, datapagination } = useSelector(
+    (state) => state.sellar
+  );
   const [filteredData, setFilteredData] = useState([]);
   const { analytics, loadinganalytics, analyticserror } = useSelector(
     (state) => state.sellar
   );
   const { categories } = useSelector((state) => state.master);
 
-  
   const dispatch = useDispatch();
   useEffect(() => {
-  if (selectedValue) {
+    if (selectedValue) {
       dispatch(
         fetchAllProperties({
           id: selectedValue,
@@ -66,31 +67,27 @@ export default function SellersManagement() {
         })
       );
     }
-  }, [dispatch, selectedValue, isapproved,itemsPerPage,currentPage]);
+  }, [dispatch, selectedValue, isapproved, itemsPerPage, currentPage]);
 
   useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
 
-useEffect(() => {
-  if (categories?.length > 0) {
-    setSelectedValue(categories[0]?._id); 
-  }
-}, [categories]);
+  useEffect(() => {
+    if (categories?.length > 0) {
+      setSelectedValue(categories[0]?._id);
+    }
+  }, [categories]);
 
   const handleSelectChange = (value) => {
     setSelectedValue(value);
   };
 
-
-
   const handletabchange = (value) => {
     setTab(value);
   };
 
-
-
- const handlePageChange = (newPage) => {
+  const handlePageChange = (newPage) => {
     const pagination = getCurrentPagination();
     if (
       pagination &&
@@ -104,7 +101,7 @@ useEffect(() => {
 
   // Get current pagination data based on active tab
   const getCurrentPagination = () => {
-    return datapagination
+    return datapagination;
   };
 
   // Generate page numbers to display
@@ -154,7 +151,6 @@ useEffect(() => {
   useEffect(() => {
     setCurrentPage(1);
   }, [isapproved]);
-
 
   const renderPaginationAlways = () => {
     const pagination = getCurrentPagination();
@@ -246,7 +242,6 @@ useEffect(() => {
     );
   };
 
-
   return (
     <div className="w-full rounded-lg border h-full bg-white p-4">
       {/* Main Tabs */}
@@ -257,7 +252,7 @@ useEffect(() => {
             onClick={() => setisapproved("")}
             className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
-           {` Owner's Properties`}
+            {` Owner's Properties`}
           </TabsTrigger>
           <TabsTrigger
             value="active"
@@ -339,19 +334,33 @@ useEffect(() => {
               </div>
             ) : data?.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No seller applications available
+                No data available
               </div>
             ) : (
               <Table>
                 <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
                   <TableRow className="">
-                     <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Owner</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Name</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Category</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Location</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Phone No</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Status</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Action</TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Property Name
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Property Owner
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Category
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Location
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Phone No
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -361,11 +370,9 @@ useEffect(() => {
                       className="border-b border-gray-200 h-12"
                     >
                       <TableCell className="font-medium">
-                        {application?.owner?.name}
-                      </TableCell>
-                      <TableCell>
                         {application?.name}
                       </TableCell>
+                      <TableCell>{application?.owner?.name}</TableCell>
                       <TableCell>{application?.category?.name}</TableCell>
                       <TableCell>{application.location?.area}</TableCell>
                       <TableCell>{application?.Number}</TableCell>
@@ -373,41 +380,33 @@ useEffect(() => {
                         <Badge
                           className={`font-medium ${
                             application.isapproved === "pending"
-                              ? "text-amber-500 border-amber-200 bg-amber-50"
+                              ? "text-amber-500 border-amber-200 bg-amber-50 capitalize"
                               : application.isapproved === "approved"
-                              ? "text-green-500 border-green-200 bg-green-50"
+                              ? "text-green-500 border-green-200 bg-green-50 capitalize"
                               : application.isapproved === "rejected"
-                              ? "text-red-500"
+                              ? "text-red-500 bg-red-50 border-red-200 capitalize"
                               : "text-gray-500"
                           }`}
                         >
-                          {application.isapproved}
+                          {application?.isapproved}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {application.isapproved === "Approved" ? (
-                          <span
-                            onClick={() =>
+                        <span
+                          onClick={() => {
+                            const selectedCategory = categories.find(
+                              (category) => category._id === selectedValue
+                            );
+                            if (selectedCategory) {
                               router.push(
-                                `/product-seller/profile/${application?._id}`
-                              )
+                                `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                              );
                             }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Profile
-                          </span>
-                        ) : (
-                          <span
-                            onClick={() =>
-                              router.push(
-                                `/product-seller/profiledoc/${application?._id}`
-                              )
-                            }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Details
-                          </span>
-                        )}
+                          }}
+                          className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                        >
+                          View Profile
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -455,7 +454,7 @@ useEffect(() => {
             </div>
           </div>
 
-         <div className=" rounded-md">
+          <div className=" rounded-md">
             {loading ? (
               <div className="flex items-center justify-center py-10 text-gray-500">
                 <span className="loader2 " />
@@ -466,19 +465,33 @@ useEffect(() => {
               </div>
             ) : data?.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No seller applications available
+                No data available
               </div>
             ) : (
               <Table>
                 <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
                   <TableRow className="">
-                     <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Owner</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Property Name</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Category</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Location</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Phone No</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Status</TableHead>
-                      <TableHead className="text-xs font-medium text-gray-500 uppercase">Action</TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Property Name
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Property Owner
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Category
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Location
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Phone No
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -488,11 +501,9 @@ useEffect(() => {
                       className="border-b border-gray-200 h-12"
                     >
                       <TableCell className="font-medium">
-                        {application?.owner?.name}
-                      </TableCell>
-                      <TableCell>
                         {application?.name}
                       </TableCell>
+                      <TableCell>{application?.owner?.name}</TableCell>
                       <TableCell>{application?.category?.name}</TableCell>
                       <TableCell>{application.location?.area}</TableCell>
                       <TableCell>{application?.Number}</TableCell>
@@ -500,41 +511,33 @@ useEffect(() => {
                         <Badge
                           className={`font-medium ${
                             application.isapproved === "pending"
-                              ? "text-amber-500 border-amber-200 bg-amber-50"
+                              ? "text-amber-500 border-amber-200 bg-amber-50 capitalize"
                               : application.isapproved === "approved"
-                              ? "text-green-500 border-green-200 bg-green-50"
+                              ? "text-green-500 border-green-200 bg-green-50 capitalize"
                               : application.isapproved === "rejected"
-                              ? "text-red-500"
+                              ? "text-red-500 bg-red-50 border-red-200 capitalize"
                               : "text-gray-500"
                           }`}
                         >
-                          {application.isapproved}
+                          {application?.isapproved}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {application.isapproved === "Approved" ? (
-                          <span
-                            onClick={() =>
+                        <span
+                          onClick={() => {
+                            const selectedCategory = categories.find(
+                              (category) => category._id === selectedValue
+                            );
+                            if (selectedCategory) {
                               router.push(
-                                `/product-seller/profile/${application?._id}`
-                              )
+                                `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                              );
                             }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Profile
-                          </span>
-                        ) : (
-                          <span
-                            onClick={() =>
-                              router.push(
-                                `/product-seller/profiledoc/${application?._id}`
-                              )
-                            }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
-                          >
-                            View Details
-                          </span>
-                        )}
+                          }}
+                          className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                        >
+                          View Profile
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}
