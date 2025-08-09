@@ -3,6 +3,7 @@ import "./globals.css";
 import { NextuiProviderWrapper } from "./providers";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { Providers } from "@/lib/Redux/provider";
+import KeepAlive from "@/components/Logincomponents/Keepalive";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,10 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <NextuiProviderWrapper>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+            <KeepAlive/>
+            {children}
+            </ToastProvider>
           </NextuiProviderWrapper>
         </body>
       </html>
