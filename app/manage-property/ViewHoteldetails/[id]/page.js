@@ -10,11 +10,13 @@ import {
   Shield,
   Utensils,
   Play,
-  Tent,
+  Hotel,
+  Bed,
+  Users,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchcampingbyid } from "@/lib/Redux/Slices/campingSlice";
+import { fetchhotelbyid } from "@/lib/Redux/Slices/hotelSlice";
 import { BaseUrl } from "@/lib/API/Baseurl";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/toast-provider";
@@ -25,29 +27,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function CampingDetailsPage() {
+export default function HotelDetailsPage() {
   const { addToast } = useToast();
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
   const { id } = params;
-  const { data, loading, error } = useSelector((state) => state.camping);
+  const { data, loading, error } = useSelector((state) => state.hotel);
   const [commission, setCommission] = useState(0);
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
-  const [selectedTent, setSelectedTent] = useState(0);
+  const [selectedRoom, setSelectedRoom] = useState(0);
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchcampingbyid(id));
+      dispatch(fetchhotelbyid(id));
     }
   }, [dispatch, id]);
 
-  const handleCampingStatus = async (status) => {
+  const handleHotelStatus = async (status) => {
     if (status === "approved" && (!commission || commission <= 0)) {
       addToast({
-        title: "Commission is required to approve the camping.",
+        title: "Commission is required to approve the hotel.",
         description: "Please enter a valid commission percentage.",
         variant: "destructive",
         duration: 5000,
@@ -56,11 +58,11 @@ export default function CampingDetailsPage() {
     }
 
     const token = Cookies.get("token");
-    const campingId = id;
+    const hotelId = id;
     const body = {
-      campingId: [
+      hotelId: [
         {
-          campingId,
+          hotelId,
           remarks: status,
           commission: commission,
         },
@@ -74,7 +76,7 @@ export default function CampingDetailsPage() {
     }
 
     try {
-      let result = await fetch(`${BaseUrl}/camping/approve/campings`, {
+      let result = await fetch(`${BaseUrl}/hotel/approve/hotels`, {
         method: "PATCH",
         headers: {
           "Content-type": "application/json",
@@ -86,16 +88,16 @@ export default function CampingDetailsPage() {
 
       if (result.success) {
         addToast({
-          title: `Camping ${status} Successfully`,
-          description: result.message || `Camping has been ${status}`,
+          title: `Hotel ${status} Successfully`,
+          description: result.message || `Hotel has been ${status}`,
           variant: "success",
           duration: 5000,
         });
         // Refresh the data
-        dispatch(fetchcampingbyid(id));
+        dispatch(fetchhotelbyid(id));
       } else {
         addToast({
-          title: `Failed to ${status} camping`,
+          title: `Failed to ${status} hotel`,
           description: result.message || "Something went wrong",
           variant: "destructive",
           duration: 5000,
@@ -103,7 +105,7 @@ export default function CampingDetailsPage() {
       }
     } catch (error) {
       addToast({
-        title: `Failed to ${status} camping`,
+        title: `Failed to ${status} hotel`,
         description: error.message,
         variant: "destructive",
         duration: 5000,
@@ -114,54 +116,60 @@ export default function CampingDetailsPage() {
     }
   };
 
-  const getTentTypeIcon = (tentType) => {
-    switch (tentType.toLowerCase()) {
+  const getRoomTypeIcon = (roomType) => {
+    switch (roomType.toLowerCase()) {
       case "single":
-        return "🏕️";
-      case "couple":
-        return "💕";
+        return "🛏️";
+      case "double":
+        return "🛏️🛏️";
+      case "deluxe":
+        return "✨";
+      case "suite":
+        return "🏨";
       case "family":
         return "👨‍👩‍👧‍👦";
-      case "luxury":
-        return "✨";
-      case "treehouse":
-        return "🌳";
+      case "presidential":
+        return "👑";
       default:
-        return "🏕️";
+        return "🛏️";
     }
   };
 
-  const getTentTypeColor = (tentType) => {
-    switch (tentType.toLowerCase()) {
+  const getRoomTypeColor = (roomType) => {
+    switch (roomType.toLowerCase()) {
       case "single":
-        return "bg-blue-100 text-blue-800";
-      case "couple":
-        return "bg-pink-100 text-pink-800";
-      case "family":
+        return "bg-[#106C83]/10 text-[#106C83]";
+      case "double":
         return "bg-green-100 text-green-800";
-      case "luxury":
+      case "deluxe":
         return "bg-purple-100 text-purple-800";
-      case "treehouse":
+      case "suite":
         return "bg-amber-100 text-amber-800";
+      case "family":
+        return "bg-pink-100 text-pink-800";
+      case "presidential":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getTentTypeDescription = (tentType) => {
-    switch (tentType.toLowerCase()) {
+  const getRoomTypeDescription = (roomType) => {
+    switch (roomType.toLowerCase()) {
       case "single":
-        return "Perfect for solo travelers seeking adventure and solitude.";
-      case "couple":
-        return "Romantic getaway for couples with cozy accommodations.";
+        return "Comfortable accommodation for solo travelers.";
+      case "double":
+        return "Spacious room perfect for couples or two guests.";
+      case "deluxe":
+        return "Premium room with enhanced amenities and comfort.";
+      case "suite":
+        return "Luxurious suite with separate living area.";
       case "family":
-        return "Spacious tents designed for families with children.";
-      case "luxury":
-        return "Premium camping experience with high-end amenities.";
-      case "treehouse":
-        return "Unique elevated experience among the trees.";
+        return "Large room designed for families with children.";
+      case "presidential":
+        return "Ultimate luxury experience with exclusive amenities.";
       default:
-        return "Comfortable camping accommodation.";
+        return "Comfortable hotel accommodation.";
     }
   };
 
@@ -177,8 +185,8 @@ export default function CampingDetailsPage() {
     return (
       <div className="w-full flex justify-center items-center h-screen">
         <div className="text-center">
-          <p className="text-red-500 mb-4">Error loading camping details</p>
-          <Button onClick={() => dispatch(fetchcampingbyid(id))}>Retry</Button>
+          <p className="text-red-500 mb-4">Error loading hotel details</p>
+          <Button onClick={() => dispatch(fetchhotelbyid(id))}>Retry</Button>
         </div>
       </div>
     );
@@ -187,7 +195,7 @@ export default function CampingDetailsPage() {
   if (!data) {
     return (
       <div className="w-full flex justify-center items-center h-screen">
-        <p>No camping data found</p>
+        <p>No hotel data found</p>
       </div>
     );
   }
@@ -200,7 +208,7 @@ export default function CampingDetailsPage() {
           className="h-5 w-5 mr-2 cursor-pointer"
           onClick={() => router.back()}
         />
-        <h1 className="text-lg font-bold">Camping Details</h1>
+        <h1 className="text-lg font-bold">Hotel Details</h1>
         <Badge
           className={
             data?.isapproved === "approved"
@@ -218,7 +226,7 @@ export default function CampingDetailsPage() {
       </header>
 
       <div className="p-4">
-        {/* Camping Images */}
+        {/* Hotel Images */}
         <div className="mb-6">
           <div className="rounded-lg overflow-hidden mb-4">
             <Image
@@ -226,7 +234,7 @@ export default function CampingDetailsPage() {
                 data.images?.[imageIndex] ||
                 "/placeholder.svg?height=400&width=600"
               }
-              alt="Camping Image"
+              alt="Hotel Image"
               width={600}
               height={400}
               className="w-full h-80 object-cover"
@@ -258,7 +266,7 @@ export default function CampingDetailsPage() {
           <div className="mb-6">
             <h3 className="font-bold mb-4 flex items-center">
               <Play className="h-5 w-5 mr-2" />
-              Camping Reel
+              Hotel Reel
             </h3>
             <div className="rounded-lg overflow-hidden">
               <video
@@ -275,12 +283,12 @@ export default function CampingDetailsPage() {
           </div>
         )}
 
-        {/* Camping Basic Info */}
+        {/* Hotel Basic Info */}
         <Card className="mb-6">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <Badge className="mb-2">Camping</Badge>
+                <Badge className="mb-2">Hotel</Badge>
                 <h2 className="text-2xl font-bold mb-2">{data.name}</h2>
                 <div className="flex items-center text-gray-600 mb-2">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -289,9 +297,9 @@ export default function CampingDetailsPage() {
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">
-                  <Tent className="h-4 w-4 mr-1" />
+                  <Hotel className="h-4 w-4 mr-1" />
                   <span className="text-sm">
-                    {data.tents?.length} tent types available
+                    {data.rooms?.length} room types available
                   </span>
                 </div>
               </div>
@@ -299,7 +307,7 @@ export default function CampingDetailsPage() {
                 <div className="text-lg font-bold text-[#106C83]">
                   From ₹
                   {Math.min(
-                    ...(data.tents?.map((tent) => tent.pricePerNight) || [0])
+                    ...(data.rooms?.map((room) => room.pricePerNight) || [0])
                   )?.toLocaleString()}
                 </div>
                 <div className="text-sm text-gray-600">per night</div>
@@ -317,63 +325,68 @@ export default function CampingDetailsPage() {
                 <span className="ml-2">₹{data.lateCheckoutCharge}</span>
               </div>
               <div>
-                <span className="font-medium">Commission:</span>
-                <span className="ml-2">₹{data.commission}</span>
+                <span className="font-medium">Total Rooms:</span>
+                <span className="ml-2">
+                  {data.rooms?.reduce(
+                    (total, room) => total + room.totalRooms,
+                    0
+                  )}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Tent Details */}
+        {/* Room Details */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Tent className="h-5 w-5 mr-2" />
-              Available Tents
+              <Bed className="h-5 w-5 mr-2" />
+              Available Rooms
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs
-              value={selectedTent.toString()}
-              onValueChange={(value) => setSelectedTent(Number.parseInt(value))}
+              value={selectedRoom.toString()}
+              onValueChange={(value) => setSelectedRoom(Number.parseInt(value))}
             >
               <TabsList
                 className={`grid w-full ${
-                  data.tents?.length <= 2
+                  data.rooms?.length <= 2
                     ? "grid-cols-2"
-                    : data.tents?.length === 3
+                    : data.rooms?.length === 3
                     ? "grid-cols-3"
-                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                 }`}
               >
-                {data.tents?.map((tent, index) => (
+                {data.rooms?.map((room, index) => (
                   <TabsTrigger
                     key={index}
                     value={index.toString()}
                     className="text-xs md:text-sm"
                   >
-                    {tent.tentType}
+                    {room.roomType}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
-              {data.tents?.map((tent, index) => (
+              {data.rooms?.map((room, index) => (
                 <TabsContent
                   key={index}
                   value={index.toString()}
                   className="mt-4"
                 >
                   <div className="space-y-4">
-                    {/* Tent Images */}
+                    {/* Room Images */}
                     <div className="grid grid-cols-2 gap-2">
-                      {tent.tentimages?.map((img, imgIndex) => (
+                      {room.images?.map((img, imgIndex) => (
                         <div
                           key={imgIndex}
                           className="rounded-lg overflow-hidden"
                         >
                           <Image
                             src={img || "/placeholder.svg"}
-                            alt={`${tent.tentType} tent`}
+                            alt={`${room.roomType} room`}
                             width={200}
                             height={150}
                             className="w-full h-32 object-cover"
@@ -382,49 +395,56 @@ export default function CampingDetailsPage() {
                       ))}
                     </div>
 
-                    {/* Tent Info */}
+                    {/* Room Info */}
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-2xl">
-                        {getTentTypeIcon(tent.tentType)}
+                        {getRoomTypeIcon(room.roomType)}
                       </span>
-                      <Badge className={getTentTypeColor(tent.tentType)}>
-                        {tent.tentType} Tent
+                      <Badge className={getRoomTypeColor(room.roomType)}>
+                        {room.roomType} Room
                       </Badge>
                     </div>
 
                     <div className="mb-4">
                       <p className="text-sm text-gray-600 italic">
-                        {getTentTypeDescription(tent.tentType)}
+                        {getRoomTypeDescription(room.roomType)}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h4 className="font-semibold mb-2">Tent Details</h4>
+                        <h4 className="font-semibold mb-2">Room Details</h4>
                         <div className="space-y-1 text-sm">
                           <div>
                             <span className="font-medium">Type:</span>
-                            <span className="ml-2">{tent.tentType}</span>
+                            <span className="ml-2">{room.roomType}</span>
                           </div>
                           <div>
-                            <span className="font-medium">Total Tents:</span>
-                            <span className="ml-2">{tent.totaltents}</span>
+                            <span className="font-medium">Room Number:</span>
+                            <span className="ml-2">{room.roomNumber}</span>
                           </div>
                           <div>
-                            <span className="font-medium">Capacity:</span>
-                            <span className="ml-2">
-                              {tent.minCapacity} - {tent.maxCapacity} guests
-                            </span>
+                            <span className="font-medium">Total Rooms:</span>
+                            <span className="ml-2">{room.totalRooms}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium">Max Capacity:</span>
+                            <div className="flex items-center ml-2">
+                              <Users className="h-3 w-3 mr-1" />
+                              <span>{room.maxCapacity} guests</span>
+                            </div>
                           </div>
                           <div>
                             <span className="font-medium">Status:</span>
                             <Badge
                               variant={
-                                tent.isAvailable ? "default" : "secondary"
+                                room.status === "available"
+                                  ? "default"
+                                  : "secondary"
                               }
                               className="ml-2"
                             >
-                              {tent.isAvailable ? "Available" : "Not Available"}
+                              {room.status}
                             </Badge>
                           </div>
                         </div>
@@ -432,23 +452,33 @@ export default function CampingDetailsPage() {
                       <div>
                         <h4 className="font-semibold mb-2">Pricing</h4>
                         <div className="text-2xl font-bold text-[#106C83] mb-2">
-                          ₹{tent.pricePerNight?.toLocaleString()}
+                          ₹{room.pricePerNight?.toLocaleString()}
                         </div>
                         <div className="text-sm text-gray-600">per night</div>
                       </div>
                     </div>
 
-                    {/* Tent Amenities */}
+                    {/* Room Amenities */}
                     <div>
-                      <h4 className="font-semibold mb-2">Tent Amenities</h4>
+                      <h4 className="font-semibold mb-2">Room Amenities</h4>
                       <div className="flex flex-wrap gap-2">
-                        {tent.amenities?.map((amenity, amenityIndex) => (
+                        {room.amenities?.map((amenity, amenityIndex) => (
                           <Badge key={amenityIndex} variant="outline">
                             {amenity}
                           </Badge>
                         ))}
                       </div>
                     </div>
+
+                    {/* Booked Dates */}
+                    {room.bookedDates && room.bookedDates.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Booked Dates</h4>
+                        <div className="text-sm text-gray-600">
+                          {room.bookedDates.length} booking(s) found
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
               ))}
@@ -485,39 +515,43 @@ export default function CampingDetailsPage() {
         </Card>
 
         {/* General Amenities */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">General Amenities</h3>
-            <div className="flex flex-wrap gap-2">
-              {data.amenities?.map((amenity, index) => (
-                <Badge key={index} variant="outline">
-                  {amenity}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {data.amenities && data.amenities.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h3 className="font-bold mb-4">Hotel Amenities</h3>
+              <div className="flex flex-wrap gap-2">
+                {data.amenities?.map((amenity, index) => (
+                  <Badge key={index} variant="outline">
+                    {amenity}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Camping Rules */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Shield className="h-5 w-5 mr-2" />
-              Camping Rules
-            </h3>
-            <ul className="space-y-2">
-              {data.CampingRules?.map((rule, index) => (
-                <li
-                  key={index}
-                  className="text-sm text-gray-700 flex items-start"
-                >
-                  <span className="w-2 h-2 bg-[#106C83] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+        {/* Hotel Rules */}
+        {data.HotelRules && data.HotelRules.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h3 className="font-bold mb-4 flex items-center">
+                <Shield className="h-5 w-5 mr-2" />
+                Hotel Rules
+              </h3>
+              <ul className="space-y-2">
+                {data.HotelRules?.map((rule, index) => (
+                  <li
+                    key={index}
+                    className="text-sm text-gray-700 flex items-start"
+                  >
+                    <span className="w-2 h-2 bg-[#106C83] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    {rule}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Food Options */}
         {data.foodOptions && (
@@ -552,7 +586,7 @@ export default function CampingDetailsPage() {
                 href={data.location.maplink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#106C83] hover:underline"
+                className="text-[#106C83] hover:underline hover:text-[#0e5c6f]"
               >
                 View on Google Maps
               </a>
@@ -560,10 +594,10 @@ export default function CampingDetailsPage() {
           </Card>
         )}
 
-        {/* Camping Stats */}
+        {/* Hotel Stats */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Camping Statistics</h3>
+            <h3 className="font-bold mb-4">Hotel Statistics</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium">Average Rating:</span>
@@ -589,7 +623,6 @@ export default function CampingDetailsPage() {
           </CardContent>
         </Card>
 
-        {/* Commission Section - Only show if camping is pending approval */}
         {data.isapproved === "pending" && (
           <>
             <Card className="my-6">
@@ -617,18 +650,18 @@ export default function CampingDetailsPage() {
             {/* Action Buttons */}
             <div className="flex gap-4 mb-8">
               <Button
-                onClick={() => handleCampingStatus("approved")}
-                className="flex-1 bg-[#106C83] hover:bg-[#0d5a6e]"
+                onClick={() => handleHotelStatus("approved")}
+                className="flex-1 bg-[#106C83] hover:bg-[#0e5c6f]"
                 disabled={loadingApprove}
               >
                 {loadingApprove ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 ) : (
-                  "Approve Camping"
+                  "Approve Hotel"
                 )}
               </Button>
               <Button
-                onClick={() => handleCampingStatus("rejected")}
+                onClick={() => handleHotelStatus("rejected")}
                 variant="outline"
                 className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
                 disabled={loadingReject}
@@ -636,7 +669,7 @@ export default function CampingDetailsPage() {
                 {loadingReject ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
                 ) : (
-                  "Reject Camping"
+                  "Reject Hotel"
                 )}
               </Button>
             </div>
