@@ -16,7 +16,7 @@ const KeepAlive = () => {
       } catch (error) {
         console.error('Error pinging server:', error);
       }
-    },  1000); // Every 10 minutes (600,000 ms)
+    }, 10 * 60 * 1000); // Every 10 minutes (600,000 ms)
 
     // Cleanup the interval on component unmount
     return () => clearInterval(interval);
