@@ -60,13 +60,10 @@ export default function HotelDetailsPage() {
     const token = Cookies.get("token");
     const hotelId = id;
     const body = {
-      hotelId: [
-        {
-          hotelId,
-          remarks: status,
-          commission: commission,
-        },
-      ],
+      id:hotelId,
+      status:status,
+      commission:commission,
+      isLive:true,
     };
 
     if (status === "approved") {
@@ -76,8 +73,8 @@ export default function HotelDetailsPage() {
     }
 
     try {
-      let result = await fetch(`${BaseUrl}/hotel/approve/hotels`, {
-        method: "PATCH",
+      let result = await fetch(`${BaseUrl}/Hotel/approve-reject/${hotelId}`, {
+        method: "PUT",
         headers: {
           "Content-type": "application/json",
           token: token,

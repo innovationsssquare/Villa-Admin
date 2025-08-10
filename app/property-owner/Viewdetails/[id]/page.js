@@ -20,6 +20,7 @@ import {
   User,
   Mail,
   Phone,
+  ChevronLeft ,
   Hash,
   BadgeIcon as IdCard,
 } from "lucide-react";
@@ -114,6 +115,7 @@ export default function OwnerDetailsClient() {
   const { singleowner, singleloading, singleerror } = useSelector(
     (state) => state.owner
   );
+  const router = useRouter();
 
   const dispatch = useDispatch();
 
@@ -177,6 +179,13 @@ export default function OwnerDetailsClient() {
       ) : (
         <ScrollArea className="w-full mx-auto bg-white h-screen pb-14 px-4 pt-6 ">
           <div className="space-y-6">
+          <div className=" flex items-center gap-2">
+             <ChevronLeft
+          className="h-5 w-5 mr-2 cursor-pointer"
+          onClick={() => router.back()}
+        />
+        <h1 className="text-lg font-bold">Owner Details</h1>
+          </div>
             {/* Header */}
             <Card>
               <CardContent className="p-6">
@@ -225,7 +234,7 @@ export default function OwnerDetailsClient() {
                         />
                         <span className="inline-flex items-center gap-1">
                           <Phone className="h-4 w-4" />{" "}
-                          {singleowner?.phone || "No phone"}
+                          {singleowner?.bankDetails?.phone || "No phone"}
                         </span>
                         <Separator
                           orientation="vertical"
@@ -280,7 +289,7 @@ export default function OwnerDetailsClient() {
                     <CreditCard className="h-4 w-4" />
                     Bank details
                   </div>
-                  {singleowner?.bankDetailsUpdated ? (
+                  {singleowner?.bankDetails ? (
                     <Badge className="bg-emerald-600 text-white">Updated</Badge>
                   ) : (
                     <Badge variant="secondary">Not Updated</Badge>
@@ -351,7 +360,7 @@ export default function OwnerDetailsClient() {
                 />
                 <CheckItem ok={hasBankDetails} label="Bank details present" />
                 <CheckItem ok={!!singleowner?.email} label="Email provided" />
-                <CheckItem ok={!!singleowner?.phone} label="Phone provided" />
+                <CheckItem ok={!!singleowner?.bankDetails?.phone} label="Phone provided" />
               </CardContent>
             </Card>
 

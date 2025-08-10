@@ -303,7 +303,7 @@ export default function SellersManagement() {
                         {application?.name}
                       </TableCell>
                       <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.phone}</TableCell>
+                      <TableCell>{application?.bankDetails?.phone}</TableCell>
                       <TableCell>{application?.properties?.length}</TableCell>
                       <TableCell>
                         <Badge
@@ -390,7 +390,7 @@ export default function SellersManagement() {
                         {application?.name}
                       </TableCell>
                       <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.phone}</TableCell>
+                      <TableCell>{application?.bankDetails?.phone}</TableCell>
                       <TableCell>{application?.properties?.length}</TableCell>
                       <TableCell>
                         <Badge

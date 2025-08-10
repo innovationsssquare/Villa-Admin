@@ -59,13 +59,10 @@ export default function CottageDetailsPage() {
     const token = Cookies.get("token");
     const cottageId = id;
     const body = {
-      cottageId: [
-        {
-          cottageId,
-          remarks: status,
-          commission: commission,
-        },
-      ],
+      id: cottageId,
+      status: status,
+      commission: commission,
+      isLive:true
     };
 
     if (status === "approved") {
@@ -75,14 +72,17 @@ export default function CottageDetailsPage() {
     }
 
     try {
-      let result = await fetch(`${BaseUrl}/cottage/approve/cottages`, {
-        method: "PATCH",
-        headers: {
-          "Content-type": "application/json",
-          token: token,
-        },
-        body: JSON.stringify(body),
-      });
+      let result = await fetch(
+        `${BaseUrl}/Cottage/approve-reject/${cottageId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+            token: token,
+          },
+          body: JSON.stringify(body),
+        }
+      );
       result = await result.json();
 
       if (result.success) {
