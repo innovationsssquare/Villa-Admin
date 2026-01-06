@@ -19,18 +19,78 @@ const LocationForm = ({ location, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: location?.name || "",
     type: location?.type || "city",
-    coordinates: location?.coordinates || [73.4149859407758, 18.754284332995855],
+    coordinates: location?.coordinates || [
+      73.4149859407758, 18.754284332995855,
+    ],
     description: location?.description || "",
     features: location?.features || [],
     isPopular: location?.isPopular || false,
+    coverImage: location?.coverImage || "",
   });
 
   const [newFeature, setNewFeature] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    location?.coverImage || null
+  );
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+
+const handleImageChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  setSelectedFile(file);
+
+  const reader = new FileReader();
+  reader.onloadend = () => setImagePreview(reader.result);
+  reader.readAsDataURL(file);
+};
+
+const removeImage = () => {
+  setSelectedFile(null);
+  setImagePreview(null);
+  setFormData((prev) => ({ ...prev, coverImage: "" }));
+};
+
+const uploadImage = async (file) => {
+  if (!file) return null;
+
+  const reader = new FileReader();
+  const base64 = await new Promise((resolve, reject) => {
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ file: base64 }),
+  });
+
+  const data = await res.json();
+  if (!data.success) throw new Error("Image upload failed");
+  return data.url;
+};
+
+
+
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  let uploadedImageUrl = formData.coverImage;
+
+  if (selectedFile) {
+    uploadedImageUrl = await uploadImage(selectedFile);
+  }
+
+  onSubmit({
+    ...formData,
+    coverImage: uploadedImageUrl,
+  });
+};
+
 
   const addFeature = () => {
     if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
@@ -156,6 +216,42 @@ const LocationForm = ({ location, onSubmit, onCancel }) => {
           }
         />
       </div>
+<div className="space-y-2">
+  <Label>Cover Image</Label>
+
+  <div className="border-2 border-dashed rounded-lg p-4 flex items-center justify-center">
+    {imagePreview ? (
+      <div className="relative h-32 w-32 rounded-md overflow-hidden">
+        <img
+          src={imagePreview}
+          alt="Cover preview"
+          className="h-full w-full object-cover"
+        />
+        <Button
+          type="button"
+          size="sm"
+          variant="destructive"
+          className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+          onClick={removeImage}
+        >
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    ) : (
+      <label className="cursor-pointer text-sm text-muted-foreground">
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageChange}
+        />
+        Click to upload image
+      </label>
+    )}
+  </div>
+</div>
+
+
 
       <div className="flex gap-3 pt-4">
         <Button

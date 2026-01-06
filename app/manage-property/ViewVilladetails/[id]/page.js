@@ -23,6 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import VideoModal from "@/components/Propertymanagecomponent/VideoModal";
 
 export default function VillaDetailsPage() {
   const { addToast } = useToast();
@@ -176,7 +177,7 @@ export default function VillaDetailsPage() {
               className="w-full h-80 object-cover"
             />
           </div>
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="flex gap-2 overflow-x-auto items-center justify-between">
             {data.images?.map((img, key) => (
               <div
                 key={key}
@@ -194,30 +195,16 @@ export default function VillaDetailsPage() {
                 />
               </div>
             ))}
+            {data?.reelVideo && (
+              <div className="">
+                <VideoModal
+                  thumbnailSrc={data?.images[0]}
+                  videoUrl={data?.reelVideo}
+                />
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Reel Video */}
-        {data.reelVideo && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Play className="h-5 w-5 mr-2" />
-              Villa Reel
-            </h3>
-            <div className="rounded-lg overflow-hidden">
-              <video
-                controls
-                className="w-full h-64 object-cover"
-                poster={
-                  data?.images?.[0] || "/placeholder.svg?height=256&width=400"
-                }
-              >
-                <source src={data?.reelVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        )}
 
         {/* Villa Basic Info */}
         <Card className="mb-6">
@@ -229,9 +216,11 @@ export default function VillaDetailsPage() {
                 <div className="flex items-center text-gray-600 mb-2">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span className="text-sm">
-                    {data?.location?.addressLine}, {data.location?.city}
+                    {data?.address?.addressLine}, {data?.address?.area},{" "}
+                    {data?.address?.city}
                   </span>
                 </div>
+
                 <div className="flex items-center text-gray-600">
                   <Users className="h-4 w-4 mr-1" />
                   <span className="text-sm">Max {data.maxCapacity} guests</span>
@@ -239,9 +228,12 @@ export default function VillaDetailsPage() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-[#106C83]">
-                  ₹{data.basePricePerNight?.toLocaleString()}
+                  ₹{data.pricing?.weekdayPrice.toLocaleString("en-IN")} / ₹
+                  {data.pricing?.weekendPrice.toLocaleString("en-IN")}
                 </div>
-                <div className="text-sm text-gray-600">per night</div>
+                <div className="text-sm text-gray-600">
+                  weekday / weekend per night
+                </div>
               </div>
             </div>
 
@@ -338,7 +330,27 @@ export default function VillaDetailsPage() {
                 <Utensils className="h-5 w-5 mr-2" />
                 Food Options
               </h3>
-              <p className="text-gray-700">{data.foodOptions}</p>
+
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="font-medium">Available:</span>{" "}
+                  {data.foodOptions.available.join(", ")}
+                </div>
+
+                <div>
+                  <span className="font-medium">Adult Price:</span> ₹
+                  {data.foodOptions.adultPrice}
+                </div>
+
+                <div>
+                  <span className="font-medium">Child Price:</span> ₹
+                  {data.foodOptions.childPrice}
+                </div>
+
+                {data.foodOptions.note && (
+                  <p className="text-gray-600">{data.foodOptions.note}</p>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
@@ -347,12 +359,72 @@ export default function VillaDetailsPage() {
         <Card className="mb-6">
           <CardContent className="p-6">
             <h3 className="font-bold mb-4">Cancellation Policy</h3>
-            <p className="text-gray-700">{data.cancellationPolicy}</p>
+            <ul className="space-y-2 text-sm">
+              {data.cancellationPolicy.map((policy, i) => (
+                <li key={i} className="flex items-start">
+                  <span className="w-2 h-2 bg-[#106C83] rounded-full mt-2 mr-3" />
+                  {policy}
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
 
+        {data.topamenities?.length > 0 && (
+          <div className="mb-4">
+            <h4 className="font-medium mb-2">Top Amenities</h4>
+            <div className="flex flex-wrap gap-2">
+              {data.topamenities.map((a, i) => (
+                <Badge key={i} className="bg-[#106C83]/10 text-[#106C83]">
+                  {a}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {data.reviews?.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h3 className="font-bold mb-4">Reviews ({data.totalReviews})</h3>
+
+              <div className="space-y-4">
+                {data.reviews.map((review) => (
+                  <div key={review._id} className="border-b pb-4">
+                    <div className="flex justify-between">
+                      <span className="font-medium">
+                        {review.userId?.fullName}
+                      </span>
+                      <span>⭐ {review.rating}</span>
+                    </div>
+
+                    <p className="text-sm text-gray-700 mt-1">
+                      {review.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {data.nearbyattractions?.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h3 className="font-bold mb-4">Nearby Attractions</h3>
+              <ul className="space-y-2 text-sm">
+                {data.nearbyattractions.map((place) => (
+                  <li key={place._id}>
+                    • {place.nearbylocation} – {place.distance}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Location Map */}
-        {data.location?.maplink && (
+        {/* {data.location?.maplink && (
           <Card className="mb-6">
             <CardContent className="p-6">
               <h3 className="font-bold mb-4 flex items-center">
@@ -369,7 +441,7 @@ export default function VillaDetailsPage() {
               </a>
             </CardContent>
           </Card>
-        )}
+        )} */}
 
         {/* Commission Section - Only show if villa is pending approval */}
 
@@ -398,12 +470,12 @@ export default function VillaDetailsPage() {
                   {data.isLive ? "Live" : "Not Live"}
                 </span>
               </div>
-              {data?.commission && <div>
-                <span className="font-medium">commission:</span>
-                <span className="ml-2">
-                  {data?.commission}
-                </span>
-              </div>}
+              {data?.commission && (
+                <div>
+                  <span className="font-medium">commission:</span>
+                  <span className="ml-2">{data?.commission}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
