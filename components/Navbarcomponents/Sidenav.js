@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import Logo from "@/public/Asset/Logo.png";
-import Logo2 from "@/public/Asset/Logo2.png";
+import Logo from "@/public/Asset/applogo.png";
+import Logo2 from "@/public/Asset/icon.png";
 import {
   LayoutDashboard,
   PackageSearch,
@@ -95,7 +95,9 @@ const Sidenav = () => {
       <div className="p-0 sticky top-0 border-b w-full h-16 flex justify-between items-center px-4 transition-all duration-300 ease-in-out">
         {!isMinimized ? (
           <>
-            <div className="w-auto transform transition-all duration-500 ease-in-out"></div>
+            <div className="w-auto transform transition-all duration-500 ease-in-out flex items-center">
+              <Image src={Logo} alt="logo" height={50} width={50}/>
+            </div>
           </>
         ) : (
           <></>
@@ -131,7 +133,7 @@ const Sidenav = () => {
           <div
             className={cn(
               "space-y-1 pb-2",
-              !isMinimized && "border-b border-gray-200"
+              !isMinimized && "border-b border-gray-200",
             )}
           >
             <TooltipProvider>
@@ -176,53 +178,7 @@ const Sidenav = () => {
                       {item.label}
                     </span>
                   </Button>
-                )
-              )}
-            </TooltipProvider>
-          </div>
-        </div>
-
-        <div className="py-2">
-          {!isMinimized && (
-            <p className="px-4 text-xs font-medium text-gray-500 mb-1">
-              Account
-            </p>
-          )}
-          <div className="space-y-0.5">
-            <TooltipProvider>
-              {isMinimized ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="light"
-                      isIconOnly={true}
-                      onPress={() => router.push("/settings")}
-                      className={`w-full cursor-pointer flex justify-center items-center p-2 text-sm rounded-md transition-all duration-300 ${
-                        isActive("/settings")
-                          ? "bg-[#106C83] text-white hover:bg-[#106C83]"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <Settings size={18} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" className="p-2">
-                    <p className="text-sm font-medium">Settings</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <Button
-                  variant="light"
-                  onPress={() => router.push("/settings")}
-                  className={`w-56 flex justify-start cursor-pointer items-center px-4 py-2 text-sm rounded-md transition-all duration-300 ${
-                    isActive("/settings")
-                      ? "bg-[#106C83] text-white hover:bg-[#106C83]"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  <Settings size={15} className="mr-2" />
-                  Settings
-                </Button>
+                ),
               )}
             </TooltipProvider>
           </div>
@@ -233,7 +189,7 @@ const Sidenav = () => {
           className={cn(
             "mt-auto border-t",
             isMinimized ? "p-2" : "p-4",
-            "flex items-center"
+            "flex items-center",
           )}
         >
           {isMinimized ? (

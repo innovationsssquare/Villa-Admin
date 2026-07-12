@@ -1,217 +1,209 @@
 "use client";
-import { CreditCard, DollarSign, MoreHorizontal, Wallet } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useEffect, useState } from "react";
-import Revenuecard from "@/components/revenuecomponent/Revenuecard";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useState, useMemo, useEffect } from "react";
+import { IndianRupee, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import StatsCard from "@/components/Payoutcomponents/StatsCard";
+import PayoutsFilters from "@/components/Payoutcomponents/PayoutsFilters";
+import PayoutsTable from "@/components/Payoutcomponents/PayoutsTable";
+import PayoutsPagination from "@/components/Payoutcomponents/PayoutsPagination";
+import PayoutDetailsModal from "@/components/Payoutcomponents/PayoutDetailsModal";
+import RequestPayoutModal from "@/components/Payoutcomponents/RequestPayoutModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  FetchAllpaidpayout,
-  FetchAllpendingpayout,
-} from "@/lib/Redux/Slices/revenueSlice";
+import { fetchAllpayout } from "@/lib/Redux/Slices/payoutSlice";
 
-export default function SellerDashboard() {
+
+
+const AdminPayouts = () => {
   const dispatch = useDispatch();
-  const {
-    pendingpayout,
-    paidpayout,
-    pendingpayoutloading,
-    paidpayoutloading,
-    pendingpayouterror,
-    paidpayouterror
-  } = useSelector((state) => state.revenue);
-
-
-  const [activeTab, setActiveTab] = useState("completed");
-
+  const [filters, setFilters] = useState({ page: 1, limit: 10 });
+  const [selectedPayout, setSelectedPayout] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [payoutToRequest, setPayoutToRequest] = useState(null);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { payouts, loading, error } = useSelector((state) => state.payout);
+  // Filter data based on current filters
   useEffect(() => {
-    if (activeTab === "completed") {
-      dispatch(FetchAllpaidpayout());
-    } else if (activeTab === "pending") {
-      dispatch(FetchAllpendingpayout());
-    }
-  }, [activeTab, dispatch]);
+    dispatch(fetchAllpayout(filters));
+  }, [dispatch, filters]);
+
+const filteredData = useMemo(() => {
+  let data = [...payouts];
+
+  if (filters.payoutStatus) {
+    data = data.filter((p) => p.payoutStatus === filters.payoutStatus);
+  }
+  if (filters.propertyType) {
+    data = data.filter((p) => p.propertyType === filters.propertyType);
+  }
+  if (filters.startDate) {
+    data = data.filter(
+      (p) => new Date(p.checkIn) >= new Date(filters.startDate)
+    );
+  }
+  if (filters.endDate) {
+    data = data.filter(
+      (p) => new Date(p.checkOut) <= new Date(filters.endDate)
+    );
+  }
+
+  return data;
+}, [filters, payouts]);   // 👈 add payouts
+
+  // Calculate stats
+const stats = useMemo(() => {
+  const allData = payouts;
+
+  const totalPending = allData.filter(
+    (p) => p.payoutStatus === "pending"
+  ).length;
+
+  const totalCompleted = allData.filter(
+    (p) => p.payoutStatus === "completed"
+  ).length;
+
+  const pendingAmount = allData
+    .filter((p) => p.payoutStatus === "pending")
+    .reduce((sum, p) => sum + p.financials.netPayout, 0);
+
+  const totalCommission = allData.reduce(
+    (sum, p) => sum + p.financials.commissionAmount,
+    0
+  );
+
+  return {
+    totalPending,
+    totalCompleted,
+    pendingAmount,
+    totalCommission,
+  };
+}, [payouts]);   // 👈 add payouts
+
+
+  // Pagination
+  const paginatedData = useMemo(() => {
+    const start = ((filters.page || 1) - 1) * (filters.limit || 10);
+    const end = start + (filters.limit || 10);
+    return filteredData.slice(start, end);
+  }, [filteredData, filters.page, filters.limit]);
+
+  const totalPages = Math.ceil(filteredData.length / (filters.limit || 10));
+
+  const handleViewPayout = (payout) => {
+    setSelectedPayout(payout);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleRequestPayout = (payout) => {
+    setPayoutToRequest(payout);
+    setIsRequestModalOpen(true);
+  };
+
+  const handleConfirmPayout = async (payout) => {
+    setIsProcessing(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setIsProcessing(false);
+    setIsRequestModalOpen(false);
+    setPayoutToRequest(null);
+    toast.success(
+      `Payout request initiated for ₹${payout.financials.netPayout.toLocaleString()}`
+    );
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ page: 1, limit: 10 });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   return (
-    <ScrollArea className="w-full bg-gray-50 mx-auto pb-14 h-screen">
-      <section className="p-4">
-        <Revenuecard />
-        <div className="bg-white rounded-lg border p-4 mb-2">
-          <div className="flex justify-between items-center mb-6">
-            <Tabs
-              onValueChange={setActiveTab}
-              defaultValue="completed"
-              className="w-auto"
-            >
-              <TabsList className="bg-transparent p-0">
-                <TabsTrigger
-                  value="completed"
-                  className="px-0 py-2 mr-6 data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#106C83] data-[state=active]:rounded-none data-[state=active]:shadow-none"
-                >
-                  Completed Transaction
-                </TabsTrigger>
-                <TabsTrigger
-                  value="pending"
-                  className="px-0 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#106C83] data-[state=active]:rounded-none data-[state=active]:shadow-none"
-                >
-                  Pending Transaction
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <div className="flex justify-between gap-4 items-center  mb-4 ">
-              <Select defaultValue="this-week">
-                <SelectTrigger className="w-[180px] border rounded-md">
-                  <SelectValue placeholder="This Week" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="this-week">This Week</SelectItem>
-                  <SelectItem value="this-month">This Month</SelectItem>
-                  <SelectItem value="last-month">Last Month</SelectItem>
-                  <SelectItem value="custom">Custom Range</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button className="bg-[#106C83] hover:bg-[#106C83] text-sm">
-                Withdraw
-              </Button>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            {activeTab === "completed" ? (
-              // Completed Transactions (Paid Payout)
-              <>
-                {paidpayoutloading ? (
-                  // Loading State
-                  <div className="flex justify-center items-center py-10">
-                    <span className="loader2"></span>
-                  </div>
-                ) : paidpayouterror ? (
-                  // Error State
-                  <div className="flex justify-center items-center py-10">
-                    <p>{paidpayouterror}</p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader className="bg-gray-100 border border-gray-300">
-                      <TableRow className="bg-gray-50">
-                        <TableHead>CLIENT NAME</TableHead>
-                        <TableHead>ORDER ID</TableHead>
-                        <TableHead>DATE</TableHead>
-                        <TableHead>PAYMENT METHOD</TableHead>
-                        <TableHead>AMOUNT</TableHead>
-                        <TableHead>COMMISSION</TableHead>
-                        <TableHead>STATUS</TableHead>
-                        <TableHead>ACTIONS</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paidpayout?.map((transaction, index) => (
-                        <TableRow
-                          key={index}
-                          className="border-t border-gray-200 h-14"
-                        >
-                          <TableCell>{transaction?.vendorId?.Vendorname}</TableCell>
-                          <TableCell>{transaction.orderId}</TableCell>
-                          <TableCell>{transaction.date}</TableCell>
-                          <TableCell>{transaction.paymentMethod}</TableCell>
-                          <TableCell>{transaction?.totalAmount}</TableCell>
-                          <TableCell>{transaction.commission}</TableCell>
-                          <TableCell className="text-green-500">
-                            Complete
-                          </TableCell>
-                          <TableCell>
-                            <Link
-                              href="#"
-                              className="text-[#106C83] hover:underline"
-                            >
-                              View Invoice
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </>
-            ) : (
-              // Pending Transactions (Pending Payout)
-              <>
-                {pendingpayoutloading ? (
-                  // Loading State
-                  <div className="flex justify-center items-center py-10">
-                    <span className="loader2"></span>
-                  </div>
-                ) : pendingpayouterror ? (
-                  // Error State
-                  <div className="flex justify-center items-center py-10">
-                    <p>{pendingpayouterror}</p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader className="bg-gray-100 border border-gray-300">
-                      <TableRow className="bg-gray-50">
-                        <TableHead>CLIENT NAME</TableHead>
-                        <TableHead>ORDER ID</TableHead>
-                        <TableHead>DATE</TableHead>
-                        <TableHead>PAYMENT METHOD</TableHead>
-                        <TableHead>AMOUNT</TableHead>
-                        <TableHead>COMMISSION</TableHead>
-                        <TableHead>STATUS</TableHead>
-                        <TableHead>ACTIONS</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pendingpayout?.map((transaction, index) => (
-                        <TableRow
-                          key={index}
-                          className="border-t border-gray-200 h-14"
-                        >
-                          <TableCell>{transaction.clientName}</TableCell>
-                          <TableCell>{transaction.orderId}</TableCell>
-                          <TableCell>{transaction.date}</TableCell>
-                          <TableCell>{transaction.paymentMethod}</TableCell>
-                          <TableCell>{transaction?.totalPayoutAmount}</TableCell>
-                          <TableCell>{transaction.commission}</TableCell>
-                          <TableCell className="text-yellow-500">
-                            Pending
-                          </TableCell>
-                          <TableCell>
-                            <Link
-                              href="#"
-                              className="text-[#106C83] hover:underline"
-                            >
-                              View Breakdown
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </>
-            )}
-          </div>
+    <ScrollArea className="pb-14 bg-gray-50 h-screen p-4">
+      <div className="w-full mx-auto space-y-3">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="Pending Payouts"
+            value={stats.totalPending.toString()}
+            icon={Clock}
+            iconColor="text-warning"
+          />
+          <StatsCard
+            title="Completed Payouts"
+            value={stats.totalCompleted.toString()}
+            icon={CheckCircle2}
+            iconColor="text-success"
+          />
+          <StatsCard
+            title="Pending Amount"
+            value={formatCurrency(stats.pendingAmount)}
+            icon={IndianRupee}
+            iconColor="text-warning"
+          />
+          <StatsCard
+            title="Total Commission"
+            value={formatCurrency(stats.totalCommission)}
+            icon={AlertTriangle}
+            iconColor="text-info"
+          />
         </div>
-      </section>
+
+        {/* Filters */}
+        <PayoutsFilters
+          filters={filters}
+          onFilterChange={setFilters}
+          onReset={handleResetFilters}
+        />
+
+        {/* Table */}
+        <PayoutsTable
+          payouts={paginatedData}
+          onViewPayout={handleViewPayout}
+          onRequestPayout={handleRequestPayout}
+        />
+
+        {/* Pagination */}
+        <PayoutsPagination
+          currentPage={filters.page || 1}
+          totalPages={totalPages}
+          totalRecords={filteredData.length}
+          limit={filters.limit || 10}
+          onPageChange={(page) => setFilters({ ...filters, page })}
+          onLimitChange={(limit) => setFilters({ ...filters, limit, page: 1 })}
+        />
+
+        {/* Modals */}
+        <PayoutDetailsModal
+          payout={selectedPayout}
+          isOpen={isDetailsModalOpen}
+          onClose={() => {
+            setIsDetailsModalOpen(false);
+            setSelectedPayout(null);
+          }}
+          onRequestPayout={handleRequestPayout}
+        />
+
+        <RequestPayoutModal
+          payout={payoutToRequest}
+          isOpen={isRequestModalOpen}
+          onClose={() => {
+            setIsRequestModalOpen(false);
+            setPayoutToRequest(null);
+          }}
+          onConfirm={handleConfirmPayout}
+          isLoading={isProcessing}
+        />
+      </div>
     </ScrollArea>
   );
-}
+};
+
+export default AdminPayouts;
