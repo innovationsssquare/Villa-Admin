@@ -20,9 +20,15 @@ import {
   User,
   Mail,
   Phone,
-  ChevronLeft ,
+  ChevronLeft,
   Hash,
   BadgeIcon as IdCard,
+  Check,
+  X,
+  Clock,
+  AlertTriangle,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -49,14 +55,18 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { fetchownerbyid } from "@/lib/Redux/Slices/ownerSlice";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { verifyowner } from "@/lib/API/Owner/Owner";
+import { verifyowner, updateDocumentStatus } from "@/lib/API/Owner/Owner";
+import { useToast } from "@/components/ui/toast-provider";
 
 function formatDate(iso) {
   try {
@@ -96,6 +106,51 @@ function CopyBtn({ value, label }) {
   );
 }
 
+const PRESET_REASONS = [
+  "Document image is blurry or illegible",
+  "Name on document does not match profile",
+  "Document is expired or invalid",
+  "Incorrect document type uploaded",
+  "Missing back side or signature page",
+  "Bank account or IFSC code does not match passbook",
+];
+
+function DocStatusBadge({ status, reason }) {
+  const s = String(status || "").toLowerCase();
+  if (s === "approved" || s === "available") {
+    return (
+      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 flex items-center gap-1 font-medium w-fit">
+        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+        Approved
+      </Badge>
+    );
+  }
+  if (s === "rejected" || s === "error") {
+    return (
+      <div className="flex flex-col gap-1 items-start">
+        <Badge className="bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-50 flex items-center gap-1 font-medium w-fit">
+          <AlertCircle className="h-3.5 w-3.5 text-rose-600" />
+          Rejected
+        </Badge>
+        {reason ? (
+          <span
+            className="text-[11px] text-rose-600 font-medium max-w-[220px] truncate"
+            title={reason}
+          >
+            Reason: {reason}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+  return (
+    <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 flex items-center gap-1 font-medium w-fit">
+      <Clock className="h-3.5 w-3.5 text-amber-600" />
+      Pending Review
+    </Badge>
+  );
+}
+
 function DocTypeBadge({ type }) {
   const map = {
     agreement: "Agreement",
@@ -106,22 +161,26 @@ function DocTypeBadge({ type }) {
 }
 
 export default function OwnerDetailsClient() {
-  const [owner, setOwner] = useState();
   const [showAcc, setShowAcc] = useState(false);
   const [previewDoc, setPreviewDoc] = useState(null);
   const [verifying, setVerifying] = useState(false);
+  const [actionLoading, setActionLoading] = useState({});
+  const [rejectModalDoc, setRejectModalDoc] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [selectedPreset, setSelectedPreset] = useState("");
+
+  const { addToast } = useToast();
   const params = useParams();
   const { id } = params;
   const { singleowner, singleloading, singleerror } = useSelector(
     (state) => state.owner
   );
   const router = useRouter();
-
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchownerbyid(id));
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   const docMap = useMemo(() => {
     const m = {};
@@ -133,38 +192,151 @@ export default function OwnerDetailsClient() {
     return m;
   }, [singleowner?.documents]);
 
-  const hasAdhaar = !!docMap["adhaar"]?.length;
-  const hasPassbook = !!docMap["bank_passbook"]?.length;
-  const hasAgreement = !!docMap["agreement"]?.length;
+  const getDocCheckStatus = (type) => {
+    const docs = docMap[type] || [];
+    if (!docs.length) {
+      return { uploaded: false, approved: false, rejected: false, statusText: "Missing" };
+    }
+    const approved = docs.some(
+      (d) => d.status === "approved" || d.status === "available"
+    );
+    if (approved) {
+      return { uploaded: true, approved: true, rejected: false, statusText: "Approved" };
+    }
+    const rejected = docs.every(
+      (d) => d.status === "rejected" || d.status === "error"
+    );
+    if (rejected) {
+      return { uploaded: true, approved: false, rejected: true, statusText: "Rejected" };
+    }
+    return { uploaded: true, approved: false, rejected: false, statusText: "Pending Review" };
+  };
+
+  const adhaarStatus = getDocCheckStatus("adhaar");
+  const passbookStatus = getDocCheckStatus("bank_passbook");
+  const agreementStatus = getDocCheckStatus("agreement");
+
   const hasBankDetails =
     !!singleowner?.bankDetails?.accountNumber &&
     !!singleowner?.bankDetails?.ifscCode;
 
-  const requiredOk = hasAdhaar && hasPassbook && hasAgreement;
-  const optionalOk = !!singleowner?.email;
-  const canVerify = requiredOk;
+  const allRequiredApproved =
+    adhaarStatus.approved && passbookStatus.approved && agreementStatus.approved;
+  const canVerify = allRequiredApproved && hasBankDetails;
+
+  const handleApproveDoc = async (doc) => {
+    if (!doc?._id) return;
+    setActionLoading((prev) => ({ ...prev, [doc._id]: "approving" }));
+    try {
+      const res = await updateDocumentStatus(id, doc._id, {
+        status: "approved",
+      });
+      if (res?.success || res?.status !== false) {
+        addToast({
+          title: "Document Approved",
+          description: `"${doc.title}" has been verified and approved.`,
+          variant: "success",
+        });
+        dispatch(fetchownerbyid(id));
+      } else {
+        addToast({
+          title: "Approval Failed",
+          description: res?.message || "Could not approve document.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      addToast({
+        title: "Error",
+        description: err.message || "An error occurred while approving.",
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [doc._id]: null }));
+    }
+  };
+
+  const handleOpenRejectModal = (doc) => {
+    setRejectModalDoc(doc);
+    setRejectionReason(doc.rejectionReason || "");
+    setSelectedPreset("");
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectModalDoc?._id || !rejectionReason.trim()) {
+      addToast({
+        title: "Reason Required",
+        description: "Please enter or select a reason for rejecting this document.",
+        variant: "warning",
+      });
+      return;
+    }
+    const docId = rejectModalDoc._id;
+    setActionLoading((prev) => ({ ...prev, [docId]: "rejecting" }));
+    try {
+      const res = await updateDocumentStatus(id, docId, {
+        status: "rejected",
+        rejectionReason: rejectionReason.trim(),
+      });
+      if (res?.success || res?.status !== false) {
+        addToast({
+          title: "Document Rejected",
+          description: `"${rejectModalDoc.title}" marked as rejected. Host will see this reason in app.`,
+          variant: "destructive",
+        });
+        setRejectModalDoc(null);
+        setRejectionReason("");
+        setSelectedPreset("");
+        dispatch(fetchownerbyid(id));
+      } else {
+        addToast({
+          title: "Rejection Failed",
+          description: res?.message || "Could not reject document.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      addToast({
+        title: "Error",
+        description: err.message || "An error occurred while rejecting.",
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [docId]: null }));
+    }
+  };
 
   async function verifyOwner() {
     setVerifying(true);
     try {
+      const nextVerified = !singleowner?.isVerified;
       const data = {
-        isVerified: true,
+        isVerified: nextVerified,
       };
 
       const res = await verifyowner(id, data);
-      if (res) {
-        alert("success");
+      if (res?.success || res?.status !== false) {
+        addToast({
+          title: nextVerified ? "Owner Verified" : "Owner Unverified",
+          description: nextVerified
+            ? "Host account has been verified successfully."
+            : "Owner verification status was revoked.",
+          variant: "success",
+        });
+        dispatch(fetchownerbyid(id));
+      } else {
+        addToast({
+          title: "Verification failed",
+          description: res?.message || "Please try again.",
+          variant: "destructive",
+        });
       }
-      // toast({
-      //   title: "Owner verified",
-      //   description: "Verification status updated successfully.",
-      // });
     } catch (e) {
-      // toast({
-      //   title: "Verification failed",
-      //   description: "Please try again.",
-      //   variant: "destructive",
-      // });
+      addToast({
+        title: "Verification failed",
+        description: e.message || "Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setVerifying(false);
     }
@@ -250,19 +422,21 @@ export default function OwnerDetailsClient() {
                   <div className="flex flex-col items-stretch gap-2 sm:flex-row">
                     <Button
                       className={cn(
-                        "gap-2",
+                        "gap-2 font-medium shadow-sm transition-all",
                         singleowner?.isVerified
-                          ? "bg-emerald-600 hover:bg-emerald-600"
-                          : ""
+                          ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                          : canVerify
+                          ? "bg-[#106C83] hover:bg-[#0e5b6e] text-white"
+                          : "bg-muted text-muted-foreground"
                       )}
                       disabled={
-                        singleowner?.isVerified || !canVerify || verifying
+                        (!canVerify && !singleowner?.isVerified) || verifying
                       }
                       onClick={verifyOwner}
                     >
-                      {owner?.isVerified ? (
+                      {singleowner?.isVerified ? (
                         <>
-                          <ShieldCheck className="h-4 w-4" /> Verified
+                          <ShieldCheck className="h-4 w-4" /> Verified (Click to Revoke)
                         </>
                       ) : (
                         <>
@@ -324,43 +498,61 @@ export default function OwnerDetailsClient() {
 
             {/* Verification checklist */}
             {!singleowner?.isVerified && (
-              <Alert>
-                <AlertTitle className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
+              <Alert className="border-amber-200 bg-amber-50/50">
+                <AlertTitle className="flex items-center gap-2 text-amber-900 font-semibold">
+                  <Shield className="h-4 w-4 text-amber-600" />
                   Verification Checklist
                 </AlertTitle>
-                <AlertDescription>
-                  Complete the required items to enable verification.
+                <AlertDescription className="text-amber-800 text-xs mt-1">
+                  Each required document must be Approved individually before final owner verification can be completed.
                 </AlertDescription>
               </Alert>
             )}
 
             <Card>
               <CardHeader>
-                <CardTitle>Verification Requirements</CardTitle>
+                <CardTitle className="text-base font-semibold">Verification Requirements</CardTitle>
                 <CardDescription>
-                  Required items must be present before verifying.
+                  All required documents must be Approved individually before verifying owner.
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-2">
                 <CheckItem
-                  ok={hasAdhaar}
-                  label="Aadhaar document uploaded"
+                  ok={adhaarStatus.approved}
+                  label="Aadhaar Document"
+                  statusText={adhaarStatus.statusText}
+                  isRejected={adhaarStatus.rejected}
                   required
                 />
                 <CheckItem
-                  ok={hasPassbook}
-                  label="Bank passbook uploaded"
+                  ok={passbookStatus.approved}
+                  label="Bank Passbook"
+                  statusText={passbookStatus.statusText}
+                  isRejected={passbookStatus.rejected}
                   required
                 />
                 <CheckItem
-                  ok={hasAgreement}
-                  label="Owner agreement uploaded"
+                  ok={agreementStatus.approved}
+                  label="Owner Agreement"
+                  statusText={agreementStatus.statusText}
+                  isRejected={agreementStatus.rejected}
                   required
                 />
-                <CheckItem ok={hasBankDetails} label="Bank details present" />
-                <CheckItem ok={!!singleowner?.email} label="Email provided" />
-                <CheckItem ok={!!singleowner?.bankDetails?.phone} label="Phone provided" />
+                <CheckItem
+                  ok={hasBankDetails}
+                  label="Bank details present"
+                  statusText={hasBankDetails ? "Provided" : "Missing"}
+                />
+                <CheckItem
+                  ok={!!singleowner?.email}
+                  label="Email provided"
+                  statusText={singleowner?.email ? "Provided" : "Missing"}
+                />
+                <CheckItem
+                  ok={!!singleowner?.bankDetails?.phone || !!singleowner?.phone}
+                  label="Phone provided"
+                  statusText={singleowner?.bankDetails?.phone || singleowner?.phone ? "Provided" : "Missing"}
+                />
               </CardContent>
             </Card>
 
@@ -531,7 +723,7 @@ export default function OwnerDetailsClient() {
                                     <TableCell className="whitespace-nowrap">
                                       <DocTypeBadge type={d.type} />
                                     </TableCell>
-                                    <TableCell className="max-w-[260px]">
+                                    <TableCell className="max-w-[240px]">
                                       <div className="line-clamp-1 font-medium">
                                         {d.title}
                                       </div>
@@ -539,32 +731,27 @@ export default function OwnerDetailsClient() {
                                         {d.description}
                                       </div>
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap">
+                                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                                       {formatDate(d.date)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap">
+                                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                                       {d.size}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap">
-                                      {d.status === "available" ? (
-                                        <Badge className="bg-emerald-600 text-white">
-                                          Available
-                                        </Badge>
-                                      ) : (
-                                        <Badge variant="secondary">
-                                          Unavailable
-                                        </Badge>
-                                      )}
+                                      <DocStatusBadge
+                                        status={d.status}
+                                        reason={d.rejectionReason}
+                                      />
                                     </TableCell>
                                     <TableCell className="text-right">
-                                      <div className="flex items-center justify-end gap-2">
+                                      <div className="flex items-center justify-end gap-1.5">
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          className="gap-2"
+                                          className="h-8 px-2.5 gap-1.5 text-xs"
                                           onClick={() => setPreviewDoc(d)}
                                         >
-                                          <Eye className="h-4 w-4" /> View
+                                          <Eye className="h-3.5 w-3.5" /> View
                                         </Button>
                                         <a
                                           href={d.downloadUrl}
@@ -574,12 +761,64 @@ export default function OwnerDetailsClient() {
                                           <Button
                                             variant="outline"
                                             size="sm"
-                                            className="gap-2"
+                                            className="h-8 px-2.5 gap-1.5 text-xs"
                                           >
-                                            <Download className="h-4 w-4" />{" "}
-                                            Download
+                                            <Download className="h-3.5 w-3.5" />
                                           </Button>
                                         </a>
+                                        <Button
+                                          size="sm"
+                                          className={cn(
+                                            "h-8 px-3 gap-1.5 text-xs font-medium transition-all",
+                                            d.status === "approved" ||
+                                              d.status === "available"
+                                              ? "bg-emerald-600/90 text-white cursor-default hover:bg-emerald-600/90"
+                                              : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                          )}
+                                          disabled={
+                                            actionLoading[d._id] ||
+                                            d.status === "approved" ||
+                                            d.status === "available"
+                                          }
+                                          onClick={() => handleApproveDoc(d)}
+                                        >
+                                          {actionLoading[d._id] ===
+                                          "approving" ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                          ) : (
+                                            <Check className="h-3.5 w-3.5" />
+                                          )}
+                                          {d.status === "approved" ||
+                                          d.status === "available"
+                                            ? "Approved"
+                                            : "Approve"}
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className={cn(
+                                            "h-8 px-2.5 gap-1.5 text-xs font-medium border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800 transition-all",
+                                            d.status === "rejected" ||
+                                              d.status === "error"
+                                              ? "bg-rose-50 border-rose-300"
+                                              : ""
+                                          )}
+                                          disabled={!!actionLoading[d._id]}
+                                          onClick={() =>
+                                            handleOpenRejectModal(d)
+                                          }
+                                        >
+                                          {actionLoading[d._id] ===
+                                          "rejecting" ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin text-rose-600" />
+                                          ) : (
+                                            <X className="h-3.5 w-3.5 text-rose-600" />
+                                          )}
+                                          {d.status === "rejected" ||
+                                          d.status === "error"
+                                            ? "Change Reason"
+                                            : "Reject"}
+                                        </Button>
                                       </div>
                                     </TableCell>
                                   </TableRow>
@@ -588,9 +827,9 @@ export default function OwnerDetailsClient() {
                                   <TableRow>
                                     <TableCell
                                       colSpan={6}
-                                      className="text-center text-sm text-muted-foreground"
+                                      className="text-center text-sm text-muted-foreground py-6"
                                     >
-                                      No documents in this category.
+                                      No documents uploaded in this category.
                                     </TableCell>
                                   </TableRow>
                                 )}
@@ -605,30 +844,168 @@ export default function OwnerDetailsClient() {
               </CardContent>
             </Card>
 
+            {/* Reject Document Reason Dialog */}
+            <Dialog
+              open={!!rejectModalDoc}
+              onOpenChange={(o) => !o && setRejectModalDoc(null)}
+            >
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-rose-700">
+                    <AlertTriangle className="h-5 w-5 text-rose-600" />
+                    Reject Document
+                  </DialogTitle>
+                  <DialogDescription>
+                    Provide the rejection reason for this document. The property owner will see this notification in their mobile app to re-upload.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-2">
+                  {/* Selected document summary */}
+                  <div className="p-3 bg-muted/60 rounded-lg border flex items-center justify-between text-sm">
+                    <div>
+                      <div className="font-semibold">{rejectModalDoc?.title}</div>
+                      <div className="text-xs text-muted-foreground capitalize mt-0.5">
+                        Type: {rejectModalDoc?.type} · Size: {rejectModalDoc?.size}
+                      </div>
+                    </div>
+                    <DocTypeBadge type={rejectModalDoc?.type} />
+                  </div>
+
+                  {/* Preset quick reasons */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Quick Preset Reasons
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PRESET_REASONS.map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPreset(preset);
+                            setRejectionReason(preset);
+                          }}
+                          className={cn(
+                            "text-xs px-2.5 py-1 rounded-full border transition-all text-left",
+                            selectedPreset === preset
+                              ? "bg-rose-500 text-white border-rose-600 font-medium shadow-xs"
+                              : "bg-background hover:bg-muted text-foreground border-border"
+                          )}
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Detailed custom note */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Rejection Reason / Guidance for Owner *
+                    </label>
+                    <Textarea
+                      value={rejectionReason}
+                      onChange={(e) => {
+                        setRejectionReason(e.target.value);
+                        if (selectedPreset && e.target.value !== selectedPreset) {
+                          setSelectedPreset("");
+                        }
+                      }}
+                      placeholder="Explain why this document was rejected..."
+                      rows={3}
+                      className="resize-none text-sm"
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                  <Button
+                    variant="outline"
+                    onClick={() => setRejectModalDoc(null)}
+                    disabled={!!actionLoading[rejectModalDoc?._id]}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-rose-600 hover:bg-rose-700 text-white gap-1.5"
+                    onClick={handleConfirmReject}
+                    disabled={
+                      !rejectionReason.trim() ||
+                      !!actionLoading[rejectModalDoc?._id]
+                    }
+                  >
+                    {actionLoading[rejectModalDoc?._id] === "rejecting" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
+                    Confirm Rejection
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             {/* Document Preview Dialog */}
             <Dialog
               open={!!previewDoc}
               onOpenChange={(o) => !o && setPreviewDoc(null)}
             >
-              <DialogContent className="max-w-4xl">
+              <DialogContent className="max-w-4xl max-h-[90vh]">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    {previewDoc?.title}
-                    <span className="text-xs font-normal text-muted-foreground">
-                      ({previewDoc?.size})
-                    </span>
+                  <DialogTitle className="flex items-center justify-between gap-2 pr-6">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-muted-foreground" />
+                      <span>{previewDoc?.title}</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        ({previewDoc?.size})
+                      </span>
+                    </div>
+                    {previewDoc && <DocTypeBadge type={previewDoc?.type} />}
                   </DialogTitle>
                 </DialogHeader>
-                <div className="h-[70vh]">
+                <div className="h-[70vh] flex items-center justify-center overflow-auto bg-muted/20 rounded-md border p-2">
                   {previewDoc ? (
-                    <iframe
-                      src={previewDoc.downloadUrl}
-                      className="h-full w-full rounded-md border"
-                      title={previewDoc.title}
-                    />
+                    previewDoc.downloadUrl?.match(
+                      /\.(jpeg|jpg|png|webp|avif)($|\?)/i
+                    ) || previewDoc.downloadUrl?.includes("/image/upload/") ? (
+                      <img
+                        src={previewDoc.downloadUrl}
+                        alt={previewDoc.title}
+                        className="max-h-full max-w-full object-contain rounded-md shadow-sm"
+                      />
+                    ) : (
+                      <iframe
+                        src={previewDoc.downloadUrl}
+                        className="h-full w-full rounded-md border bg-white"
+                        title={previewDoc.title}
+                      />
+                    )
                   ) : null}
                 </div>
+                <DialogFooter className="flex items-center justify-between sm:justify-between w-full">
+                  <div className="text-xs text-muted-foreground">
+                    Uploaded: {formatDate(previewDoc?.date)}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={previewDoc?.downloadUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Button variant="outline" size="sm" className="gap-1.5">
+                        <Download className="h-3.5 w-3.5" /> Download File
+                      </Button>
+                    </a>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setPreviewDoc(null)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
@@ -650,22 +1027,60 @@ function Field({ label, value, icon }) {
   );
 }
 
-function CheckItem({ ok, label, required = false }) {
+function CheckItem({ ok, label, statusText, isRejected, required = false }) {
   return (
-    <div className="flex items-center justify-between rounded-md border p-3">
-      <div className="flex items-center gap-2">
+    <div
+      className={cn(
+        "flex items-center justify-between rounded-lg border p-3 transition-colors",
+        ok
+          ? "border-emerald-200 bg-emerald-50/40"
+          : isRejected
+          ? "border-rose-200 bg-rose-50/40"
+          : required
+          ? "border-amber-200 bg-amber-50/30"
+          : "border-border"
+      )}
+    >
+      <div className="flex items-center gap-2.5">
         {ok ? (
-          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+          <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+        ) : isRejected ? (
+          <FileX2 className="h-5 w-5 text-rose-600 shrink-0" />
         ) : required ? (
-          <FileX2 className="h-5 w-5 text-amber-600" />
+          <Clock className="h-5 w-5 text-amber-600 shrink-0" />
         ) : (
-          <FileCheck2 className="h-5 w-5 text-muted-foreground" />
+          <FileCheck2 className="h-5 w-5 text-muted-foreground shrink-0" />
         )}
-        <span className={cn("text-sm", !ok && required ? "font-medium" : "")}>
+        <span
+          className={cn(
+            "text-sm",
+            ok
+              ? "font-medium text-emerald-950"
+              : isRejected
+              ? "font-medium text-rose-950"
+              : !ok && required
+              ? "font-medium"
+              : ""
+          )}
+        >
           {label}
         </span>
       </div>
-      {required && <Badge variant="secondary">{ok ? "OK" : "Required"}</Badge>}
+      <Badge
+        variant={ok ? "default" : "secondary"}
+        className={cn(
+          "text-xs font-medium capitalize",
+          ok
+            ? "bg-emerald-600 text-white hover:bg-emerald-600"
+            : isRejected
+            ? "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-100"
+            : required
+            ? "bg-amber-100 text-amber-900 border-amber-200 hover:bg-amber-100"
+            : ""
+        )}
+      >
+        {statusText || (ok ? "OK" : required ? "Required" : "Optional")}
+      </Badge>
     </div>
   );
 }
