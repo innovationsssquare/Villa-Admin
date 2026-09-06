@@ -137,7 +137,7 @@ export default function MessagingInterface() {
           </div>
           <div className="flex-grow">
             <p className="text-gray-700 font-medium">Messages</p>
-            <p className="text-xl font-bold text-[#106C83]">7,782</p>
+            <p className="text-xl font-bold text-[#FF6900]">7,782</p>
           </div>
           <Button variant="outline" className="ml-auto">
             This Week <ChevronDown className="ml-2 h-4 w-4" />
@@ -154,7 +154,7 @@ export default function MessagingInterface() {
           </div>
           <div className="flex-grow">
             <p className="text-gray-700 font-medium">Pending Response</p>
-            <p className="text-xl font-bold text-[#106C83]">555</p>
+            <p className="text-xl font-bold text-[#FF6900]">555</p>
           </div>
           <Button variant="outline" className="ml-auto">
             This Week <ChevronDown className="ml-2 h-4 w-4" />
@@ -184,7 +184,7 @@ export default function MessagingInterface() {
                     onClick={() => setActiveTab("User")}
                     className={`rounded-none py-2 cursor-pointer ${
                       activeTab === "User"
-                        ? " text-[#106C83] focus:bg-[#106C83]"
+                        ? " text-[#FF6900] focus:bg-[#FF6900]"
                         : "bg-white text-black"
                     }`}
                   >
@@ -195,7 +195,7 @@ export default function MessagingInterface() {
                     onClick={() => setActiveTab("Vendor")}
                     className={`rounded-none py-2 cursor-pointer ${
                       activeTab === "Vendor"
-                        ? " text-[#106C83] focus:bg-[#106C83]"
+                        ? " text-[#FF6900] focus:bg-[#FF6900]"
                         : "bg-white text-black"
                     }`}
                   >
@@ -217,7 +217,7 @@ export default function MessagingInterface() {
                         key={contact?.id}
                         className={`flex items-center p-4 cursor-pointer ${
                           selectedContact?.id === contact?.id
-                            ? "bg-[#106C83] text-white"
+                            ? "bg-[#FF6900] text-white"
                             : ""
                         }`}
                         onClick={() => setSelectedContact(contact)}
@@ -311,7 +311,7 @@ export default function MessagingInterface() {
                     <div
                       className={`max-w-[70%] p-3 rounded-lg ${
                         message.sender === "user"
-                          ? "bg-[#106C83] text-white"
+                          ? "bg-[#FF6900] text-white"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
@@ -345,7 +345,7 @@ export default function MessagingInterface() {
                     key={message?.id}
                     className={`p-2 rounded-md max-w-[50%] my-1 ${
                       message?.sender === "user"
-                        ? "bg-[#106C83] text-white self-end ml-auto"
+                        ? "bg-[#FF6900] text-white self-end ml-auto"
                         : "bg-gray-100 text-black self-start"
                     }`}
                   >
@@ -371,7 +371,7 @@ export default function MessagingInterface() {
                   }}
                 />
                 <Button
-                  className="ml-2 bg-[#106C83] hover:bg-teal-700"
+                  className="ml-2 bg-[#FF6900] hover:bg-[#E05D00] text-white shadow-sm shadow-[#FF6900]/25 transition-colors cursor-pointer"
                   onClick={handleSendMessage}
                 >
                   <Send className="h-4 w-4" />

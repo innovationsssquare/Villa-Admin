@@ -52,7 +52,7 @@ const Revenuecard = () => {
                   Total Earnings
                 </p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalVendorAmount}
                 </p>
               </>
@@ -83,7 +83,7 @@ const Revenuecard = () => {
               <>
                 <p className="text-sm font-medium text-gray-600">Commission</p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalCommission}
                 </p>
               </>
@@ -116,7 +116,7 @@ const Revenuecard = () => {
                   Pending Payout
                 </p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalPendingPayout}
                 </p>
               </>
@@ -147,7 +147,7 @@ const Revenuecard = () => {
               <>
                 <p className="text-sm font-medium text-gray-600">Withdrawn</p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalWithdrawn}
                 </p>
               </>

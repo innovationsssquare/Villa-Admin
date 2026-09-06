@@ -137,7 +137,7 @@ const LocationTable = () => {
         </div>
         <Button
           onClick={() => setIsFormOpen(true)}
-          className="w-full sm:w-auto bg-[#106C83] text-white hover:bg-[#106C83] cursor-pointer"
+          className="w-full sm:w-auto bg-[#FF6900] text-white hover:bg-[#FF6900] cursor-pointer"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Location

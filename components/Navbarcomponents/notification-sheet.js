@@ -102,7 +102,7 @@ export default function NotificationSheet() {
         <Button variant="outline" size="icon" className="relative cursor-pointer">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#106C83] text-xs text-white">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF6900] text-xs text-white shadow-sm shadow-[#FF6900]/30 font-semibold">
               {unreadCount}
             </span>
           )}
@@ -117,7 +117,7 @@ export default function NotificationSheet() {
                 variant="ghost"
                 size="sm"
                 onClick={markAllAsRead}
-                className="text-[#106C83] hover:text-[#106C83]/80 hover:bg-[#106C83]/10"
+                className="text-[#FF6900] hover:text-[#E05D00] hover:bg-[#FFF1E6]"
               >
                 Mark all as read
               </Button>
@@ -142,7 +142,7 @@ export default function NotificationSheet() {
                     "flex gap-3 p-3 rounded-lg transition-colors",
                     notification.read
                       ? "bg-background"
-                      : "bg-[#106C83]/10 hover:bg-[#106C83]/15"
+                      : "bg-[#FFF1E6]/50 hover:bg-[#FFF1E6]"
                   )}
                 >
                   <div
@@ -150,7 +150,7 @@ export default function NotificationSheet() {
                       "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
                       notification.read
                         ? "bg-muted"
-                        : "bg-[#106C83]/20 text-[#106C83]"
+                        : "bg-[#FFF1E6] text-[#FF6900]"
                     )}
                   >
                     {getIcon(notification.type)}
@@ -160,7 +160,7 @@ export default function NotificationSheet() {
                       <p
                         className={cn(
                           "text-sm font-medium",
-                          !notification.read && "text-[#106C83]"
+                          !notification.read && "text-[#FF6900]"
                         )}
                       >
                         {notification.title}

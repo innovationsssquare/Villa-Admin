@@ -238,7 +238,7 @@ export default function CampingDetailsPage() {
                 key={key}
                 onClick={() => setImageIndex(key)}
                 className={`flex-shrink-0 w-20 h-16 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                  key === imageIndex ? "border-[#106C83]" : "border-gray-200"
+                  key === imageIndex ? "border-[#FF6900]" : "border-gray-200"
                 }`}
               >
                 <Image
@@ -296,7 +296,7 @@ export default function CampingDetailsPage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-[#106C83]">
+                <div className="text-lg font-bold text-[#FF6900]">
                   From ₹
                   {Math.min(
                     ...(data.tents?.map((tent) => tent.pricePerNight) || [0])
@@ -431,7 +431,7 @@ export default function CampingDetailsPage() {
                       </div>
                       <div>
                         <h4 className="font-semibold mb-2">Pricing</h4>
-                        <div className="text-2xl font-bold text-[#106C83] mb-2">
+                        <div className="text-2xl font-bold text-[#FF6900] mb-2">
                           ₹{tent.pricePerNight?.toLocaleString()}
                         </div>
                         <div className="text-sm text-gray-600">per night</div>
@@ -511,7 +511,7 @@ export default function CampingDetailsPage() {
                   key={index}
                   className="text-sm text-gray-700 flex items-start"
                 >
-                  <span className="w-2 h-2 bg-[#106C83] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                   {rule}
                 </li>
               ))}
@@ -552,7 +552,7 @@ export default function CampingDetailsPage() {
                 href={data.location.maplink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#106C83] hover:underline"
+                className="text-[#FF6900] hover:underline"
               >
                 View on Google Maps
               </a>
@@ -618,7 +618,7 @@ export default function CampingDetailsPage() {
             <div className="flex gap-4 mb-8">
               <Button
                 onClick={() => handleCampingStatus("approved")}
-                className="flex-1 bg-[#106C83] hover:bg-[#0d5a6e]"
+                className="flex-1 bg-[#FF6900] hover:bg-[#0d5a6e]"
                 disabled={loadingApprove}
               >
                 {loadingApprove ? (

@@ -39,7 +39,7 @@ export default function SellerApplicationsTable() {
             <TabsTrigger
               value="seller"
               className={`text-sm border-0 rounded-none font-medium ${
-                activeTab === "seller" ? "border-b-2 border-[#106C83]" : ""
+                activeTab === "seller" ? "border-b-2 border-[#FF6900]" : ""
               }`}
             >
               Latest Seller Applications
@@ -48,7 +48,7 @@ export default function SellerApplicationsTable() {
               value="provider"
               className={`text-sm border-0 rounded-none shadow-none  text-[#939393] font-medium ${
                 activeTab === "provider"
-                  ? "border-b-2 text-black border-[#106C83]"
+                  ? "border-b-2 text-black border-[#FF6900]"
                   : ""
               }`}
             >
@@ -60,7 +60,7 @@ export default function SellerApplicationsTable() {
             <Button
               onClick={() => router.push("/product-seller")}
               variant="default"
-              className="bg-[#106C83] hover:bg-[#106C83] cursor-pointer"
+              className="bg-[#FF6900] hover:bg-[#FF6900] cursor-pointer"
             >
               View all
             </Button>
@@ -148,7 +148,7 @@ export default function SellerApplicationsTable() {
                                 `/product-seller/profile/${application?._id}`
                               )
                             }
-                            className="text-[#106C83] hover:underline cursor-pointer font-medium"
+                            className="text-[#FF6900] hover:underline cursor-pointer font-medium"
                           >
                             View Profile
                           </span>

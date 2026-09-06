@@ -53,7 +53,7 @@ const Statcard = () => {
                 Total Properties
                 </p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.productSellers}
                 </p>
               </>
@@ -82,7 +82,7 @@ const Statcard = () => {
                 <p className="text-sm font-medium text-gray-600">
                  Pending Properties
                 </p>
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.serviceProviders}
                 </p>
               </>
@@ -111,7 +111,7 @@ const Statcard = () => {
                 <p className="text-sm font-medium text-gray-600">
                  Approved Properties
                 </p>
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.pendingApprovals}
                 </p>
               </>
@@ -140,7 +140,7 @@ const Statcard = () => {
                 <p className="text-sm font-medium text-gray-600">
                  Rejected Properties
                 </p>
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.rejectedProfiles}
                 </p>
               </>

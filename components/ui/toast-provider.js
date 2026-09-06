@@ -16,7 +16,7 @@ const toastVariants = cva(
       variant: {
         default: "border bg-background text-foreground",
         destructive: "border-red-500 bg-red-500 text-white",
-        success: "border-[#106C83] bg-[#106C83] text-white",
+        success: "border-[#FF6900] bg-[#FF6900] text-white",
         warning: "border-yellow-500 bg-yellow-500 text-white",
         info: "border-blue-500 bg-blue-500 text-white",
       },

@@ -7,9 +7,9 @@ export default function NotFound() {
       <div className="text-center max-w-md mx-auto">
         <div className="mb-8 flex justify-center">
           <div className="relative">
-            <div className="absolute -inset-1 rounded-full bg-[#106C83]/20 blur-lg animate-pulse"></div>
+            <div className="absolute -inset-1 rounded-full bg-[#FF6900]/20 blur-lg animate-pulse"></div>
             <div className="relative bg-white p-6 rounded-full shadow-lg">
-              <FileQuestion size={80} className="text-[#106C83]" />
+              <FileQuestion size={80} className="text-[#FF6900]" />
             </div>
           </div>
         </div>
@@ -23,7 +23,7 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#106C83] text-white font-medium transition-all hover:bg-[#106C83]/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#106C83]/50 focus:ring-offset-2"
+          className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#FF6900] text-white font-medium transition-all hover:bg-[#FF6900]/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#FF6900]/50 focus:ring-offset-2"
         >
           <span>Return Home</span>
         </Link>

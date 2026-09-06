@@ -75,19 +75,19 @@ function ProjectCard({ project }) {
         <div className="flex items-center text-sm">
           <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
           <span className="text-gray-700">Service: </span>
-          <span className="text-[#106C83] ml-1 font-medium">{project.service}</span>
+          <span className="text-[#FF6900] ml-1 font-medium">{project.service}</span>
         </div>
 
         <div className="flex items-center text-sm">
           <User className="h-4 w-4 mr-2 text-gray-500" />
           <span className="text-gray-700">Assigned to: </span>
-          <span className="text-[#106C83] ml-1 font-medium">{project.provider}</span>
+          <span className="text-[#FF6900] ml-1 font-medium">{project.provider}</span>
         </div>
 
         <div className="flex items-center text-sm">
           <Calendar className="h-4 w-4 mr-2 text-gray-500" />
           <span className="text-gray-700">Due: </span>
-          <span className="text-[#106C83] ml-1 font-medium">{project.dueDate}</span>
+          <span className="text-[#FF6900] ml-1 font-medium">{project.dueDate}</span>
         </div>
       </div>
 
@@ -96,12 +96,12 @@ function ProjectCard({ project }) {
           <span className="text-gray-700">Progress</span>
           <span className="text-gray-500">{project.progress}%</span>
         </div>
-        <Progress value={project.progress} className="h-2 bg-gray-100" indicatorClassName="bg-[#106C83]" />
+        <Progress value={project.progress} className="h-2 bg-gray-100" indicatorClassName="bg-[#FF6900]" />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Button className="bg-[#106C83] hover:bg-[#106C83] text-white">View</Button>
-        <Button variant="outline" className="border-[#106C83] text-[#106C83] hover:bg-teal-50">
+        <Button className="bg-[#FF6900] hover:bg-[#E05D00] text-white shadow-sm shadow-[#FF6900]/25">View</Button>
+        <Button variant="outline" className="border-[#FF6900] text-[#FF6900] hover:bg-[#FFF1E6]">
           Requirements
         </Button>
       </div>

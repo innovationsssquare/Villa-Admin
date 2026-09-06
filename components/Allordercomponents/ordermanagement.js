@@ -64,19 +64,19 @@ export default function Ordersmanagement() {
         <TabsList className="p-0 bg-transparent space-x-2 h-auto">
           <TabsTrigger
             value="all"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             All Orders
           </TabsTrigger>
           {/* <TabsTrigger
             value="active"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             Product Orders
           </TabsTrigger>
           <TabsTrigger
             value="Services"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             Service Orders
           </TabsTrigger> */}
@@ -91,7 +91,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("Delivered")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Delivered"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -101,7 +101,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("Pending")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Pending"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -111,7 +111,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("Processing")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Processing"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -121,7 +121,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("Cancelled")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Cancelled"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -232,7 +232,7 @@ export default function Ordersmanagement() {
                       <TableCell>
                         <span
                          onClick={()=>router.push(`/orders/Vieworder/${application?.orderId}`)}
-                          className="text-[#106C83] hover:underline font-medium cursor-pointer"
+                          className="text-[#FF6900] hover:underline font-medium cursor-pointer"
                         >
                           View Details
                         </span>
@@ -301,7 +301,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("all")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "all"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -311,7 +311,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("pending")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "pending"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -321,7 +321,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("rejected")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "rejected"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -331,7 +331,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("blacklisted")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "blacklisted"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -437,7 +437,7 @@ export default function Ordersmanagement() {
                       <TableCell>
                         <span
                           href="#"
-                          className="text-[#106C83] hover:underline font-medium"
+                          className="text-[#FF6900] hover:underline font-medium"
                         >
                           View Details
                         </span>
@@ -445,7 +445,7 @@ export default function Ordersmanagement() {
                       <TableCell>
                         <span
                           href="#"
-                          className="text-[#106C83] hover:underline font-medium"
+                          className="text-[#FF6900] hover:underline font-medium"
                         >
                           View Details
                         </span>
@@ -514,7 +514,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("all")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "all"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -524,7 +524,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("pending")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "pending"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -534,7 +534,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("rejected")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "rejected"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -544,7 +544,7 @@ export default function Ordersmanagement() {
                   onClick={() => setProfileTab("blacklisted")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "blacklisted"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -650,7 +650,7 @@ export default function Ordersmanagement() {
                       <TableCell>
                         <span
                           href="#"
-                          className="text-[#106C83] hover:underline font-medium"
+                          className="text-[#FF6900] hover:underline font-medium"
                         >
                           View Details
                         </span>
@@ -658,7 +658,7 @@ export default function Ordersmanagement() {
                       <TableCell>
                         <span
                           href="#"
-                          className="text-[#106C83] hover:underline font-medium"
+                          className="text-[#FF6900] hover:underline font-medium"
                         >
                           View Details
                         </span>

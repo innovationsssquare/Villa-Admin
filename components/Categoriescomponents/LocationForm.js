@@ -256,7 +256,7 @@ const uploadImage = async (file) => {
       <div className="flex gap-3 pt-4">
         <Button
           type="submit"
-          className="flex-1 bg-[#106C83] hover:bg-[#106C83] cursor-pointer text-white"
+          className="flex-1 bg-[#FF6900] hover:bg-[#FF6900] cursor-pointer text-white"
         >
           {location ? "Update Location" : "Create Location"}
         </Button>

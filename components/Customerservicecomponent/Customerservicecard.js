@@ -18,7 +18,7 @@ const Customerservicecard = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-600">Completed Services</p>
-            <p className="text-2xl font-bold text-[#106C83]">7,782</p>
+            <p className="text-2xl font-bold text-[#FF6900]">7,782</p>
           </div>
         </div>
 
@@ -34,7 +34,7 @@ const Customerservicecard = () => {
             <p className="text-sm font-medium text-gray-600">
             Pending Services
             </p>
-            <p className="text-2xl font-bold text-[#106C83]">7,867</p>
+            <p className="text-2xl font-bold text-[#FF6900]">7,867</p>
           </div>
         </div>
 
@@ -50,7 +50,7 @@ const Customerservicecard = () => {
             <p className="text-sm font-medium text-gray-600">
             Ongoing Services
             </p>
-            <p className="text-2xl font-bold text-[#106C83]">146</p>
+            <p className="text-2xl font-bold text-[#FF6900]">146</p>
           </div>
         </div>
 

@@ -137,7 +137,7 @@ export default function CottageDetailsPage() {
   const getCottageTypeColor = (cottageType) => {
     switch (cottageType.toLowerCase()) {
       case "single":
-        return "bg-[#106C83]/10 text-[#106C83]";
+        return "bg-[#FF6900]/10 text-[#FF6900]";
       case "family":
         return "bg-green-100 text-green-800";
       case "couple":
@@ -245,7 +245,7 @@ export default function CottageDetailsPage() {
                 key={key}
                 onClick={() => setImageIndex(key)}
                 className={`flex-shrink-0 w-20 h-16 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                  key === imageIndex ? "border-[#106C83]" : "border-gray-200"
+                  key === imageIndex ? "border-[#FF6900]" : "border-gray-200"
                 }`}
               >
                 <Image
@@ -303,7 +303,7 @@ export default function CottageDetailsPage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold text-[#106C83]">
+                <div className="text-lg font-bold text-[#FF6900]">
                   From ₹
                   {Math.min(
                     ...(data.cottages?.map(
@@ -455,7 +455,7 @@ export default function CottageDetailsPage() {
                       </div>
                       <div>
                         <h4 className="font-semibold mb-2">Pricing</h4>
-                        <div className="text-2xl font-bold text-[#106C83] mb-2">
+                        <div className="text-2xl font-bold text-[#FF6900] mb-2">
                           ₹{cottage.pricePerNight?.toLocaleString()}
                         </div>
                         <div className="text-sm text-gray-600">per night</div>
@@ -548,7 +548,7 @@ export default function CottageDetailsPage() {
                     key={index}
                     className="text-sm text-gray-700 flex items-start"
                   >
-                    <span className="w-2 h-2 bg-[#106C83] rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3 flex-shrink-0"></span>
                     {rule}
                   </li>
                 ))}
@@ -590,7 +590,7 @@ export default function CottageDetailsPage() {
                 href={data.location.maplink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#106C83] hover:underline hover:text-[#0e5c6f]"
+                className="text-[#FF6900] hover:underline hover:text-[#0e5c6f]"
               >
                 View on Google Maps
               </a>
@@ -656,7 +656,7 @@ export default function CottageDetailsPage() {
             <div className="flex gap-4 mb-8">
               <Button
                 onClick={() => handleCottageStatus("approved")}
-                className="flex-1 bg-[#106C83] hover:bg-[#0e5c6f]"
+                className="flex-1 bg-[#FF6900] hover:bg-[#0e5c6f]"
                 disabled={loadingApprove}
               >
                 {loadingApprove ? (

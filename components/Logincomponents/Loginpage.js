@@ -7,10 +7,10 @@ import { Sparkles } from "lucide-react";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-[#0B2530] to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-br from-neutral-950 via-[#14110E] to-black flex items-center justify-center p-4 relative overflow-hidden">
       {/* Subtle Background Lighting */}
-      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#106C83]/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#1E8EA6]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#FF6900]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#EA580C]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         {/* Brand Header */}
@@ -25,8 +25,8 @@ export default function SignInPage() {
               priority
             />
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs text-teal-200 font-medium">
-            <Sparkles className="h-3 w-3 text-teal-300" />
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-orange-500/20 text-xs text-orange-200 font-medium">
+            <Sparkles className="h-3 w-3 text-orange-400" />
             <span>Management Console</span>
           </div>
         </div>

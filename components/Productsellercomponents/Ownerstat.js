@@ -52,7 +52,7 @@ const Ownerstats = () => {
                 Total Owners
                 </p>
 
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.productSellers}
                 </p>
               </>
@@ -81,7 +81,7 @@ const Ownerstats = () => {
                 <p className="text-sm font-medium text-gray-600">
                 Verified Owners
                 </p>
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.serviceProviders}
                 </p>
               </>
@@ -110,7 +110,7 @@ const Ownerstats = () => {
                 <p className="text-sm font-medium text-gray-600">
                  Not Verified Owners
                 </p>
-                <p className="text-2xl font-bold text-[#106C83]">
+                <p className="text-2xl font-bold text-[#FF6900]">
                   {data?.pendingApprovals}
                 </p>
               </>

@@ -73,7 +73,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-4 flex justify-end">
-                  <button className="px-4 py-2 bg-[#106C83] text-white text-sm rounded-md hover:bg-teal-700">
+                  <button className="px-4 py-2 bg-[#FF6900] text-white text-sm rounded-md hover:bg-[#E05D00] shadow-sm shadow-[#FF6900]/25 transition-colors">
                     View all
                   </button>
                 </div>

@@ -327,7 +327,7 @@ export function Categoriestable() {
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer">
+                <Button className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer">
                   <Plus className="h-4 w-4" />
                   Add New
                 </Button>
@@ -441,7 +441,7 @@ export function Categoriestable() {
                               </SelectContent>
                             </Select>
                             <Button
-                              className="bg-[#106C83] rounded-lg text-white h-9"
+                              className="bg-[#FF6900] rounded-lg text-white h-9"
                               type="button"
                               onPress={addSeasonalTrend} 
                               size="sm"
@@ -490,7 +490,7 @@ export function Categoriestable() {
                   <div className="flex justify-end gap-4 py-2">
                     <Button
                       onClick={handleSubmit} // Fixed to use onClick instead of onPress
-                      className="bg-[#106C83] rounded-lg text-white h-9 w-44"
+                      className="bg-[#FF6900] rounded-lg text-white h-9 w-44"
                     >
                       {isSubmitting ? <span className="loader"></span> : "Create Category"}
                     </Button>
@@ -573,7 +573,7 @@ export function Categoriestable() {
                                     Setupdatteid(subcategory._id)
                                     setIsDialogOpen2(true)
                                   }}
-                                  className="p-2 text-[#106C83] cursor-pointer hover:text-[#106C83] hover:bg-blue-50 rounded-md transition-colors"
+                                  className="p-2 text-[#FF6900] cursor-pointer hover:text-[#FF6900] hover:bg-blue-50 rounded-md transition-colors"
                                   title="Edit category"
                                 >
                                   <Edit className="h-4 w-4" />
@@ -641,7 +641,7 @@ export function Categoriestable() {
                                                 />
                                                 <div className="mt-2">
                                                   <Label htmlFor="image-upload" className="cursor-pointer">
-                                                    <span className="text-sm text-center font-medium bg-[#106C83] p-2 rounded-full text-white hover:text-primary/80">
+                                                    <span className="text-sm text-center font-medium bg-[#FF6900] p-2 rounded-full text-white hover:text-primary/80">
                                                       Click to upload
                                                     </span>
                                                   </Label>
@@ -718,7 +718,7 @@ export function Categoriestable() {
                                               </SelectContent>
                                             </Select>
                                             <Button
-                                              className="bg-[#106C83] rounded-lg text-white h-9"
+                                              className="bg-[#FF6900] rounded-lg text-white h-9"
                                               type="button"
                                               onPress={addSeasonalTrend}
                                               size="sm"
@@ -776,7 +776,7 @@ export function Categoriestable() {
                                         <Button
                                           type="submit"
                                           disabled={isSubmitting}
-                                          className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer"
+                                          className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer"
                                         >
                                           {isSubmitting ? (
                                             <>

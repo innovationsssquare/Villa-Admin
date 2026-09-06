@@ -158,7 +158,7 @@ export default function Documents({ document ,id}) {
                 <div className="flex-shrink-0">
                   <Button
                     variant="link"
-                    className="text-[#106C83] hover:underline cursor-pointer font-medium p-0 h-auto"
+                    className="text-[#FF6900] hover:underline cursor-pointer font-medium p-0 h-auto"
                     onClick={() => window.open(`/${filename}`, "_blank")}
                   >
                     View Document

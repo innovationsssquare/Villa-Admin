@@ -250,14 +250,14 @@ export default function SellersManagement() {
           <TabsTrigger
             value="applications"
             onClick={() => setisapproved("")}
-            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             {` Owner's Properties`}
           </TabsTrigger>
           <TabsTrigger
             value="active"
             onClick={() => setisapproved("approved")}
-            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             Approved Properties
           </TabsTrigger>
@@ -272,7 +272,7 @@ export default function SellersManagement() {
                   onClick={() => setisapproved("")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     isapproved === ""
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -282,7 +282,7 @@ export default function SellersManagement() {
                   onClick={() => setisapproved("pending")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     isapproved === "pending"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -292,7 +292,7 @@ export default function SellersManagement() {
                   onClick={() => setisapproved("rejected")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     isapproved === "rejected"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -403,7 +403,7 @@ export default function SellersManagement() {
                               );
                             }
                           }}
-                          className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                          className="text-[#FF6900] cursor-pointer hover:underline font-medium"
                         >
                           View Profile
                         </span>
@@ -424,7 +424,7 @@ export default function SellersManagement() {
                   onClick={() => setisapproved("approved")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     isapproved === "approved"
-                      ? "border-b-2 border-[#106C83] text-[#106C83]"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -534,7 +534,7 @@ export default function SellersManagement() {
                               );
                             }
                           }}
-                          className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                          className="text-[#FF6900] cursor-pointer hover:underline font-medium"
                         >
                           View Profile
                         </span>

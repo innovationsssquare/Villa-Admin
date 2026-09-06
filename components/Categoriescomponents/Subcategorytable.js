@@ -184,7 +184,7 @@
 //             </div>
 //             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 //               <DialogTrigger asChild>
-//                 <Button className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer">
+//                 <Button className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer">
 //                   <Plus className="h-4 w-4" />
 //                   Add New
 //                 </Button>
@@ -284,7 +284,7 @@
 //                                 htmlFor="image-upload"
 //                                 className="cursor-pointer"
 //                               >
-//                                  <span className="text-sm text-center font-medium  bg-[#106C83] p-2 rounded-full text-white hover:text-primary/80">
+//                                  <span className="text-sm text-center font-medium  bg-[#FF6900] p-2 rounded-full text-white hover:text-primary/80">
 //                                   Click to upload
 //                                 </span>
 //                               </Label>
@@ -320,7 +320,7 @@
 //                     <Button
 //                       type="submit"
 //                       disabled={isSubmitting}
-//                       className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer"
+//                       className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer"
 //                     >
 //                       {isSubmitting ? (
 //                         <>

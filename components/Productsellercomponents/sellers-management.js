@@ -238,14 +238,14 @@ export default function SellersManagement() {
           <TabsTrigger
             value={false}
             onClick={() => setisVerified(false)}
-            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
            All Owners
           </TabsTrigger>
           <TabsTrigger
             value={true}
             onClick={() => setisVerified(true)}
-            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
           >
             Verified Owners
           </TabsTrigger>
@@ -328,7 +328,7 @@ export default function SellersManagement() {
                                 `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                            className="text-[#FF6900] cursor-pointer hover:underline font-medium"
                           >
                             View Profile
                           </span>
@@ -415,7 +415,7 @@ export default function SellersManagement() {
                                 `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
-                            className="text-[#106C83] cursor-pointer hover:underline font-medium"
+                            className="text-[#FF6900] cursor-pointer hover:underline font-medium"
                           >
                             View Profile
                           </span>

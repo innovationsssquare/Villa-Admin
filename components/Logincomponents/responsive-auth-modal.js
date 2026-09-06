@@ -94,7 +94,7 @@ export const AdminLoginForm = ({ onSuccess }) => {
     <div className="space-y-6 w-full text-left">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-gradient-to-tr from-[#106C83] to-[#1E8EA6] rounded-2xl flex items-center justify-center shadow-md shadow-[#106C83]/20 mb-3">
+        <div className="mx-auto w-12 h-12 bg-gradient-to-tr from-[#FF6900] to-[#FF8733] rounded-2xl flex items-center justify-center shadow-md shadow-[#FF6900]/25 mb-3">
           <KeyRound className="h-6 w-6 text-white" />
         </div>
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -133,7 +133,7 @@ export const AdminLoginForm = ({ onSuccess }) => {
                 if (error) setError(null);
               }}
               placeholder="admin@thevillacamp.com or username"
-              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#106C83] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#106C83]/20 text-gray-900 placeholder:text-gray-400"
+              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 placeholder:text-gray-400"
               required
             />
           </div>
@@ -159,13 +159,13 @@ export const AdminLoginForm = ({ onSuccess }) => {
                 if (error) setError(null);
               }}
               placeholder="••••••••••••"
-              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#106C83] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#106C83]/20 text-gray-900 placeholder:text-gray-400 font-mono"
+              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 placeholder:text-gray-400 font-mono"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -184,7 +184,7 @@ export const AdminLoginForm = ({ onSuccess }) => {
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="rounded border-gray-300 text-[#106C83] focus:ring-[#106C83] h-3.5 w-3.5 accent-[#106C83]"
+              className="rounded border-gray-300 text-[#FF6900] focus:ring-[#FF6900] h-3.5 w-3.5 accent-[#FF6900]"
             />
             <span>Remember this device</span>
           </label>
@@ -194,7 +194,7 @@ export const AdminLoginForm = ({ onSuccess }) => {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 bg-[#106C83] hover:bg-[#0d5568] text-white font-semibold rounded-xl shadow-md shadow-[#106C83]/20 transition-all duration-200 text-sm mt-2 gap-2 cursor-pointer"
+          className="w-full h-11 bg-[#FF6900] hover:bg-[#E05D00] text-white font-semibold rounded-xl shadow-md shadow-[#FF6900]/25 transition-all duration-200 text-sm mt-2 gap-2 cursor-pointer"
         >
           {loading ? (
             <>
@@ -241,7 +241,7 @@ const ResponsiveAuthModal = ({ autoOpen = false, onOpenChange }) => {
           <DrawerTrigger asChild>
             <Button
               variant="outline"
-              className="bg-[#106C83] text-white hover:bg-[#0d5568]"
+              className="bg-[#FF6900] text-white hover:bg-[#E05D00] shadow-sm shadow-[#FF6900]/25"
             >
               <LogIn className="mr-2 h-4 w-4" />
               Sign In
@@ -275,7 +275,7 @@ const ResponsiveAuthModal = ({ autoOpen = false, onOpenChange }) => {
         <DialogTrigger asChild>
           <Button
             variant="outline"
-            className="bg-[#106C83] text-white hover:bg-[#0d5568]"
+            className="bg-[#FF6900] text-white hover:bg-[#E05D00] shadow-sm shadow-[#FF6900]/25"
           >
             <LogIn className="mr-2 h-4 w-4" />
             Sign In

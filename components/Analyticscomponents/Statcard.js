@@ -19,7 +19,7 @@ const Statcard = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-600">Product Sellers</p>
-            <p className="text-2xl font-bold text-[#106C83]">2,452</p>
+            <p className="text-2xl font-bold text-[#FF6900]">2,452</p>
           </div>
         </div>
 
@@ -35,7 +35,7 @@ const Statcard = () => {
             <p className="text-sm font-medium text-gray-600">
               Service Providers
             </p>
-            <p className="text-2xl font-bold text-[#106C83]">7,867</p>
+            <p className="text-2xl font-bold text-[#FF6900]">7,867</p>
           </div>
         </div>
 
@@ -51,7 +51,7 @@ const Statcard = () => {
             <p className="text-sm font-medium text-gray-600">
               Pending Approvals
             </p>
-            <p className="text-2xl font-bold text-[#106C83]">146</p>
+            <p className="text-2xl font-bold text-[#FF6900]">146</p>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ const Statcard = () => {
             <p className="text-sm font-medium text-gray-600">
               Rejected Profiles
             </p>
-            <p className="text-2xl font-bold text-[#106C83]">55</p>
+            <p className="text-2xl font-bold text-[#FF6900]">55</p>
           </div>
         </div>
       </div>

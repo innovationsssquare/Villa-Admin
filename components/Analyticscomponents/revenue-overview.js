@@ -79,7 +79,7 @@ export default function RevenueOverview() {
           </div>
 
           <div className="relative h-60">
-            <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 transform text-sm font-medium text-[#106C83]">
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 transform text-sm font-medium text-[#FF6900]">
               Sales
             </div>
 

@@ -228,7 +228,7 @@
 //             </div>
 //             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 //               <DialogTrigger asChild>
-//                 <Button className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer">
+//                 <Button className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer">
 //                   <Plus className="h-4 w-4" />
 //                   Add New
 //                 </Button>
@@ -288,7 +288,7 @@
 //                     <Button
 //                       type="submit"
 //                       disabled={isSubmitting}
-//                       className="flex items-center gap-2 bg-[#106C83] rounded-sm text-white cursor-pointer"
+//                       className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer"
 //                     >
 //                       {isSubmitting ? (
 //                         <>

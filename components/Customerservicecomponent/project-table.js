@@ -97,7 +97,7 @@ export default function ProjectTable() {
               value="all-works"
               className={`px-4 py-2 border-0 rounded-none ${
                 activeTab === "all-works"
-                  ? "border-b-2 border-[#106C83] font-medium text-[#106C83]"
+                  ? "border-b-2 border-[#FF6900] font-medium text-[#FF6900]"
                   : "text-gray-500"
               }`}
             >
@@ -107,7 +107,7 @@ export default function ProjectTable() {
               value="ongoing-projects"
               className={`px-4 py-2 border-0 rounded-none ${
                 activeTab === "ongoing-projects"
-                  ? "border-b-2 border-[#106C83] font-medium text-[#106C83]"
+                  ? "border-b-2 border-[#FF6900] font-medium text-[#FF6900]"
                   : "text-gray-500"
               }`}
             >
@@ -269,7 +269,7 @@ function ViewRequirementModal() {
       <DialogTrigger asChild>
         <Button
           variant="link"
-          className="text-[#106C83] hover:text-[#106C83] p-0 h-auto"
+          className="text-[#FF6900] hover:text-[#FF6900] p-0 h-auto"
         >
           View Requirement
         </Button>
@@ -366,7 +366,7 @@ function SendQuoteModal() {
               <div className="relative">
                 <div className="flex">
                   <Input type="text" placeholder="Set Date" className="pr-10" />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#106C83]">
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#FF6900]">
                     <Calendar className="h-5 w-5" />
                   </div>
                 </div>
@@ -383,7 +383,7 @@ function SendQuoteModal() {
             />
           </div>
 
-          <Button className="w-full bg-[#106C83] hover:bg-[#106C83]">
+          <Button className="w-full bg-[#FF6900] hover:bg-[#FF6900]">
             Send Quote
           </Button>
         </div>
@@ -398,7 +398,7 @@ function AssignProviderModal() {
       <DialogTrigger asChild>
         <Button
           variant="default"
-          className="bg-[#106C83] hover:bg-[#106C83] text-white w-32 "
+          className="bg-[#FF6900] hover:bg-[#FF6900] text-white w-32 "
           size="sm"
         >
           Assign Provider
@@ -452,7 +452,7 @@ function AssignProviderModal() {
 
                   <a
                     href="#"
-                    className="text-[#106C83] text-sm flex items-center hover:underline"
+                    className="text-[#FF6900] text-sm flex items-center hover:underline"
                   >
                     www.providername.com
                     <ExternalLink className="h-3 w-3 ml-1" />
@@ -483,7 +483,7 @@ function AssignProviderModal() {
 
                   <Button
                     variant="outline"
-                    className="w-full border-[#106C83] text-[#106C83] hover:bg-teal-50"
+                    className="w-full border-[#FF6900] text-[#FF6900] hover:bg-[#FFF1E6]"
                   >
                     View Profile
                   </Button>
@@ -492,7 +492,7 @@ function AssignProviderModal() {
             ))}
           </div>
 
-          <Button className="w-full bg-[#106C83] hover:bg-[#106C83]">
+          <Button className="w-full bg-[#FF6900] hover:bg-[#E05D00] text-white shadow-sm shadow-[#FF6900]/25">
             Assign Provider
           </Button>
         </div>

@@ -96,7 +96,7 @@ export default function SellerProfile({ seller }) {
 
                   <Link
                     href={`${profile?.CompanyId?.BussinessWebsite}`}
-                    className="text-teal-600 text-sm flex items-center hover:underline mb-2"
+                    className="text-[#FF6900] text-sm flex items-center hover:underline mb-2"
                   >
                     {profile?.CompanyId?.BussinessWebsite}
                     <ChevronRight className="h-3 w-3 ml-1" />

@@ -426,7 +426,7 @@ export default function OwnerDetailsClient() {
                         singleowner?.isVerified
                           ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                           : canVerify
-                          ? "bg-[#106C83] hover:bg-[#0e5b6e] text-white"
+                          ? "bg-[#FF6900] hover:bg-[#0e5b6e] text-white"
                           : "bg-muted text-muted-foreground"
                       )}
                       disabled={

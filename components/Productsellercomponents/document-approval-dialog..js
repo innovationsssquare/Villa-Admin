@@ -63,8 +63,8 @@ export function DocumentApprovalDialog({
         <div className="flex flex-col h-[90vh] md:h-[90vh]">
           {/* Header */}
           <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex bg-[#106C83] items-center p-2 rounded-xl gap-4">
-              <div className="bg-white text-[#106C83] font-bold rounded-md p-2 flex items-center justify-center">
+            <div className="flex bg-[#FF6900] items-center p-2 rounded-xl gap-4 shadow-sm shadow-[#FF6900]/25">
+              <div className="bg-white text-[#FF6900] font-bold rounded-md p-2 flex items-center justify-center">
                 <span className="text-2xl">
                   {getApprovedCount()}/{documents.length}
                 </span>

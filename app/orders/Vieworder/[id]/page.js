@@ -42,7 +42,7 @@ const Page = () => {
                       <div className="flex justify-between items-center">
                         <div className="space-y-2">
                           <h2 className="font-bold text-gray-800">#order829</h2>
-                          <div className="bg-[#106C83] text-white px-4 py-2 rounded-full inline-flex items-center">
+                          <div className="bg-[#FF6900] text-white px-4 py-2 rounded-full inline-flex items-center">
                             <span className="mr-2">📦</span> Estimated Delivery:
                             27-03-2025
                           </div>
@@ -59,14 +59,14 @@ const Page = () => {
                       <div className="relative">
                         {/* Progress Bar */}
                         <div className="h-1 bg-gray-200 absolute top-5 left-7 right-7 z-0">
-                          <div className="h-1 bg-[#106C83] w-[40%]"></div>
+                          <div className="h-1 bg-[#FF6900] w-[40%]"></div>
                         </div>
 
                         {/* Status Steps */}
                         <div className="flex justify-between relative z-10">
                           {/* Order Placed */}
                           <div className="flex flex-col items-center">
-                            <div className="w-10 h-10 rounded-full bg-[#106C83] flex items-center justify-center text-white mb-2">
+                            <div className="w-10 h-10 rounded-full bg-[#FF6900] flex items-center justify-center text-white mb-2">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
@@ -90,7 +90,7 @@ const Page = () => {
 
                           {/* In Transit */}
                           <div className="flex flex-col items-center">
-                            <div className="w-10 h-10 rounded-full bg-[#106C83] flex items-center justify-center text-white mb-2">
+                            <div className="w-10 h-10 rounded-full bg-[#FF6900] flex items-center justify-center text-white mb-2">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
@@ -274,11 +274,11 @@ const Page = () => {
 
                       <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <Mail className="text-[#106C83]" size={20} />
+                          <Mail className="text-[#FF6900]" size={20} />
                           <span>robbink@gmail.com</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Phone className="text-[#106C83]" size={20} />
+                          <Phone className="text-[#FF6900]" size={20} />
                           <span>+91 783678356</span>
                         </div>
                       </div>
@@ -315,8 +315,8 @@ const Page = () => {
                           <span>$29</span>
                         </div>
                         <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between font-semibold">
-                          <span className="text-[#106C83]">Total</span>
-                          <span className="text-[#106C83]">$829</span>
+                          <span className="text-[#FF6900]">Total</span>
+                          <span className="text-[#FF6900]">$829</span>
                         </div>
                       </div>
                     </div>
@@ -328,7 +328,7 @@ const Page = () => {
                       </h3>
                       <div className="flex gap-3">
                         <MapPin
-                          className="text-[#106C83] flex-shrink-0"
+                          className="text-[#FF6900] flex-shrink-0"
                           size={24}
                         />
                         <div>

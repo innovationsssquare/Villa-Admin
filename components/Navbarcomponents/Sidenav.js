@@ -112,12 +112,12 @@ const Sidenav = () => {
           {isMinimized ? (
             <PanelLeftOpen
               size={20}
-              className="text-[#106C83] cursor-pointer"
+              className="text-[#FF6900] cursor-pointer"
             />
           ) : (
             <PanelLeftClose
               size={20}
-              className="text-[#106C83] cursor-pointer"
+              className="text-[#FF6900] cursor-pointer"
             />
           )}
         </Button>
@@ -126,8 +126,8 @@ const Sidenav = () => {
       <div className="flex w-full mt-3 px-2 flex-col flex-1">
         <div className="py-2">
           {!isMinimized && (
-            <p className="px-4 text-xs font-medium text-gray-500 mb-1 transition-all duration-900 ease-in-out">
-              Dashboard
+            <p className="px-4 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 transition-all duration-900 ease-in-out">
+              Navigation
             </p>
           )}
           <div
@@ -145,16 +145,16 @@ const Sidenav = () => {
                         variant="light"
                         isIconOnly={true}
                         onPress={() => router.push(item.path)}
-                        className={`w-full flex justify-center cursor-pointer items-center p-2 text-sm rounded-md transition-all duration-900 ${
+                        className={`w-full flex justify-center cursor-pointer items-center p-2 text-sm rounded-lg transition-all duration-300 ${
                           isActive(item.path)
-                            ? "bg-[#106C83] text-white"
-                            : "text-gray-700 hover:bg-gray-100"
+                            ? "bg-[#FF6900] text-white shadow-md shadow-[#FF6900]/25"
+                            : "text-gray-700 hover:bg-[#FFF1E6] hover:text-[#FF6900]"
                         }`}
                       >
                         <item.icon size={18} />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="p-2">
+                    <TooltipContent side="right" className="p-2 bg-[#171717] text-white border-none">
                       <p className="text-sm font-medium">{item.label}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -163,13 +163,13 @@ const Sidenav = () => {
                     variant="light"
                     key={item.label}
                     onPress={() => router.push(item.path)}
-                    className={`w-56 flex justify-start cursor-pointer items-center px-4 py-2 text-sm rounded-md transition-all duration-300 ${
+                    className={`w-56 flex justify-start cursor-pointer items-center px-4 py-2.5 text-sm rounded-lg transition-all duration-300 ${
                       isActive(item.path)
-                        ? "bg-[#106C83] text-white hover:text-gray-700 hover:bg-[#106C83]"
-                        : "text-gray-700 hover:bg-gray-100"
+                        ? "bg-gradient-to-r from-[#FF6900] to-[#FF8733] text-white shadow-md shadow-[#FF6900]/25 font-semibold"
+                        : "text-gray-700 hover:bg-[#FFF1E6] hover:text-[#FF6900]"
                     }`}
                   >
-                    <item.icon size={15} className="mr-2" />
+                    <item.icon size={16} className="mr-2.5" />
                     <span
                       className={`transition-all transform duration-900 ${
                         isMinimized ? "w-20 opacity-0" : ""

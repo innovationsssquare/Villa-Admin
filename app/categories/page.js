@@ -22,16 +22,16 @@ export default function TableTabs() {
         <TabsList className="grid w-[500px] grid-cols-4 gap-2 mb-4">
           <TabsTrigger
             value="Category"
-            className={`text-sm border-0 font-medium  cursor-pointer rounded-md px-6 py-2  data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50 ${
-              activeTab === "Category" ? "border-b-2 border-[#106C83]" : ""
+            className={`text-sm border-0 font-medium  cursor-pointer rounded-md px-6 py-2  data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50 ${
+              activeTab === "Category" ? "border-b-2 border-[#FF6900]" : ""
             }`}
           >
             Category
           </TabsTrigger>
           <TabsTrigger
             value="location"
-            className={`text-sm border-0 font-medium  cursor-pointer rounded-md px-6 py-2  data-[state=active]:bg-[#106C83] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50 ${
-              activeTab === "location" ? "border-b-2 border-[#106C83]" : ""
+            className={`text-sm border-0 font-medium  cursor-pointer rounded-md px-6 py-2  data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50 ${
+              activeTab === "location" ? "border-b-2 border-[#FF6900]" : ""
             }`}
           >
             Location{" "}

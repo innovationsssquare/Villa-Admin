@@ -67,7 +67,7 @@ export default function DocumentApprovalPage({data}) {
   return (
     <div className="container flex items-center justify-center">
       <Button variant={"outline"} onClick={() => setOpen(true)}>
-        <span href="#" className="text-[#106C83] hover:underline font-medium">
+        <span href="#" className="text-[#FF6900] hover:underline font-medium">
           View Details
         </span>{" "}
       </Button>
