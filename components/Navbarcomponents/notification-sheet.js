@@ -134,8 +134,8 @@ export default function NotificationSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative cursor-pointer border-neutral-200 hover:border-[#FF6900]/40">
-          <Bell className="h-5 w-5 text-neutral-700" />
+        <Button variant="outline" size="icon" className="relative cursor-pointer border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-[#FF6900]/40">
+          <Bell className="h-5 w-5 text-neutral-700 dark:text-neutral-300" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF6900] text-xs text-white shadow-sm shadow-[#FF6900]/30 font-semibold animate-pulse">
               {unreadCount}
@@ -143,19 +143,19 @@ export default function NotificationSheet() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md bg-white border-l border-neutral-200">
-        <SheetHeader className="border-b border-neutral-100 pb-4">
+      <SheetContent className="w-full sm:max-w-md bg-white dark:bg-[#0E0E11] border-l border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100">
+        <SheetHeader className="border-b border-neutral-100 dark:border-neutral-800/80 pb-4">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-xl font-bold text-neutral-900 flex items-center gap-2">
+            <SheetTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
               <span>Notifications</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFF1E6] text-[#FF6900] font-medium">Live</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFF1E6] dark:bg-orange-950/60 text-[#FF6900] font-medium border border-[#FF6900]/20">Live</span>
             </SheetTitle>
             {unreadCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={markAllAsRead}
-                className="text-[#FF6900] hover:text-[#E05D00] hover:bg-[#FFF1E6]"
+                className="text-[#FF6900] hover:text-[#E05D00] hover:bg-[#FFF1E6] dark:hover:bg-neutral-800"
               >
                 Mark all as read
               </Button>
@@ -167,7 +167,7 @@ export default function NotificationSheet() {
             {notifs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Bell className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No notifications</h3>
+                <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">No notifications</h3>
                 <p className="text-sm text-muted-foreground">
                   {`You're all caught up! No new notifications.`}
                 </p>
@@ -179,16 +179,16 @@ export default function NotificationSheet() {
                   className={cn(
                     "flex gap-3 p-3 rounded-xl border transition-all",
                     notification.read
-                      ? "bg-neutral-50/50 border-neutral-100 text-neutral-600"
-                      : "bg-[#FFF1E6]/40 border-[#FF6900]/20 text-neutral-900 shadow-sm"
+                      ? "bg-neutral-50/50 dark:bg-neutral-900/40 border-neutral-100 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400"
+                      : "bg-[#FFF1E6]/40 dark:bg-neutral-900/90 border-[#FF6900]/20 dark:border-[#FF6900]/40 text-neutral-900 dark:text-neutral-100 shadow-sm"
                   )}
                 >
                   <div
                     className={cn(
                       "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm",
                       notification.read
-                        ? "bg-white border border-neutral-200"
-                        : "bg-white border border-[#FF6900]/30 text-[#FF6900]"
+                        ? "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+                        : "bg-white dark:bg-neutral-800 border border-[#FF6900]/30 text-[#FF6900]"
                     )}
                   >
                     {getIcon(notification.type)}
@@ -198,7 +198,7 @@ export default function NotificationSheet() {
                       <p
                         className={cn(
                           "text-sm font-semibold",
-                          !notification.read ? "text-neutral-900" : "text-neutral-700"
+                          !notification.read ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-700 dark:text-neutral-300"
                         )}
                       >
                         {notification.title}
@@ -215,7 +215,7 @@ export default function NotificationSheet() {
                         </Button>
                       )}
                     </div>
-                    <p className="text-xs text-neutral-600 leading-relaxed">
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                       {notification.description}
                     </p>
                     <p className="text-[10px] text-neutral-400">

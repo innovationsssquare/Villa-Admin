@@ -97,18 +97,18 @@ export const AdminLoginForm = ({ onSuccess }) => {
         <div className="mx-auto w-12 h-12 bg-gradient-to-tr from-[#FF6900] to-[#FF8733] rounded-2xl flex items-center justify-center shadow-md shadow-[#FF6900]/25 mb-3">
           <KeyRound className="h-6 w-6 text-white" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-neutral-100">
           Admin Portal
         </h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-neutral-400">
           Enter your admin credentials to access the console
         </p>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-700 animate-in fade-in slide-in-from-top-1 duration-200">
-          <AlertCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+        <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl flex items-start gap-2.5 text-xs text-rose-700 dark:text-rose-300 animate-in fade-in slide-in-from-top-1 duration-200">
+          <AlertCircle className="h-4 w-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="flex-1 font-medium">{error}</div>
         </div>
       )}
@@ -117,11 +117,11 @@ export const AdminLoginForm = ({ onSuccess }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Username / Email Field */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-700 block">
+          <label className="text-xs font-semibold text-gray-700 dark:text-neutral-300 block">
             Username or Email
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-neutral-500">
               <User className="h-4 w-4" />
             </div>
             <input
@@ -133,7 +133,7 @@ export const AdminLoginForm = ({ onSuccess }) => {
                 if (error) setError(null);
               }}
               placeholder="admin@thevillacamp.com or username"
-              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 placeholder:text-gray-400"
+              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/50 dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-900/80 focus:bg-white dark:focus:bg-neutral-900 border border-gray-200 dark:border-neutral-800 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 dark:text-neutral-100 placeholder:text-gray-400 dark:placeholder:text-neutral-500"
               required
             />
           </div>
@@ -142,12 +142,12 @@ export const AdminLoginForm = ({ onSuccess }) => {
         {/* Password Field */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-gray-700 block">
+            <label className="text-xs font-semibold text-gray-700 dark:text-neutral-300 block">
               Password
             </label>
           </div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 dark:text-neutral-500">
               <Lock className="h-4 w-4" />
             </div>
             <input
@@ -159,13 +159,13 @@ export const AdminLoginForm = ({ onSuccess }) => {
                 if (error) setError(null);
               }}
               placeholder="••••••••••••"
-              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 hover:bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 placeholder:text-gray-400 font-mono"
+              className="w-full pl-10 pr-10 py-2.5 bg-gray-50/50 dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-900/80 focus:bg-white dark:focus:bg-neutral-900 border border-gray-200 dark:border-neutral-800 focus:border-[#FF6900] rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#FF6900]/20 text-gray-900 dark:text-neutral-100 placeholder:text-gray-400 dark:placeholder:text-neutral-500 font-mono"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-neutral-200 transition-colors cursor-pointer"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -179,12 +179,12 @@ export const AdminLoginForm = ({ onSuccess }) => {
 
         {/* Remember me */}
         <div className="flex items-center justify-between text-xs pt-1">
-          <label className="flex items-center gap-2 cursor-pointer select-none text-gray-600">
+          <label className="flex items-center gap-2 cursor-pointer select-none text-gray-600 dark:text-neutral-400">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="rounded border-gray-300 text-[#FF6900] focus:ring-[#FF6900] h-3.5 w-3.5 accent-[#FF6900]"
+              className="rounded border-gray-300 dark:border-neutral-700 text-[#FF6900] focus:ring-[#FF6900] h-3.5 w-3.5 accent-[#FF6900]"
             />
             <span>Remember this device</span>
           </label>

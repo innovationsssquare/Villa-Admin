@@ -25,7 +25,7 @@ export function BookingsPagination({
   const end = Math.min(page * limit, total);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card rounded-xl border border-border p-4 shadow-sm">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 p-4 shadow-sm">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span>Showing</span>
         <span className="font-medium text-foreground">

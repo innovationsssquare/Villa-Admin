@@ -33,8 +33,8 @@ const formatCurrency = (amount, currency = "INR") => {
 export function BookingsTable({ bookings, isLoading,onViewBooking }) {
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl border border-border overflow-hidden h-[50vh] flex justify-center items-center">
-        <div className="p-8 text-center text-muted-foreground">
+      <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 overflow-hidden h-[50vh] flex justify-center items-center">
+        <div className="p-8 text-center text-muted-foreground dark:text-neutral-400">
            <span className="loader2"></span>
         </div>
       </div>
@@ -43,8 +43,8 @@ export function BookingsTable({ bookings, isLoading,onViewBooking }) {
 
   if (bookings.length === 0) {
     return (
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="p-8 text-center text-muted-foreground">
+      <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 overflow-hidden">
+        <div className="p-8 text-center text-muted-foreground dark:text-neutral-400">
           No bookings found matching your filters.
         </div>
       </div>
@@ -52,11 +52,11 @@ export function BookingsTable({ bookings, isLoading,onViewBooking }) {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
+    <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50 hover:bg-muted/50">
+            <TableRow className="bg-muted/50 dark:bg-neutral-900/60 hover:bg-muted/50 dark:hover:bg-neutral-900/60 border-b border-border dark:border-neutral-800">
               <TableHead className="font-semibold">Booking ID</TableHead>
               <TableHead className="font-semibold">Property</TableHead>
               <TableHead className="font-semibold">Customer</TableHead>
@@ -73,7 +73,7 @@ export function BookingsTable({ bookings, isLoading,onViewBooking }) {
           </TableHeader>
           <TableBody>
             {bookings.map((booking) => (
-              <TableRow key={booking._id} className="group">
+              <TableRow key={booking._id} className="group hover:bg-muted/40 dark:hover:bg-neutral-800/40 border-b border-border dark:border-neutral-800/60">
                 <TableCell className="font-mono text-xs">
                   {booking._id.slice(-8).toUpperCase()}
                 </TableCell>

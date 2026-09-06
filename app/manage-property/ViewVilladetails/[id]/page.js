@@ -138,9 +138,9 @@ export default function VillaDetailsPage() {
   }
 
   return (
-    <ScrollArea className="w-full mx-auto bg-white h-screen pb-14 px-4">
+    <ScrollArea className="w-full mx-auto bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 px-4 text-neutral-900 dark:text-neutral-100 transition-colors">
       {/* Header */}
-      <header className="py-4 flex items-center sticky top-0 bg-white z-10 border-b">
+      <header className="py-4 flex items-center sticky top-0 bg-white dark:bg-[#09090B] z-10 border-b border-gray-200 dark:border-neutral-800">
         <ChevronLeft
           className="h-5 w-5 mr-2 cursor-pointer"
           onClick={() => router.back()}

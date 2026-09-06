@@ -145,20 +145,20 @@ const LocationTable = () => {
       </div>
 
       {/* Table */}
-      <Card className="border-border overflow-hidden p-0">
+      <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] overflow-hidden p-0 transition-colors">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Type</TableHead>
-                <TableHead className="font-semibold hidden md:table-cell">
+              <TableRow className="bg-gray-50 dark:bg-neutral-900/60 border-b border-gray-200 dark:border-neutral-800">
+                <TableHead className="font-semibold text-gray-700 dark:text-neutral-300">Name</TableHead>
+                <TableHead className="font-semibold text-gray-700 dark:text-neutral-300">Type</TableHead>
+                <TableHead className="font-semibold text-gray-700 dark:text-neutral-300 hidden md:table-cell">
                   Coordinates
                 </TableHead>
-                <TableHead className="font-semibold hidden lg:table-cell">
+                <TableHead className="font-semibold text-gray-700 dark:text-neutral-300 hidden lg:table-cell">
                   Features
                 </TableHead>
-                <TableHead className="font-semibold text-right">
+                <TableHead className="font-semibold text-gray-700 dark:text-neutral-300 text-right">
                   Actions
                 </TableHead>
               </TableRow>
@@ -174,7 +174,7 @@ const LocationTable = () => {
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
+                    className="text-center py-8 text-muted-foreground dark:text-neutral-400"
                   >
                     No locations found
                   </TableCell>
@@ -183,20 +183,20 @@ const LocationTable = () => {
                 filteredLocations?.map((location) => (
                   <TableRow
                     key={location?._id}
-                    className="hover:bg-muted/50 transition-colors"
+                    className="hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-800 transition-colors"
                   >
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-gray-900 dark:text-white">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-red-500 " />
                         {location?.name}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getTypeBadgeVariant(location?.type)} className={"bg-green-100 border text-green-500 border-green-400"}>
+                      <Badge variant={getTypeBadgeVariant(location?.type)} className={"bg-green-100 dark:bg-green-950/40 border text-green-700 dark:text-green-400 border-green-300 dark:border-green-800/60"}>
                         {location?.type}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell font-mono text-sm text-muted-foreground">
+                    <TableCell className="hidden md:table-cell font-mono text-sm text-gray-600 dark:text-neutral-400">
                       {location.coordinates?.[0]?.toFixed(4)},{" "}
                       {location.coordinates?.[1]?.toFixed(4)}
                     </TableCell>

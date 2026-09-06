@@ -243,21 +243,21 @@ export default function SellersManagement() {
   };
 
   return (
-    <div className="w-full rounded-lg border h-full bg-white p-4">
+    <div className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 h-full bg-white dark:bg-[#121215] p-4 shadow-sm transition-colors">
       {/* Main Tabs */}
       <Tabs value={Tab} onValueChange={handletabchange} className="">
-        <TabsList className="p-0 bg-transparent space-x-2 h-auto">
+        <TabsList className="p-0 bg-transparent space-x-2 h-auto mb-4">
           <TabsTrigger
             value="applications"
             onClick={() => setisapproved("")}
-            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
           >
             {` Owner's Properties`}
           </TabsTrigger>
           <TabsTrigger
             value="active"
             onClick={() => setisapproved("approved")}
-            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
           >
             Approved Properties
           </TabsTrigger>
@@ -266,34 +266,34 @@ export default function SellersManagement() {
         <TabsContent value="applications">
           {/* Profile Tabs and Filters */}
           <div className="flex justify-between items-center mb-4">
-            <div className="border-b border-gray-200 w-full">
+            <div className="border-b border-gray-200 dark:border-neutral-800 w-full">
               <div className="flex -mb-px">
                 <button
                   onClick={() => setisapproved("")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  className={`mr-8 py-3 text-xs font-semibold cursor-pointer transition-colors ${
                     isapproved === ""
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   All Properties
                 </button>
                 <button
                   onClick={() => setisapproved("pending")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  className={`mr-8 py-3 text-xs font-semibold cursor-pointer transition-colors ${
                     isapproved === "pending"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   Pending for Approval
                 </button>
                 <button
                   onClick={() => setisapproved("rejected")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  className={`mr-8 py-3 text-xs font-semibold cursor-pointer transition-colors ${
                     isapproved === "rejected"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   Rejected Properties
@@ -302,18 +302,18 @@ export default function SellersManagement() {
             </div>
             <div className="flex items-center gap-2 ml-4 shrink-0">
               <Select value={selectedValue} onValueChange={handleSelectChange}>
-                <SelectTrigger className="h-full w-44 border rounded-l-md  focus:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="h-9 w-44 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-xl text-xs font-medium focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white">
                   {categories?.length > 0 ? (
                     categories.map((Category) => (
-                      <SelectItem key={Category._id} value={Category._id}>
+                      <SelectItem key={Category._id} value={Category._id} className="text-xs">
                         {Category?.name}
                       </SelectItem>
                     ))
                   ) : (
-                    <div className="p-1 text-center text-sm">
+                    <div className="p-1 text-center text-xs text-neutral-400">
                       No Category available
                     </div>
                   )}
@@ -323,9 +323,9 @@ export default function SellersManagement() {
           </div>
 
           {/* Table */}
-          <div className=" rounded-md">
+          <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
-              <div className="flex items-center justify-center py-10 text-gray-500">
+              <div className="flex items-center justify-center py-10 text-gray-500 dark:text-neutral-400">
                 <span className="loader2 " />
               </div>
             ) : error ? (
@@ -333,59 +333,59 @@ export default function SellersManagement() {
                 {error}
               </div>
             ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
                 No data available
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
-                  <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                <TableHeader className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800">
+                  <TableRow className="border-b border-gray-200 dark:border-neutral-800">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Property Name
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Property Owner
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Category
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Location
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Phone No
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Action
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
                   {data?.map((application, index) => (
                     <TableRow
                       key={index}
-                      className="border-b border-gray-200 h-12"
+                      className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-neutral-900 dark:text-white">
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.owner?.name}</TableCell>
-                      <TableCell>{application?.category?.name}</TableCell>
-                      <TableCell>{application.location?.area}</TableCell>
-                      <TableCell>{application?.Number}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.owner?.name}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.category?.name}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application.location?.area}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.Number}</TableCell>
                       <TableCell>
                         <Badge
-                          className={`font-medium ${
+                          className={`font-semibold text-xs px-2.5 py-0.5 rounded-full capitalize ${
                             application.isapproved === "pending"
-                              ? "text-amber-500 border-amber-200 bg-amber-50 capitalize"
+                              ? "text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40"
                               : application.isapproved === "approved"
-                              ? "text-green-500 border-green-200 bg-green-50 capitalize"
+                              ? "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40"
                               : application.isapproved === "rejected"
-                              ? "text-red-500 bg-red-50 border-red-200 capitalize"
-                              : "text-gray-500"
+                              ? "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60"
+                              : "text-neutral-500 border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900"
                           }`}
                         >
                           {application?.isapproved}
@@ -403,9 +403,9 @@ export default function SellersManagement() {
                               );
                             }
                           }}
-                          className="text-[#FF6900] cursor-pointer hover:underline font-medium"
+                          className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
                         >
-                          View Profile
+                          View Details
                         </span>
                       </TableCell>
                     </TableRow>
@@ -418,14 +418,14 @@ export default function SellersManagement() {
 
         <TabsContent value="active">
           <div className="flex justify-between items-center mb-4">
-            <div className="border-b border-gray-200 w-full">
+            <div className="border-b border-gray-200 dark:border-neutral-800 w-full">
               <div className="flex -mb-px">
                 <button
                   onClick={() => setisapproved("approved")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  className={`mr-8 py-3 text-xs font-semibold cursor-pointer transition-colors ${
                     isapproved === "approved"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   All Approved Properties
@@ -434,18 +434,18 @@ export default function SellersManagement() {
             </div>
             <div className="flex items-center gap-2 ml-4 shrink-0">
               <Select value={selectedValue} onValueChange={handleSelectChange}>
-                <SelectTrigger className="h-full w-44 border rounded-l-md  focus:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="h-9 w-44 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-xl text-xs font-medium focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white">
                   {categories?.length > 0 ? (
                     categories.map((location) => (
-                      <SelectItem key={location._id} value={location._id}>
+                      <SelectItem key={location._id} value={location._id} className="text-xs">
                         {location?.name}
                       </SelectItem>
                     ))
                   ) : (
-                    <div className="p-1 text-center text-sm">
+                    <div className="p-1 text-center text-xs text-neutral-400">
                       No Category available
                     </div>
                   )}
@@ -454,9 +454,9 @@ export default function SellersManagement() {
             </div>
           </div>
 
-          <div className=" rounded-md">
+          <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
-              <div className="flex items-center justify-center py-10 text-gray-500">
+              <div className="flex items-center justify-center py-10 text-gray-500 dark:text-neutral-400">
                 <span className="loader2 " />
               </div>
             ) : error ? (
@@ -464,59 +464,59 @@ export default function SellersManagement() {
                 {error}
               </div>
             ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
                 No data available
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
-                  <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                <TableHeader className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800">
+                  <TableRow className="border-b border-gray-200 dark:border-neutral-800">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Property Name
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Property Owner
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Category
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Location
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Phone No
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Action
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
                   {data?.map((application, index) => (
                     <TableRow
                       key={index}
-                      className="border-b border-gray-200 h-12"
+                      className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-neutral-900 dark:text-white">
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.owner?.name}</TableCell>
-                      <TableCell>{application?.category?.name}</TableCell>
-                      <TableCell>{application.location?.area}</TableCell>
-                      <TableCell>{application?.Number}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.owner?.name}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.category?.name}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application.location?.area}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.Number}</TableCell>
                       <TableCell>
                         <Badge
-                          className={`font-medium ${
+                          className={`font-semibold text-xs px-2.5 py-0.5 rounded-full capitalize ${
                             application.isapproved === "pending"
-                              ? "text-amber-500 border-amber-200 bg-amber-50 capitalize"
+                              ? "text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40"
                               : application.isapproved === "approved"
-                              ? "text-green-500 border-green-200 bg-green-50 capitalize"
+                              ? "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40"
                               : application.isapproved === "rejected"
-                              ? "text-red-500 bg-red-50 border-red-200 capitalize"
-                              : "text-gray-500"
+                              ? "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60"
+                              : "text-neutral-500 border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900"
                           }`}
                         >
                           {application?.isapproved}
@@ -534,9 +534,9 @@ export default function SellersManagement() {
                               );
                             }
                           }}
-                          className="text-[#FF6900] cursor-pointer hover:underline font-medium"
+                          className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
                         >
-                          View Profile
+                          View Details
                         </span>
                       </TableCell>
                     </TableRow>

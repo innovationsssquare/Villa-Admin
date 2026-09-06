@@ -5,14 +5,14 @@ export function StatsCard({ title, value, icon: Icon, trend, className }) {
   return (
     <div
       className={cn(
-        "bg-card rounded-xl border border-border p-5 shadow-sm transition-all hover:shadow-md",
+        "bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 p-5 shadow-sm transition-all hover:shadow-md dark:hover:border-neutral-700",
         className
       )}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="mt-2 text-2xl font-bold tracking-tight">{value}</p>
+          <p className="text-sm font-medium text-muted-foreground dark:text-neutral-400">{title}</p>
+          <p className="mt-2 text-2xl font-bold tracking-tight text-foreground dark:text-white">{value}</p>
           {trend && (
             <p
               className={cn(

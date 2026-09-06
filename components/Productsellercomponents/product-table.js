@@ -84,7 +84,7 @@ export default function ProductTable() {
 
   return (
     <>
-      <Card className="w-full">
+      <Card className="w-full border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] transition-colors">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-medium">
             <Tabs
@@ -96,13 +96,13 @@ export default function ProductTable() {
               <TabsList className="bg-transparent p-0">
                 <TabsTrigger
                   value="approved"
-                  className="px-0 py-2 cursor-pointer mr-6 data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#FF6900] data-[state=active]:text-[#FF6900] data-[state=active]:rounded-none data-[state=active]:shadow-none font-medium"
+                  className="px-0 py-2 cursor-pointer mr-6 data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#FF6900] data-[state=active]:text-[#FF6900] data-[state=active]:rounded-none data-[state=active]:shadow-none font-medium text-gray-600 dark:text-neutral-400"
                 >
                   Approved Products
                 </TabsTrigger>
                 <TabsTrigger
                   value="pending"
-                  className="px-0 py-2 cursor-pointer data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#FF6900] data-[state=active]:text-[#FF6900] data-[state=active]:rounded-none data-[state=active]:shadow-none font-medium"
+                  className="px-0 py-2 cursor-pointer data-[state=active]:bg-transparent data-[state=active]:border-b-2 border-0 data-[state=active]:border-[#FF6900] data-[state=active]:text-[#FF6900] data-[state=active]:rounded-none data-[state=active]:shadow-none font-medium text-gray-600 dark:text-neutral-400"
                 >
                   Pending Products
                 </TabsTrigger>
@@ -120,30 +120,30 @@ export default function ProductTable() {
               <CardContent className="p-3 overflow-hidden">
                 <ScrollArea className="h-auto rounded-md overflow-hidden">
                   <Table className="overflow-hidden">
-                    <TableHeader className="bg-gray-100 text-[#9C9C9C]">
-                      <TableRow>
-                        <TableHead className="w-auto text-gray-500">
+                    <TableHeader className="bg-gray-100 dark:bg-neutral-900/60 text-[#9C9C9C]">
+                      <TableRow className="border-b border-gray-200 dark:border-neutral-800">
+                        <TableHead className="w-auto text-gray-500 dark:text-neutral-400">
                           PRODUCT NAME
                         </TableHead>
-                        <TableHead className="text-gray-500 uppercase">
+                        <TableHead className="text-gray-500 dark:text-neutral-400 uppercase">
                           Stock
                         </TableHead>
-                        <TableHead className="text-gray-500">
+                        <TableHead className="text-gray-500 dark:text-neutral-400">
                           PRODUCT PRICE
                         </TableHead>
-                        <TableHead className="text-gray-500">
+                        <TableHead className="text-gray-500 dark:text-neutral-400">
                           DISCOUNTS
                         </TableHead>
-                        <TableHead className="text-gray-500">
+                        <TableHead className="text-gray-500 dark:text-neutral-400">
                           PRICE ON DISPLAY
                         </TableHead>
-                        <TableHead className="text-gray-500">STATUS</TableHead>
-                        <TableHead className="text-gray-500">ACTIONS</TableHead>
+                        <TableHead className="text-gray-500 dark:text-neutral-400">STATUS</TableHead>
+                        <TableHead className="text-gray-500 dark:text-neutral-400">ACTIONS</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {productdata?.map((product, index) => (
-                        <TableRow key={index}>
+                        <TableRow key={index} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/40 transition-colors">
                           <TableCell>
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
@@ -156,16 +156,16 @@ export default function ProductTable() {
                                 />
                               </div>
                               <div className="ml-4">
-                                <div className="font-medium">
+                                <div className="font-medium text-gray-900 dark:text-neutral-100">
                                   {product?.Name}
                                 </div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{product.Stock}</TableCell>
-                          <TableCell>{product.Yourprice}</TableCell>
-                          <TableCell>{product.Discount}</TableCell>
-                          <TableCell>{product.SellingPrice}</TableCell>
+                          <TableCell className="text-gray-700 dark:text-neutral-300">{product.Stock}</TableCell>
+                          <TableCell className="text-gray-700 dark:text-neutral-300">{product.Yourprice}</TableCell>
+                          <TableCell className="text-gray-700 dark:text-neutral-300">{product.Discount}</TableCell>
+                          <TableCell className="text-gray-700 dark:text-neutral-300">{product.SellingPrice}</TableCell>
 
                           <TableCell>
                             <span

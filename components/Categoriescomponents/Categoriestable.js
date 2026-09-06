@@ -315,15 +315,15 @@ export function Categoriestable() {
 
   return (
     <div className="w-full space-y-4">
-      <Card>
+      <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] transition-colors">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Tag className="h-5 w-5" />
                 Categories Management
               </CardTitle>
-              <CardDescription>Manage and view all categories</CardDescription>
+              <CardDescription className="text-gray-500 dark:text-neutral-400">Manage and view all categories</CardDescription>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -486,7 +486,7 @@ export function Categoriestable() {
                   </Card>
                 </ScrollArea>
 
-                <DialogFooter className="absolute bottom-0 w-full px-8 bg-white">
+                <DialogFooter className="absolute bottom-0 w-full px-8 bg-white dark:bg-[#121215] border-t border-gray-200 dark:border-neutral-800">
                   <div className="flex justify-end gap-4 py-2">
                     <Button
                       onClick={handleSubmit} // Fixed to use onClick instead of onPress
@@ -506,29 +506,29 @@ export function Categoriestable() {
               <span className="loader2"></span>
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border border-gray-200 dark:border-neutral-800 overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[80px]">Image</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="hidden md:table-cell">Created</TableHead>
-                    <TableHead className="hidden lg:table-cell">Updated</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="bg-gray-50 dark:bg-neutral-900/60 border-b border-gray-200 dark:border-neutral-800">
+                    <TableHead className="w-[80px] text-gray-700 dark:text-neutral-300">Image</TableHead>
+                    <TableHead className="text-gray-700 dark:text-neutral-300">Category</TableHead>
+                    <TableHead className="hidden md:table-cell text-gray-700 dark:text-neutral-300">Created</TableHead>
+                    <TableHead className="hidden lg:table-cell text-gray-700 dark:text-neutral-300">Updated</TableHead>
+                    <TableHead className="text-right text-gray-700 dark:text-neutral-300">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {categories?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground dark:text-neutral-400">
                         No categories found
                       </TableCell>
                     </TableRow>
                   ) : (
                     categories?.map((subcategory) => (
-                      <TableRow key={subcategory._id}>
+                      <TableRow key={subcategory._id} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 transition-colors">
                         <TableCell>
-                          <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted">
+                          <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted dark:bg-neutral-800">
                             <Image
                               src={subcategory?.image || "/placeholder.svg?height=48&width=48"}
                               alt={subcategory?.name}

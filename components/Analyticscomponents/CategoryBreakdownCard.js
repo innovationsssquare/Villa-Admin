@@ -30,14 +30,14 @@ export default function CategoryBreakdownCard({ data = [] }) {
   };
 
   return (
-    <div className="rounded-2xl bg-white border border-neutral-200 p-6 shadow-sm flex flex-col justify-between">
+    <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 p-6 shadow-sm flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-bold text-neutral-900">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
               Category Distribution
             </h3>
-            <p className="text-xs text-neutral-500 mt-0.5">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
               Portfolio split across property verticals
             </p>
           </div>
@@ -59,24 +59,24 @@ export default function CategoryBreakdownCard({ data = [] }) {
             return (
               <div key={cat._id} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 font-medium text-neutral-800">
+                  <div className="flex items-center gap-2 font-medium text-neutral-800 dark:text-neutral-200">
                     <div className={`w-2 h-2 rounded-full ${colorClass}`} />
                     <span>{cat._id}</span>
-                    <span className="text-neutral-400 font-normal">
+                    <span className="text-neutral-400 dark:text-neutral-500 font-normal">
                       ({cat.totalBookings} bookings)
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-neutral-900">
+                    <span className="font-bold text-neutral-900 dark:text-white">
                       {formatCurrency(cat.totalRevenue)}
                     </span>
-                    <span className="text-neutral-400 font-medium min-w-[32px] text-right">
+                    <span className="text-neutral-400 dark:text-neutral-500 font-medium min-w-[32px] text-right">
                       {pct}%
                     </span>
                   </div>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full bg-neutral-100 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${colorClass}`}
                     style={{ width: `${pct}%` }}
@@ -88,9 +88,9 @@ export default function CategoryBreakdownCard({ data = [] }) {
         </div>
       </div>
 
-      <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+      <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
         <span>Combined Portfolio GMV:</span>
-        <span className="font-bold text-neutral-900 text-sm">
+        <span className="font-bold text-neutral-900 dark:text-white text-sm">
           {formatCurrency(totalRevAll)}
         </span>
       </div>

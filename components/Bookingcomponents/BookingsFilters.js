@@ -26,7 +26,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
+    <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 p-5 shadow-sm">
       <div className="flex flex-wrap items-end gap-4">
         {/* Status Filter */}
         <div className="flex flex-col gap-1.5 min-w-[160px]">

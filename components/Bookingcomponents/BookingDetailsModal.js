@@ -59,7 +59,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-2xl max-h-[90vh] p-0 bg-card dark:bg-[#121215] border-border dark:border-neutral-800 text-foreground dark:text-neutral-100">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-start justify-between">
             <div>

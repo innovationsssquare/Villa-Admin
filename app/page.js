@@ -80,21 +80,21 @@ export default function Dashboard() {
   };
 
   return (
-    <ScrollArea className="bg-[#FAFAFA] h-[calc(100vh-64px)] pb-16">
+    <ScrollArea className="bg-[#FAFAFA] dark:bg-[#09090B] h-[calc(100vh-64px)] pb-4 text-neutral-900 dark:text-neutral-100">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Executive Header Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200/80 dark:border-neutral-800">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
+              <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
                 Executive Command Console
               </h1>
-              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
                 <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
                 Live Node
               </div>
             </div>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
               Real-time portfolio revenue, guest disputes, host settlements, and booking velocity.
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function Dashboard() {
             <button
               onClick={handleManualRefresh}
               disabled={isRefreshing}
-              className="px-3.5 py-2 rounded-xl bg-white border border-neutral-200 hover:border-[#FF6900]/40 text-neutral-700 text-xs font-semibold flex items-center gap-2 shadow-sm hover:text-[#FF6900] transition-all cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-[#FF6900]/40 text-neutral-700 dark:text-neutral-300 text-xs font-semibold flex items-center gap-2 shadow-sm hover:text-[#FF6900] transition-all cursor-pointer"
             >
               <RefreshCw
                 className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#FF6900]" : ""}`}

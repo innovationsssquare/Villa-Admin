@@ -17,16 +17,16 @@ const Profilecard = ({ id }) => {
   }, [dispatch, id]);
 
   return (
-    <div className="grid grid-cols-3 gap-2 border-t border-gray-200 pt-4 mb-0">
+    <div className="grid grid-cols-3 gap-2 border-t border-gray-200 dark:border-neutral-800 pt-4 mb-0">
       <div className="text-center flex flex-col justify-center items-center gap-2">
-        <p className="text-gray-500 text-xs">Total Products</p>
+        <p className="text-gray-500 dark:text-neutral-400 text-xs">Total Products</p>
         {loadinganalytics ? (
           <>
-            <Skeleton className="w-12 h-4 bg-gray-200 rounded-md" />
+            <Skeleton className="w-12 h-4 bg-gray-200 dark:bg-neutral-800 rounded-md" />
           </>
         ) : (
           <>
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white">
               {" "}
               {data?.summary?.totalProducts}
             </p>
@@ -35,14 +35,14 @@ const Profilecard = ({ id }) => {
       </div>
 
       <div className="text-center flex flex-col justify-center items-center gap-2">
-        <p className="text-gray-500 text-xs">Revenue</p>
+        <p className="text-gray-500 dark:text-neutral-400 text-xs">Revenue</p>
         {loadinganalytics ? (
           <>
-            <Skeleton className="w-12 h-4 bg-gray-200 rounded-md" />
+            <Skeleton className="w-12 h-4 bg-gray-200 dark:bg-neutral-800 rounded-md" />
           </>
         ) : (
           <>
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white">
               {" "}
               ₹ {data?.summary?.totalRevenue?.toFixed(2)}
             </p>
@@ -51,14 +51,14 @@ const Profilecard = ({ id }) => {
       </div>
 
       <div className="text-center flex flex-col justify-center items-center gap-2">
-        <p className="text-gray-500 text-xs">Commission</p>
+        <p className="text-gray-500 dark:text-neutral-400 text-xs">Commission</p>
         {loadinganalytics ? (
           <>
-            <Skeleton className="w-12 h-4 bg-gray-200 rounded-md" />
+            <Skeleton className="w-12 h-4 bg-gray-200 dark:bg-neutral-800 rounded-md" />
           </>
         ) : (
           <>
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-sm text-gray-900 dark:text-white">
               {" "}
               ₹ {data?.summary?.totalCommission?.toFixed(2)}
             </p>

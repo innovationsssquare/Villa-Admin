@@ -34,7 +34,7 @@ const PayoutsFilters = ({ filters, onFilterChange, onReset }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 bg-card rounded-lg border border-border">
+    <div className="flex flex-wrap gap-4 p-4 bg-card dark:bg-[#121215] rounded-lg border border-border dark:border-neutral-800 shadow-sm">
       {/* Payout Status Filter */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-muted-foreground">

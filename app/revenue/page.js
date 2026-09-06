@@ -126,7 +126,7 @@ const stats = useMemo(() => {
   };
 
   return (
-    <ScrollArea className="pb-14 bg-gray-50 h-screen p-4">
+    <ScrollArea className="pb-14 bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] p-4 text-neutral-900 dark:text-neutral-100 transition-colors">
       <div className="w-full mx-auto space-y-3">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

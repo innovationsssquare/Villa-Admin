@@ -85,30 +85,30 @@ export default function ProjectTable() {
   ];
 
   return (
-    <div className="w-full  mx-auto p-4 bg-white rounded-lg border border-gray-200">
+    <div className="w-full mx-auto p-4 bg-white dark:bg-[#121215] rounded-xl border border-gray-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm transition-colors">
       <div className="flex justify-between items-center mb-4 w-full">
         <Tabs
           defaultValue="all-works"
           className="w-full mx-auto"
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid w-auto grid-cols-5">
+          <TabsList className="grid w-auto grid-cols-5 bg-transparent">
             <TabsTrigger
               value="all-works"
-              className={`px-4 py-2 border-0 rounded-none ${
+              className={`px-4 py-2 border-0 rounded-none cursor-pointer ${
                 activeTab === "all-works"
-                  ? "border-b-2 border-[#FF6900] font-medium text-[#FF6900]"
-                  : "text-gray-500"
+                  ? "border-b-2 border-[#FF6900] font-semibold text-[#FF6900]"
+                  : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
               }`}
             >
               All Works
             </TabsTrigger>
             <TabsTrigger
               value="ongoing-projects"
-              className={`px-4 py-2 border-0 rounded-none ${
+              className={`px-4 py-2 border-0 rounded-none cursor-pointer ${
                 activeTab === "ongoing-projects"
-                  ? "border-b-2 border-[#FF6900] font-medium text-[#FF6900]"
-                  : "text-gray-500"
+                  ? "border-b-2 border-[#FF6900] font-semibold text-[#FF6900]"
+                  : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
               }`}
             >
               Ongoing Projects
@@ -184,21 +184,21 @@ export default function ProjectTable() {
             <div className=" rounded-lg overflow-hidden mt-4">
               <ScrollArea className="h-full w-full">
                 <Table>
-                  <TableHeader className="bg-gray-100 border border-gray-300 ">
+                  <TableHeader className="bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-800">
                     <TableRow>
-                      <TableHead className="w-[200px]">PROJECT</TableHead>
-                      <TableHead>CLIENT</TableHead>
-                      <TableHead>REQUESTED DATE</TableHead>
-                      <TableHead>REQUIREMENTS</TableHead>
-                      <TableHead>STATUS</TableHead>
-                      <TableHead className="text-right">ACTIONS</TableHead>
+                      <TableHead className="w-[200px] text-gray-700 dark:text-neutral-300">PROJECT</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300">CLIENT</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300">REQUESTED DATE</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300">REQUIREMENTS</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300">STATUS</TableHead>
+                      <TableHead className="text-right text-gray-700 dark:text-neutral-300">ACTIONS</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {projects.map((project) => (
                       <TableRow
                         key={project.id}
-                        className="border-t border-gray-200 h-14"
+                        className="border-t border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/40 h-14"
                       >
                         <TableCell className="font-medium">
                           {project.name}
@@ -274,9 +274,9 @@ function ViewRequirementModal() {
           View Requirement
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#121215] border-gray-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
             Customer Requirements
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
@@ -285,9 +285,9 @@ function ViewRequirementModal() {
           </DialogClose>
         </DialogHeader>
         <div className="space-y-6">
-          <div className="bg-gray-50 p-4 rounded-md">
-            <h3 className="font-semibold mb-2">{`Buyer's Request`}</h3>
-            <p className="text-sm text-gray-700">
+          <div className="bg-gray-50 dark:bg-neutral-900/60 p-4 rounded-xl border border-gray-100 dark:border-neutral-800">
+            <h3 className="font-semibold mb-2 text-neutral-900 dark:text-neutral-100">{`Buyer's Request`}</h3>
+            <p className="text-sm text-gray-700 dark:text-neutral-300">
              {` Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -298,7 +298,7 @@ function ViewRequirementModal() {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Reference</h3>
+            <h3 className="font-semibold mb-2 text-neutral-900 dark:text-neutral-100">Reference</h3>
             <div className="grid grid-cols-2 gap-4">
               <Image
                 src="/placeholder.svg?height=150&width=250"
@@ -313,9 +313,9 @@ function ViewRequirementModal() {
             </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-md">
-            <h3 className="font-semibold mb-2">Estimated Timeline</h3>
-            <p className="text-sm">By April 30th: 4 Weeks</p>
+          <div className="bg-gray-50 dark:bg-neutral-900/60 p-4 rounded-xl border border-gray-100 dark:border-neutral-800">
+            <h3 className="font-semibold mb-2 text-neutral-900 dark:text-neutral-100">Estimated Timeline</h3>
+            <p className="text-sm text-gray-700 dark:text-neutral-300">By April 30th: 4 Weeks</p>
           </div>
         </div>
       </DialogContent>
@@ -335,9 +335,9 @@ function SendQuoteModal() {
           Send Quote
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#121215] border-gray-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Send Quote</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-100">Send Quote</DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -345,13 +345,13 @@ function SendQuoteModal() {
         </DialogHeader>
         <div className="space-y-6">
           <div>
-            <h3 className="font-medium mb-4">
+            <h3 className="font-medium mb-4 text-neutral-900 dark:text-neutral-100">
               Set Price & Estimated Completion
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <Select>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
                     <SelectValue placeholder="Set Price" />
                   </SelectTrigger>
                   <SelectContent>
@@ -365,7 +365,7 @@ function SendQuoteModal() {
               </div>
               <div className="relative">
                 <div className="flex">
-                  <Input type="text" placeholder="Set Date" className="pr-10" />
+                  <Input type="text" placeholder="Set Date" className="pr-10 border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900" />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#FF6900]">
                     <Calendar className="h-5 w-5" />
                   </div>
@@ -375,15 +375,15 @@ function SendQuoteModal() {
           </div>
 
           <div>
-            <h3 className="font-medium mb-2">Message (Optional)</h3>
+            <h3 className="font-medium mb-2 text-neutral-900 dark:text-neutral-100">Message (Optional)</h3>
             <Textarea
               placeholder="Type your message here..."
-              className="min-h-[150px]"
+              className="min-h-[150px] border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100"
               defaultValue="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident."
             />
           </div>
 
-          <Button className="w-full bg-[#FF6900] hover:bg-[#FF6900]">
+          <Button className="w-full bg-[#FF6900] hover:bg-[#E05D00] text-white shadow-sm shadow-[#FF6900]/25 cursor-pointer">
             Send Quote
           </Button>
         </div>
@@ -398,15 +398,15 @@ function AssignProviderModal() {
       <DialogTrigger asChild>
         <Button
           variant="default"
-          className="bg-[#FF6900] hover:bg-[#FF6900] text-white w-32 "
+          className="bg-[#FF6900] hover:bg-[#FF6900] text-white w-32 cursor-pointer"
           size="sm"
         >
           Assign Provider
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[700px] bg-white dark:bg-[#121215] border-gray-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
             Assign a Service Provider
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
@@ -431,8 +431,8 @@ function AssignProviderModal() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((provider) => (
-              <div key={provider} className="border rounded-md overflow-hidden">
-                <div className="bg-red-100 p-2 relative">
+              <div key={provider} className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 rounded-xl overflow-hidden shadow-sm">
+                <div className="bg-red-100 dark:bg-red-950/40 p-2 relative">
                   <Badge
                     variant="destructive"
                     className="absolute top-2 right-2 bg-red-500"
@@ -443,10 +443,10 @@ function AssignProviderModal() {
                 </div>
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Provider Name</h4>
+                    <h4 className="font-semibold text-neutral-900 dark:text-neutral-100">Provider Name</h4>
                     <div className="flex items-center text-sm">
                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
-                      <span>5.0 (23)</span>
+                      <span className="text-neutral-700 dark:text-neutral-300">5.0 (23)</span>
                     </div>
                   </div>
 
@@ -458,23 +458,23 @@ function AssignProviderModal() {
                     <ExternalLink className="h-3 w-3 ml-1" />
                   </a>
 
-                  <div className="text-sm text-gray-600 flex items-start">
+                  <div className="text-sm text-gray-600 dark:text-neutral-400 flex items-start">
                     <MapPin className="h-4 w-4 mr-1 shrink-0 mt-0.5" />
                     <span>This is for a sample address</span>
                   </div>
 
-                  <div className="text-sm text-gray-600 flex items-center">
+                  <div className="text-sm text-gray-600 dark:text-neutral-400 flex items-center">
                     <Mail className="h-4 w-4 mr-1" />
                     <span>providername@gmail.com</span>
                   </div>
 
-                  <div className="text-sm text-gray-600 flex items-center">
+                  <div className="text-sm text-gray-600 dark:text-neutral-400 flex items-center">
                     <Phone className="h-4 w-4 mr-1" />
                     <span>+91 9736672382 | +91 9763567389</span>
                   </div>
 
                   <div>
-                    <p className="text-xs mb-1">Skills</p>
+                    <p className="text-xs mb-1 text-gray-500 dark:text-neutral-400">Skills</p>
                     <div className="flex gap-2">
                       <Badge className="bg-blue-500">Embroidery</Badge>
                       <Badge className="bg-yellow-500">Tailoring</Badge>
@@ -483,7 +483,7 @@ function AssignProviderModal() {
 
                   <Button
                     variant="outline"
-                    className="w-full border-[#FF6900] text-[#FF6900] hover:bg-[#FFF1E6]"
+                    className="w-full border-[#FF6900] text-[#FF6900] hover:bg-[#FFF1E6] dark:hover:bg-orange-950/40 cursor-pointer"
                   >
                     View Profile
                   </Button>

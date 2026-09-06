@@ -30,21 +30,21 @@ export default function Revenuegraph({revenueoverview,loadingrevnue,errorrevenue
           {errorrevenue}
         </div>
       ) : !revenueoverview ? (
-        <div className="text-center py-8 text-gray-500">No data available</div>
+        <div className="text-center py-8 text-gray-500 dark:text-neutral-400">No data available</div>
       ) : (
-        <div className="w-full rounded-lg border bg-white p-6 col-span-2">
+        <div className="w-full rounded-lg border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] p-6 col-span-2 transition-colors">
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Revenue Overview
             </h2>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <div className="h-5 w-5 rounded bg-[#23BB4C]"></div>
-                <span className="text-gray-800 text-sm ">Revenue</span>
+                <span className="text-gray-800 dark:text-neutral-300 text-sm ">Revenue</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-5 w-5 rounded bg-[#FFB300]"></div>
-                <span className="text-gray-800 text-sm">Commission</span>
+                <span className="text-gray-800 dark:text-neutral-300 text-sm">Commission</span>
               </div>
               
             </div>
@@ -157,7 +157,7 @@ export default function Revenuegraph({revenueoverview,loadingrevnue,errorrevenue
               </AreaChart>
             </ChartContainer>
           </div>
-          <div className="mt-2 text-center text-gray-600 font-medium">Days</div>
+          <div className="mt-2 text-center text-gray-600 dark:text-neutral-400 font-medium">Days</div>
         </div>
       )}
     </>

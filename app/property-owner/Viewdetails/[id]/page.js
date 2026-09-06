@@ -349,7 +349,7 @@ export default function OwnerDetailsClient() {
           <span className="loader2"></span>
         </div>
       ) : (
-        <ScrollArea className="w-full mx-auto bg-white h-screen pb-14 px-4 pt-6 ">
+        <ScrollArea className="w-full mx-auto bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 px-4 pt-6 text-neutral-900 dark:text-neutral-100 transition-colors">
           <div className="space-y-6">
           <div className=" flex items-center gap-2">
              <ChevronLeft

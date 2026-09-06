@@ -61,16 +61,16 @@ export default function SellerDocProfile() {
         </div>
       ) : (
         <div className="w-full p-4 mx-auto">
-          <Card className="mb-3 border border-gray-200">
-            <CardContent className="">
+          <Card className="mb-3 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] transition-colors">
+            <CardContent className="pt-6">
               <div className="flex flex-col md:flex-row items-start gap-6 relative">
-                <div className="w-full md:w-44 h-44 bg-red-200 rounded-md flex justify-center items-center shrink-0">
-                  <Store className="h-16 w-16 text-gray-800" />
+                <div className="w-full md:w-44 h-44 bg-orange-100 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/40 rounded-md flex justify-center items-center shrink-0">
+                  <Store className="h-16 w-16 text-orange-600 dark:text-[#FF6900]" />
                 </div>
 
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h1 className="text-lg font-bold mb-1">
+                    <h1 className="text-lg font-bold mb-1 text-gray-900 dark:text-white">
                       {profile?.BussinessName}
                     </h1>
                   </div>
@@ -83,30 +83,22 @@ export default function SellerDocProfile() {
                     <ChevronRight className="h-3 w-3 ml-1" />
                   </Link>
 
-                  {/* <div className="flex items-center mb-4">
-                    <span className="text-yellow-500 mr-1">★</span>
-                    <span className="font-medium">{sellerData.rating}</span>
-                    <span className="text-gray-500 ml-1">
-                      ({sellerData.reviews})
-                    </span>
-                  </div> */}
-
                   <div className="space-y-3">
                     <div className="flex items-start text-sm">
-                      <MapPin className="h-4 w-4 text-gray-500 mr-2 mt-0.5 shrink-0" />
-                      <span className="text-gray-700">
+                      <MapPin className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 mt-0.5 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.Address?.City}
                       </span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <Mail className="h-4 w-4 text-gray-500 mr-2 shrink-0" />
-                      <span className="text-gray-700">
+                      <Mail className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.BussinessEmail}
                       </span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <Phone className="h-4 w-4 text-gray-500 mr-2 shrink-0" />
-                      <span className="text-gray-700">
+                      <Phone className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.BussinessNumber}
                       </span>
                     </div>
@@ -114,13 +106,13 @@ export default function SellerDocProfile() {
                 </div>
 
                 <div className="w-full mx-auto  ">
-                  <h1 className="text-lg font-bold mb-4">Revenue Overview</h1>
+                  <h1 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Revenue Overview</h1>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                     {loadinganalytics ? (
                       // Skeleton loading state
                       <>
-                        <Card className="border rounded-lg overflow-hidden">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden">
                           <CardContent className="p-6 relative">
                             <div className="absolute top-6 right-6">
                               <Skeleton className="h-11 w-11 rounded-md" />
@@ -131,7 +123,7 @@ export default function SellerDocProfile() {
                             </div>
                           </CardContent>
                         </Card>
-                        <Card className="border rounded-lg overflow-hidden">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden">
                           <CardContent className="p-6 relative">
                             <div className="absolute top-6 right-6">
                               <Skeleton className="h-11 w-11 rounded-md" />
@@ -142,7 +134,7 @@ export default function SellerDocProfile() {
                             </div>
                           </CardContent>
                         </Card>
-                        <Card className="border rounded-lg overflow-hidden">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden">
                           <CardContent className="p-6 relative">
                             <div className="absolute top-6 right-6">
                               <Skeleton className="h-11 w-11 rounded-md" />
@@ -153,7 +145,7 @@ export default function SellerDocProfile() {
                             </div>
                           </CardContent>
                         </Card>
-                        <Card className="border rounded-lg overflow-hidden">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden">
                           <CardContent className="p-6 relative">
                             <div className="absolute top-6 right-6">
                               <Skeleton className="h-11 w-11 rounded-md" />
@@ -169,16 +161,16 @@ export default function SellerDocProfile() {
                       // Actual content
                       <>
                         {/* Total Products Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Landmark className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Landmark className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">
                                 Total Products
                               </p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 {data?.summary?.totalProducts}
                               </h2>
@@ -187,14 +179,14 @@ export default function SellerDocProfile() {
                         </Card>
 
                         {/* Revenue Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Wallet className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Wallet className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">Revenue</p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">Revenue</p>
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 ₹ {data?.summary?.totalRevenue?.toFixed(2)}
                               </h2>
@@ -203,16 +195,16 @@ export default function SellerDocProfile() {
                         </Card>
 
                         {/* Commission Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Banknote className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Banknote className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">
                                 Commission
                               </p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 ₹ {data?.summary?.totalCommission?.toFixed(2)}
                               </h2>
@@ -221,14 +213,14 @@ export default function SellerDocProfile() {
                         </Card>
 
                         {/* Customers Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Users className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Users className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">Orders</p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">Orders</p>
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {data?.summary?.totalOrders}
                               </h2>
                             </div>

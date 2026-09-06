@@ -80,16 +80,16 @@ export default function SellerProfile({ seller }) {
         </div>
       ) : (
         <div className="w-full p-4 mx-auto">
-          <Card className="mb-3 border border-gray-200">
+          <Card className="mb-3 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] text-neutral-900 dark:text-neutral-100 shadow-sm">
             <CardContent className="">
               <div className="flex flex-col md:flex-row items-start gap-6 relative">
-                <div className="w-full md:w-44 h-44 bg-red-200 rounded-md flex justify-center items-center shrink-0">
-                  <Store className="h-16 w-16 text-gray-800" />
+                <div className="w-full md:w-44 h-44 bg-red-100 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl flex justify-center items-center shrink-0">
+                  <Store className="h-16 w-16 text-gray-800 dark:text-neutral-200" />
                 </div>
 
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h1 className="text-lg font-bold mb-1">
+                    <h1 className="text-lg font-bold mb-1 text-neutral-900 dark:text-neutral-100">
                       {profile?.BussinessName}
                     </h1>
                   </div>
@@ -104,28 +104,28 @@ export default function SellerProfile({ seller }) {
 
                   <div className="flex items-center mb-4">
                     <span className="text-yellow-500 mr-1">★</span>
-                    <span className="font-medium">{sellerData.rating}</span>
-                    <span className="text-gray-500 ml-1">
+                    <span className="font-medium text-neutral-900 dark:text-neutral-100">{sellerData.rating}</span>
+                    <span className="text-gray-500 dark:text-neutral-400 ml-1">
                       ({sellerData.reviews})
                     </span>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-start text-sm">
-                      <MapPin className="h-4 w-4 text-gray-500 mr-2 mt-0.5 shrink-0" />
-                      <span className="text-gray-700">
+                      <MapPin className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 mt-0.5 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.Address?.City}
                       </span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <Mail className="h-4 w-4 text-gray-500 mr-2 shrink-0" />
-                      <span className="text-gray-700">
+                      <Mail className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.BussinessEmail}
                       </span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <Phone className="h-4 w-4 text-gray-500 mr-2 shrink-0" />
-                      <span className="text-gray-700">
+                      <Phone className="h-4 w-4 text-gray-400 dark:text-neutral-500 mr-2 shrink-0" />
+                      <span className="text-gray-700 dark:text-neutral-300">
                         {profile?.CompanyId?.BussinessNumber}
                       </span>
                     </div>
@@ -188,16 +188,16 @@ export default function SellerProfile({ seller }) {
                       // Actual content
                       <>
                         {/* Total Products Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Landmark className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Landmark className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">
                                 Total Products
                               </p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 {data?.summary?.totalProducts}
                               </h2>
@@ -206,14 +206,14 @@ export default function SellerProfile({ seller }) {
                         </Card>
 
                         {/* Revenue Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Wallet className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Wallet className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">Revenue</p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">Revenue</p>
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 ₹ {data?.summary?.totalRevenue?.toFixed(2)}
                               </h2>
@@ -222,16 +222,16 @@ export default function SellerProfile({ seller }) {
                         </Card>
 
                         {/* Commission Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Banknote className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Banknote className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">
                                 Commission
                               </p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {" "}
                                 ₹ {data?.summary?.totalCommission?.toFixed(2)}
                               </h2>
@@ -240,14 +240,14 @@ export default function SellerProfile({ seller }) {
                         </Card>
 
                         {/* Customers Card */}
-                        <Card className="border rounded-lg overflow-hidden py-0 h-32">
+                        <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg overflow-hidden py-0 h-32 transition-colors">
                           <CardContent className="p-4 relative">
-                            <div className="absolute top-2 right-2 bg-gray-100 p-2 border border-gray-300 rounded-md">
-                              <Users className="h-4 w-4 text-gray-700" />
+                            <div className="absolute top-2 right-2 bg-gray-100 dark:bg-neutral-800 p-2 border border-gray-300 dark:border-neutral-700 rounded-md">
+                              <Users className="h-4 w-4 text-gray-700 dark:text-neutral-300" />
                             </div>
                             <div className="pt-6">
-                              <p className="text-gray-500 text-xs">Orders</p>
-                              <h2 className="text-xl font-bold mt-1">
+                              <p className="text-gray-500 dark:text-neutral-400 text-xs">Orders</p>
+                              <h2 className="text-xl font-bold mt-1 text-gray-900 dark:text-white">
                                 {data?.summary?.totalOrders}
                               </h2>
                             </div>
@@ -261,10 +261,10 @@ export default function SellerProfile({ seller }) {
             </CardContent>
           </Card>
 
-          <Card className="border border-gray-200">
+          <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] transition-colors">
             <CardContent className="p-6">
-              <h2 className="text-lg font-medium mb-4">About & Description</h2>
-              <div className="space-y-4 text-gray-700">
+              <h2 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">About & Description</h2>
+              <div className="space-y-4 text-gray-700 dark:text-neutral-300">
                 <p>{sellerData.description}</p>
                 <p>{sellerData.description}</p>
               </div>

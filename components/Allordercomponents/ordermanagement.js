@@ -58,41 +58,29 @@ export default function Ordersmanagement() {
   };
 
   return (
-    <div className="w-full rounded-lg border h-full bg-white p-4">
+    <div className="w-full rounded-xl border border-gray-200 dark:border-neutral-800 h-full bg-white dark:bg-[#121215] text-neutral-900 dark:text-neutral-100 p-4 shadow-sm transition-colors">
       {/* Main Tabs */}
       <Tabs defaultValue="all" className="">
         <TabsList className="p-0 bg-transparent space-x-2 h-auto">
           <TabsTrigger
             value="all"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-md px-6 py-2 text-base font-medium cursor-pointer data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 data-[state=inactive]:hover:bg-gray-50 dark:data-[state=inactive]:hover:bg-neutral-800"
           >
             All Orders
           </TabsTrigger>
-          {/* <TabsTrigger
-            value="active"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
-          >
-            Product Orders
-          </TabsTrigger>
-          <TabsTrigger
-            value="Services"
-            className="rounded-md px-6 py-2 text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
-          >
-            Service Orders
-          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="all">
           {/* Profile Tabs and Filters */}
           <div className="flex justify-between items-center mb-4">
-            <div className="border-b border-gray-200 w-full">
+            <div className="border-b border-gray-200 dark:border-neutral-800 w-full">
               <div className="flex -mb-px">
                 <button
                   onClick={() => setProfileTab("Delivered")}
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Delivered"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                  Delivered
@@ -102,7 +90,7 @@ export default function Ordersmanagement() {
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Pending"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   Pending Orders
@@ -112,7 +100,7 @@ export default function Ordersmanagement() {
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Processing"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   Processing Orders
@@ -122,7 +110,7 @@ export default function Ordersmanagement() {
                   className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
                     profileTab === "Cancelled"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
-                      : "text-gray-500 hover:text-gray-700"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
                   }`}
                 >
                   Canceled Orders
@@ -159,36 +147,33 @@ export default function Ordersmanagement() {
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
+                <TableHeader className="bg-gray-50 dark:bg-neutral-900/60 border border-gray-300 dark:border-neutral-800 rounded-md">
                   <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       Order id.
                     </TableHead>
-                    {/* <TableHead className="text-xs font-medium text-gray-500 uppercase">
-                      date
-                    </TableHead> */}
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       customer name
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       EMAIL ID
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       location
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       Items
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       payment type
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       amount
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       status
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-medium text-gray-500 dark:text-neutral-400 uppercase">
                       Actions
                     </TableHead>
                   </TableRow>
@@ -197,7 +182,7 @@ export default function Ordersmanagement() {
                   {currentItems?.map((application, index) => (
                     <TableRow
                       key={index}
-                      className="border-b border-gray-200 h-12"
+                      className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50 dark:hover:bg-neutral-800/40 h-12"
                     >
                       <TableCell className="font-medium">
                         ID: {application?.orderId.slice(-8)}

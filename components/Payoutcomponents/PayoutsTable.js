@@ -37,10 +37,10 @@ const formatCurrency = (amount, currency = "INR") => {
 
 const PayoutsTable = ({ payouts, onViewPayout, onRequestPayout }) => {
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
+    <div className="rounded-lg border border-border dark:border-neutral-800 bg-card dark:bg-[#121215] overflow-hidden shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableRow className="bg-muted/50 dark:bg-neutral-900/60 hover:bg-muted/50 dark:hover:bg-neutral-900/60 border-b border-border dark:border-neutral-800">
             <TableHead className="font-semibold text-foreground">
               Reference
             </TableHead>
@@ -82,7 +82,7 @@ const PayoutsTable = ({ payouts, onViewPayout, onRequestPayout }) => {
             </TableRow>
           ) : (
             payouts.map((payout) => (
-              <TableRow key={payout._id} className="hover:bg-muted/30">
+              <TableRow key={payout._id} className="hover:bg-muted/30 dark:hover:bg-neutral-800/40 border-b border-border dark:border-neutral-800/60">
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-mono text-sm font-medium text-foreground">

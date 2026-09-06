@@ -86,15 +86,15 @@ export default function Documents({ document ,id}) {
   return (
     <div className="w-full mx-auto p-2 space-y-6">
       <div className="w-full justify-between flex items-center">
-        <h1 className="text-lg font-bold text-gray-900">
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">
           Documents for Verification
         </h1>
 
-        <div>
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
             disabled={loadingAction !== null}
-            className="bg-white text-green-600 underline cursor-pointer font-semibold w-24"
+            className="bg-transparent hover:bg-green-50 dark:hover:bg-green-950/30 text-green-600 underline cursor-pointer font-semibold px-3"
             onPress={() => handleStatusUpdate("Approved")}
           >
            {loadingAction === "Approved"?<span className="loader2"></span>: "Accept"}
@@ -104,7 +104,7 @@ export default function Documents({ document ,id}) {
             size="sm"
             isLoading={loadingAction === "Reverify"}
             disabled={loadingAction !== null}
-            className="bg-white text-yellow-600 underline cursor-pointer font-semibold w-24"
+            className="bg-transparent hover:bg-yellow-50 dark:hover:bg-yellow-950/30 text-yellow-600 underline cursor-pointer font-semibold px-3"
             onPress={() => handleStatusUpdate("Reverify")}
           >
             Reverify
@@ -114,7 +114,7 @@ export default function Documents({ document ,id}) {
             size="sm"
             isLoading={loadingAction === "Rejected"}
             disabled={loadingAction !== null}
-            className="bg-white text-red-600 underline cursor-pointer font-semibold w-32"
+            className="bg-transparent hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 underline cursor-pointer font-semibold px-3"
             onPress={() => handleStatusUpdate("Rejected")}
           >
             Blacklist Seller
@@ -126,22 +126,22 @@ export default function Documents({ document ,id}) {
         {entries?.map(([key, filename]) => {
           const meta = documentMeta[key] || {};
           return (
-            <Card key={key} className="p-4 border border-gray-200 rounded-lg">
+            <Card key={key} className="p-4 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] rounded-lg transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="w-10 h-10 border border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
-                      <Download className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 border border-gray-300 dark:border-neutral-700 rounded-md flex items-center justify-center bg-gray-50 dark:bg-neutral-800">
+                      <Download className="w-5 h-5 text-gray-600 dark:text-neutral-400" />
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-medium text-gray-900">
+                    <h3 className="text-base font-medium text-gray-900 dark:text-white">
                       {meta.title || key}
                       {meta.required && (
                         <span
                           className={
-                            meta.urgent ? "text-red-500" : "text-gray-500"
+                            meta.urgent ? "text-red-500" : "text-gray-500 dark:text-neutral-400"
                           }
                         >
                           *
@@ -149,7 +149,7 @@ export default function Documents({ document ,id}) {
                       )}
                       {meta.urgent && <span className="text-red-500">*</span>}
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">
                       {meta.description || "No description"}
                     </p>
                   </div>

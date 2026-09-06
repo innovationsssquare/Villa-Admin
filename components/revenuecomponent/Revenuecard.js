@@ -24,13 +24,13 @@ const Revenuecard = () => {
   };
 
   return (
-    <div className=" overflow-auto  ">
+    <div className="overflow-auto">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
             {loading ? (
-              <Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />
+              <Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />
             ) : (
               <Image
                 src={Wallet}
@@ -42,16 +42,14 @@ const Revenuecard = () => {
           <div>
             {loading ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                   Total Earnings
                 </p>
-
                 <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalVendorAmount}
                 </p>
@@ -60,10 +58,10 @@ const Revenuecard = () => {
           </div>
         </div>
 
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
             {loading ? (
-              <Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />
+              <Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />
             ) : (
               <Image
                 src={Commission}
@@ -75,14 +73,12 @@ const Revenuecard = () => {
           <div>
             {loading ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">Commission</p>
-
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">Commission</p>
                 <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalCommission}
                 </p>
@@ -91,10 +87,10 @@ const Revenuecard = () => {
           </div>
         </div>
 
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
             {loading ? (
-              <Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />
+              <Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />
             ) : (
               <Image
                 src={pending}
@@ -106,16 +102,14 @@ const Revenuecard = () => {
           <div>
             {loading ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                   Pending Payout
                 </p>
-
                 <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalPendingPayout}
                 </p>
@@ -124,10 +118,10 @@ const Revenuecard = () => {
           </div>
         </div>
 
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
             {loading ? (
-              <Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />
+              <Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />
             ) : (
               <Image
                 src={withdraw}
@@ -139,14 +133,12 @@ const Revenuecard = () => {
           <div>
             {loading ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">Withdrawn</p>
-
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">Withdrawn</p>
                 <p className="text-2xl font-bold text-[#FF6900]">
                   {revenue?.totalWithdrawn}
                 </p>

@@ -55,42 +55,42 @@ export default function RevenueVelocityChart({ data = [], onPeriodChange, period
   };
 
   return (
-    <div className="rounded-2xl bg-white border border-neutral-200 p-6 shadow-sm">
+    <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 p-6 shadow-sm">
       {/* Top Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-neutral-900">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
               Revenue & Velocity Trajectory
             </h3>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800">
               Live Stream
             </span>
           </div>
-          <p className="text-xs text-neutral-500 mt-0.5">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
             Gross transaction volume aggregated across verified properties
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Metric Selector */}
-          <div className="flex bg-neutral-100 p-1 rounded-xl text-xs font-medium">
+          <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl text-xs font-medium">
             <button
               onClick={() => setActiveMetric("revenue")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 activeMetric === "revenue"
-                  ? "bg-white text-neutral-900 shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Revenue (₹)
             </button>
             <button
               onClick={() => setActiveMetric("bookings")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 activeMetric === "bookings"
-                  ? "bg-white text-neutral-900 shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Bookings
@@ -98,23 +98,23 @@ export default function RevenueVelocityChart({ data = [], onPeriodChange, period
           </div>
 
           {/* Timeframe Selector */}
-          <div className="flex bg-neutral-100 p-1 rounded-xl text-xs font-medium">
+          <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl text-xs font-medium">
             <button
               onClick={() => onPeriodChange && onPeriodChange("month")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 period === "month"
-                  ? "bg-[#FF6900] text-white shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-[#FF6900] text-white shadow-sm font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => onPeriodChange && onPeriodChange("daily")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 period === "daily"
-                  ? "bg-[#FF6900] text-white shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-[#FF6900] text-white shadow-sm font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Daily
@@ -180,25 +180,25 @@ export default function RevenueVelocityChart({ data = [], onPeriodChange, period
       </div>
 
       {/* Trajectory Highlights Footer */}
-      <div className="mt-6 pt-4 border-t border-neutral-100 grid grid-cols-3 gap-4 text-center">
+      <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-3 gap-4 text-center">
         <div>
-          <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block">
             Selected Horizon Total
           </span>
-          <span className="text-base font-bold text-neutral-900">
+          <span className="text-base font-bold text-neutral-900 dark:text-white">
             ₹{totalRev.toLocaleString()}
           </span>
         </div>
         <div>
-          <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block">
             Completed Reservations
           </span>
-          <span className="text-base font-bold text-neutral-900">
+          <span className="text-base font-bold text-neutral-900 dark:text-white">
             {totalBk}
           </span>
         </div>
         <div>
-          <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block">
             Average Booking Value (ABV)
           </span>
           <span className="text-base font-bold text-[#FF6900]">

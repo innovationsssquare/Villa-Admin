@@ -32,7 +32,7 @@ export default function SignInPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-7 shadow-2xl border border-white/20">
+        <div className="bg-white/95 dark:bg-[#121215]/95 backdrop-blur-xl rounded-3xl p-7 shadow-2xl border border-white/20 dark:border-neutral-800">
           <AdminLoginForm />
         </div>
 

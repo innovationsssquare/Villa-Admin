@@ -231,33 +231,31 @@ export default function SellersManagement() {
   };
 
   return (
-    <div className="w-full rounded-lg border h-full bg-white p-4">
+    <div className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 h-full bg-white dark:bg-[#121215] p-4 shadow-sm transition-colors">
       {/* Main Tabs */}
       <Tabs value={Tab} onValueChange={handletabchange} className="">
-        <TabsList className="p-0 bg-transparent space-x-2 h-auto">
+        <TabsList className="p-0 bg-transparent space-x-2 h-auto mb-4">
           <TabsTrigger
             value={false}
             onClick={() => setisVerified(false)}
-            className="rounded-md px-6 py-2 cursor-pointer text-base font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-200 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
           >
            All Owners
           </TabsTrigger>
           <TabsTrigger
             value={true}
             onClick={() => setisVerified(true)}
-            className="rounded-md px-6 py-2 text-base cursor-pointer font-medium data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:border-gray-300 data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-50"
+            className="rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
           >
             Verified Owners
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value={false}>
-          {/* Profile Tabs and Filters */}
-
           {/* Table */}
-          <div className=" rounded-md">
+          <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
-              <div className="flex items-center justify-center py-10 text-gray-500">
+              <div className="flex items-center justify-center py-10 text-gray-500 dark:text-neutral-400">
                 <span className="loader2 " />
               </div>
             ) : error ? (
@@ -265,70 +263,66 @@ export default function SellersManagement() {
                 {error}
               </div>
             ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
                 No Owners available
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
-                  <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                <TableHeader className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800">
+                  <TableRow className="border-b border-gray-200 dark:border-neutral-800">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Owner Name
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Email
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Phone No
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Total Properties
                     </TableHead>
-
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Action
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
                   {data?.map((application, index) => (
                     <TableRow
                       key={index}
-                      className="border-b border-gray-200 h-12"
+                      className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-neutral-900 dark:text-white">
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.bankDetails?.phone}</TableCell>
-                      <TableCell>{application?.properties?.length}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.email}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.bankDetails?.phone || "N/A"}</TableCell>
+                      <TableCell className="font-medium text-neutral-800 dark:text-neutral-200">{application?.properties?.length || 0}</TableCell>
                       <TableCell>
                         <Badge
-                          className={`font-medium ${
+                          className={`font-semibold text-xs px-2.5 py-0.5 rounded-full ${
                             application.isVerified === false
-                              ? "text-red-500 border-red-200 bg-red-50"
-                              : application.isVerified ===true
-                              ? "text-green-500 border-green-200 bg-green-50"
-                              : application.isVerified === "rejected"
-                              ? "text-red-500"
-                              : "text-gray-500"
+                              ? "text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40"
+                              : application.isVerified === true
+                              ? "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40"
+                              : "text-neutral-500 border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900"
                           }`}
                         >
-                          {application.isVerified?"Verified":"Not Verified"}
+                          {application.isVerified ? "Verified" : "Not Verified"}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                  
                           <span
                             onClick={() =>
                               router.push(
                                 `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
-                            className="text-[#FF6900] cursor-pointer hover:underline font-medium"
+                            className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
                           >
                             View Profile
                           </span>
@@ -342,9 +336,9 @@ export default function SellersManagement() {
         </TabsContent>
 
         <TabsContent value={true}>
-           <div className=" rounded-md">
+           <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
-              <div className="flex items-center justify-center py-10 text-gray-500">
+              <div className="flex items-center justify-center py-10 text-gray-500 dark:text-neutral-400">
                 <span className="loader2 " />
               </div>
             ) : error ? (
@@ -352,74 +346,69 @@ export default function SellersManagement() {
                 {error}
               </div>
             ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
                 No Owners available
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-50 border border-gray-300 rounded-md">
-                  <TableRow className="">
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                <TableHeader className="bg-gray-50 dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800">
+                  <TableRow className="border-b border-gray-200 dark:border-neutral-800">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Owner Name
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Email
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Phone No
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Total Properties
                     </TableHead>
-
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
-                    <TableHead className="text-xs font-medium text-gray-500 uppercase">
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Action
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
                   {data?.map((application, index) => (
                     <TableRow
                       key={index}
-                      className="border-b border-gray-200 h-12"
+                      className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-neutral-900 dark:text-white">
                         {application?.name}
                       </TableCell>
-                      <TableCell>{application?.email}</TableCell>
-                      <TableCell>{application?.bankDetails?.phone}</TableCell>
-                      <TableCell>{application?.properties?.length}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.email}</TableCell>
+                      <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.bankDetails?.phone || "N/A"}</TableCell>
+                      <TableCell className="font-medium text-neutral-800 dark:text-neutral-200">{application?.properties?.length || 0}</TableCell>
                       <TableCell>
                         <Badge
-                          className={`font-medium ${
+                          className={`font-semibold text-xs px-2.5 py-0.5 rounded-full ${
                             application.isVerified === false
-                              ? "text-red-500 border-red-200 bg-red-50"
-                              : application.isVerified ===true
-                              ? "text-green-500 border-green-200 bg-green-50"
-                              : application.isVerified === "rejected"
-                              ? "text-red-500"
-                              : "text-gray-500"
+                              ? "text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40"
+                              : application.isVerified === true
+                              ? "text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40"
+                              : "text-neutral-500 border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900"
                           }`}
                         >
-                          {application.isVerified?"Verified":"Not Verified"}
+                          {application.isVerified ? "Verified" : "Not Verified"}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                      
                           <span
                             onClick={() =>
                               router.push(
                                 `/property-owner/Viewdetails/${application?._id}`
                               )
                             }
-                            className="text-[#FF6900] cursor-pointer hover:underline font-medium"
+                            className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
                           >
                             View Profile
                           </span>
-                     
                       </TableCell>
                     </TableRow>
                   ))}

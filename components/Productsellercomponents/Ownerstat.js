@@ -31,9 +31,9 @@ const Ownerstats = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         {/* Product Sellers Card */}
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
-           {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />: <Image
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 shadow-sm rounded-xl p-4 flex items-start gap-3 transition-colors">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
+           {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />: <Image
               src={Dash1}
               alt="Product Sellers"
               className="object-contain w-10 h-10"
@@ -42,17 +42,16 @@ const Ownerstats = () => {
           <div>
             {loadingcount ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                 Total Owners
                 </p>
 
-                <p className="text-2xl font-bold text-[#FF6900]">
+                <p className="text-2xl font-black text-[#FF6900]">
                   {data?.productSellers}
                 </p>
               </>
@@ -61,9 +60,9 @@ const Ownerstats = () => {
         </div>
 
         {/* Service Providers Card */}
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
-           {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />:  <Image
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 shadow-sm rounded-xl p-4 flex items-start gap-3 transition-colors">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
+           {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />:  <Image
               src={Dash2}
               alt="Service Providers"
               className="object-contain w-10 h-10"
@@ -72,16 +71,15 @@ const Ownerstats = () => {
           <div>
             {loadingcount ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                 Verified Owners
                 </p>
-                <p className="text-2xl font-bold text-[#FF6900]">
+                <p className="text-2xl font-black text-[#FF6900]">
                   {data?.serviceProviders}
                 </p>
               </>
@@ -90,9 +88,9 @@ const Ownerstats = () => {
         </div>
 
         {/* Pending Approvals Card */}
-        <div className="bg-white border rounded-lg p-4 flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md ring-1 ring-gray-300 flex items-center justify-center">
-            {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 rounded-md" />:  <Image
+        <div className="bg-white dark:bg-[#121215] border border-gray-200 dark:border-neutral-800 shadow-sm rounded-xl p-4 flex items-start gap-3 transition-colors">
+          <div className="w-14 h-14 rounded-xl ring-1 ring-gray-200 dark:ring-neutral-800 bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
+            {loadingcount?<Skeleton className="w-14 h-14 bg-gray-200 dark:bg-neutral-800 rounded-xl" />:  <Image
               src={Dash3}
               alt="Pending Approvals"
               className="object-contain w-10 h-10"
@@ -101,16 +99,15 @@ const Ownerstats = () => {
           <div>
             {loadingcount ? (
               <>
-                <Skeleton className="h-4 w-32 bg-gray-200 rounded-md" />
-
-                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 rounded-md" />
+                <Skeleton className="h-4 w-32 bg-gray-200 dark:bg-neutral-800 rounded-md" />
+                <Skeleton className="h-8 w-16 mt-2 bg-gray-200 dark:bg-neutral-800 rounded-md" />
               </>
             ) : (
               <>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-neutral-400">
                  Not Verified Owners
                 </p>
-                <p className="text-2xl font-bold text-[#FF6900]">
+                <p className="text-2xl font-black text-[#FF6900]">
                   {data?.pendingApprovals}
                 </p>
               </>
