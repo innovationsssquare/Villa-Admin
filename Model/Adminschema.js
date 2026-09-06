@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 
 const AdminSchema = new mongoose.Schema({
-  firebaseUID: { type: String, required: true, unique: true },
+  firebaseUID: { type: String, unique: true, sparse: true },
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  password: { type: String },
   mobile: { type: String },
   profilePic: { type: String },
   isSuperAdmin: { type: Boolean, default: false },
@@ -16,5 +17,6 @@ const AdminSchema = new mongoose.Schema({
   deletedAt: { type: Date, default: null },
 });
 
-const Admin = mongoose.models.Admin || mongoose.model("Admin", AdminSchema);
+delete mongoose.models.Admin;
+const Admin = mongoose.model("Admin", AdminSchema);
 export default Admin;
