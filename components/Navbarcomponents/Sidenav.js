@@ -17,6 +17,8 @@ import {
   PanelLeftOpen,
   PackageCheck,
   List,
+  WalletCards,
+  Scale,
 } from "lucide-react";
 import User from "@/public/Asset/User.png";
 import { usePathname, useRouter } from "next/navigation";
@@ -63,6 +65,16 @@ const Sidenav = () => {
       label: "Revenue & Commission",
       icon: ReceiptIndianRupee,
       path: "/revenue",
+    },
+    {
+      label: "Host Payouts",
+      icon: WalletCards,
+      path: "/payouts",
+    },
+    {
+      label: "Disputes",
+      icon: Scale,
+      path: "/disputes",
     },
   ];
 

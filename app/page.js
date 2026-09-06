@@ -1,91 +1,149 @@
-import Image from "next/image"
-import { Bell, ChevronDown, ChevronRight } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import User from "@/public/Asset/User.png"
+"use client";
 
-import Statcard from "@/components/Productsellercomponents/Statcard"
-import RevenueOverview from "@/components/Analyticscomponents/revenue-overview"
-// import SellerApplicationsTable from "@/components/Analyticscomponents/seller-applications-table"
+import React, { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ExecutiveKpiGrid from "@/components/Analyticscomponents/ExecutiveKpiGrid";
+import RevenueVelocityChart from "@/components/Analyticscomponents/RevenueVelocityChart";
+import CategoryBreakdownCard from "@/components/Analyticscomponents/CategoryBreakdownCard";
+import OperationalActionCenter from "@/components/Analyticscomponents/OperationalActionCenter";
+import {
+  getAnalyticsSummary,
+  getRevenueTrends,
+  getPropertyTypeAnalytics,
+  getBookingStatusAnalytics,
+} from "@/lib/API/Analytics/Analytics";
+import { getAdminPendingHosts } from "@/lib/API/Payout/AdminPayout";
+import { getAllDisputes } from "@/lib/API/Dispute/Dispute";
+import { subscribeAdminEvents } from "@/lib/Socket/socketClient";
+import { RefreshCw, Radio } from "lucide-react";
+
 export default function Dashboard() {
+  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState(null);
+  const [bookingStatus, setBookingStatus] = useState(null);
+  const [revenueTrends, setRevenueTrends] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [payoutStats, setPayoutStats] = useState(null);
+  const [disputeStats, setDisputeStats] = useState(null);
+  const [period, setPeriod] = useState("month");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const loadAllAnalytics = async (selectedPeriod = period) => {
+    try {
+      const [
+        summaryRes,
+        bookingStatusRes,
+        trendsRes,
+        categoriesRes,
+        payoutRes,
+        disputeRes,
+      ] = await Promise.all([
+        getAnalyticsSummary(),
+        getBookingStatusAnalytics(),
+        getRevenueTrends(selectedPeriod),
+        getPropertyTypeAnalytics(),
+        getAdminPendingHosts(),
+        getAllDisputes({ limit: 1 }),
+      ]);
+
+      if (summaryRes?.success) setSummary(summaryRes.data);
+      if (bookingStatusRes?.success) setBookingStatus(bookingStatusRes.data);
+      if (trendsRes?.success) setRevenueTrends(trendsRes.data);
+      if (categoriesRes?.success) setCategoryData(categoriesRes.data);
+      if (payoutRes?.success) setPayoutStats(payoutRes.stats);
+      if (disputeRes?.success) setDisputeStats(disputeRes.stats);
+    } catch (err) {
+      console.error("Failed to load dashboard metrics:", err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAllAnalytics(period);
+
+    // Real-time socket event subscription for live updates
+    const unsubscribe = subscribeAdminEvents(() => {
+      // Re-fetch metrics silently when an administrative event arrives
+      loadAllAnalytics(period);
+    });
+
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, [period]);
+
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    loadAllAnalytics(period);
+  };
+
   return (
-    <ScrollArea className=" bg-gray-50 h-screen pb-14">
-    
-    
-
-      {/* Main Content */}
-      
-
-        {/* Dashboard Content */}
-        <div className=" overflow-auto p-3">
-          {/* Stats Cards */}
-        <Statcard/>
-
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 items-stretch">
-           <RevenueOverview/>
-            {/* Customer Requests */}
-            {/* <div className="">
-              <div className="bg-white border rounded-lg p-4">
-                <h2 className="text-lg font-medium mb-4">Customer&apos;s Requests</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center p-2 hover:bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 rounded-md overflow-hidden mr-3">
-                      <Image src={User} alt="Customer Avatar" width={40} height={40} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Customer Name</p>
-                      <p className="text-xs text-gray-500 truncate">Requirements from the customer for the service.</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                  </div>
-
-                  <div className="flex items-center p-2 hover:bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 rounded-md overflow-hidden mr-3">
-                      <Image src={User} alt="Customer Avatar" width={40} height={40} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Customer Name</p>
-                      <p className="text-xs text-gray-500 truncate">Requirements from the customer for the service.</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                  </div>
-
-                  <div className="flex items-center p-2 hover:bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 rounded-md overflow-hidden mr-3">
-                      <Image src={User} alt="Customer Avatar" width={40} height={40} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Customer Name</p>
-                      <p className="text-xs text-gray-500 truncate">Requirements from the customer for the service.</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                  </div>
-
-                  <div className="flex items-center p-2 hover:bg-gray-50 rounded-lg">
-                    <div className="w-10 h-10 rounded-md overflow-hidden mr-3">
-                      <Image src={User} alt="Customer Avatar" width={40} height={40} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Customer Name</p>
-                      <p className="text-xs text-gray-500 truncate">Requirements from the customer for the service.</p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button className="px-4 py-2 bg-[#FF6900] text-white text-sm rounded-md hover:bg-[#E05D00] shadow-sm shadow-[#FF6900]/25 transition-colors">
-                    View all
-                  </button>
-                </div>
+    <ScrollArea className="bg-[#FAFAFA] h-[calc(100vh-64px)] pb-16">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Executive Header Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-neutral-200/80">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
+                Executive Command Console
+              </h1>
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
+                Live Node
               </div>
-            </div> */}
+            </div>
+            <p className="text-xs text-neutral-500 mt-1">
+              Real-time portfolio revenue, guest disputes, host settlements, and booking velocity.
+            </p>
           </div>
 
-          {/* Applications Table */}
-        {/* <SellerApplicationsTable/> */}
-         
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="px-3.5 py-2 rounded-xl bg-white border border-neutral-200 hover:border-[#FF6900]/40 text-neutral-700 text-xs font-semibold flex items-center gap-2 shadow-sm hover:text-[#FF6900] transition-all cursor-pointer"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#FF6900]" : ""}`}
+              />
+              {isRefreshing ? "Syncing..." : "Sync Live Metrics"}
+            </button>
+          </div>
         </div>
-     
+
+        {/* 1. Top Executive KPIs */}
+        <ExecutiveKpiGrid
+          summary={summary}
+          bookingStatus={bookingStatus}
+          payoutStats={payoutStats}
+          disputeStats={disputeStats}
+          loading={loading}
+        />
+
+        {/* 2. Charts and Category Split Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className="lg:col-span-2">
+            <RevenueVelocityChart
+              data={revenueTrends}
+              period={period}
+              onPeriodChange={(newPeriod) => {
+                setPeriod(newPeriod);
+              }}
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <CategoryBreakdownCard data={categoryData} />
+          </div>
+        </div>
+
+        {/* 3. Operational Command Hub */}
+        <OperationalActionCenter
+          payoutStats={payoutStats}
+          disputeStats={disputeStats}
+        />
+      </div>
     </ScrollArea>
-  )
+  );
 }
