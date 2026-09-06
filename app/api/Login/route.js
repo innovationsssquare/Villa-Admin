@@ -18,7 +18,7 @@ const verifyPassword = (password, storedPassword) => {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const identifier = (body.email || body.username || "").trim();
+    const identifier = (body.identifier || body.email || body.username || "").trim();
     const password = body.password;
 
     if (!identifier || !password) {
