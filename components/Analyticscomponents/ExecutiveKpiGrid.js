@@ -30,11 +30,16 @@ export default function ExecutiveKpiGrid({ summary, bookingStatus, payoutStats, 
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-36 rounded-2xl bg-white/80 border border-neutral-200/80 p-5 animate-pulse shadow-sm"
+            className="h-36 rounded-2xl bg-white/80 dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 p-5 animate-pulse shadow-sm flex flex-col justify-between"
           >
-            <div className="h-4 w-24 bg-neutral-200 rounded-md mb-3" />
-            <div className="h-8 w-36 bg-neutral-200 rounded-md mb-2" />
-            <div className="h-3 w-44 bg-neutral-100 rounded-md" />
+            <div className="flex items-center justify-between">
+              <div className="h-4 w-28 bg-neutral-200 dark:bg-neutral-800 rounded-md" />
+              <div className="w-9 h-9 bg-neutral-200 dark:bg-neutral-800 rounded-xl" />
+            </div>
+            <div>
+              <div className="h-7 w-36 bg-neutral-200 dark:bg-neutral-800 rounded-md mb-2" />
+              <div className="h-3.5 w-44 bg-neutral-100 dark:bg-neutral-800/60 rounded-md" />
+            </div>
           </div>
         ))}
       </div>

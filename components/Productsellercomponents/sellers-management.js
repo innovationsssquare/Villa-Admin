@@ -44,7 +44,7 @@ export default function SellersManagement() {
   const [selectedValue, setSelectedValue] = useState("");
   const [sortValue, setSortValue] = useState("sort-by");
   const [isVerified, setisVerified] = useState();
-  const [Tab, setTab] = useState(false);
+  const [Tab, setTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -72,7 +72,7 @@ export default function SellersManagement() {
 
   const handletabchange = (value) => {
     setTab(value);
-    setisVerified(value);
+    setisVerified(value === "verified" ? true : undefined);
   };
 
   const handlePageChange = (newPage) => {
@@ -236,22 +236,36 @@ export default function SellersManagement() {
       <Tabs value={Tab} onValueChange={handletabchange} className="">
         <TabsList className="p-0 bg-transparent space-x-2 h-auto mb-4">
           <TabsTrigger
-            value={false}
-            onClick={() => setisVerified(false)}
-            className="rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
+            value="all"
+            onClick={() => {
+              setTab("all");
+              setisVerified(undefined);
+            }}
+            className={`rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm ${
+              Tab === "all"
+                ? "!bg-[#FF6900] !text-white"
+                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            }`}
           >
            All Owners
           </TabsTrigger>
           <TabsTrigger
-            value={true}
-            onClick={() => setisVerified(true)}
-            className="rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
+            value="verified"
+            onClick={() => {
+              setTab("verified");
+              setisVerified(true);
+            }}
+            className={`rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all shadow-sm ${
+              Tab === "verified"
+                ? "!bg-[#FF6900] !text-white"
+                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            }`}
           >
             Verified Owners
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={false}>
+        <TabsContent value="all">
           {/* Table */}
           <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
@@ -335,7 +349,7 @@ export default function SellersManagement() {
           </div>
         </TabsContent>
 
-        <TabsContent value={true}>
+        <TabsContent value="verified">
            <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
             {loading ? (
               <div className="flex items-center justify-center py-10 text-gray-500 dark:text-neutral-400">

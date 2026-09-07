@@ -30,18 +30,20 @@ const formatCurrency = (amount, currency = "INR") => {
   }).format(amount);
 };
 
-export function BookingsTable({ bookings, isLoading,onViewBooking }) {
+export function BookingsTable({ bookings, isLoading, onViewBooking }) {
+  const safeBookings = Array.isArray(bookings) ? bookings : [];
+
   if (isLoading) {
     return (
       <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 overflow-hidden h-[50vh] flex justify-center items-center">
         <div className="p-8 text-center text-muted-foreground dark:text-neutral-400">
-           <span className="loader2"></span>
+          <span className="loader2"></span>
         </div>
       </div>
     );
   }
 
-  if (bookings.length === 0) {
+  if (safeBookings.length === 0) {
     return (
       <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 overflow-hidden">
         <div className="p-8 text-center text-muted-foreground dark:text-neutral-400">
@@ -72,105 +74,114 @@ export function BookingsTable({ bookings, isLoading,onViewBooking }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {bookings.map((booking) => (
-              <TableRow key={booking._id} className="group hover:bg-muted/40 dark:hover:bg-neutral-800/40 border-b border-border dark:border-neutral-800/60">
-                <TableCell className="font-mono text-xs">
-                  {booking._id.slice(-8).toUpperCase()}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-md bg-primary/10 text-primary">
-                      {propertyIcons[booking.propertyType] || (
-                        <Building2 className="h-4 w-4" />
-                      )}
+            {safeBookings.map((booking) => {
+              const idStr = booking?._id ? String(booking._id).slice(-8).toUpperCase() : "N/A";
+              const unitsCount = booking?.items?.length || 0;
+              const checkInDate = booking?.checkIn ? new Date(booking.checkIn) : null;
+              const checkOutDate = booking?.checkOut ? new Date(booking.checkOut) : null;
+
+              return (
+                <TableRow
+                  key={booking?._id || Math.random()}
+                  className="group hover:bg-muted/40 dark:hover:bg-neutral-800/40 border-b border-border dark:border-neutral-800/60"
+                >
+                  <TableCell className="font-mono text-xs">
+                    {idStr}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+                        {propertyIcons[booking?.propertyType] || (
+                          <Building2 className="h-4 w-4" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">
+                          {booking?.propertyType || "Property"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {unitsCount} {unitsCount === 1 ? "unit" : "units"}
+                        </div>
+                      </div>
                     </div>
+                  </TableCell>
+                  <TableCell>
                     <div>
                       <div className="font-medium text-sm">
-                        {booking.propertyType}
+                        {booking?.customerDetails?.firstName || ""}{" "}
+                        {booking?.customerDetails?.lastName || "Guest"}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {booking.items.length}{" "}
-                        {booking.items.length === 1 ? "unit" : "units"}
+                        {booking?.customerDetails?.email || ""}
                       </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium text-sm">
-                      {booking.customerDetails.firstName}{" "}
-                      {booking.customerDetails.lastName}
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <div>
+                        {checkInDate && !isNaN(checkInDate) ? format(checkInDate, "MMM dd, yyyy") : "-"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        to {checkOutDate && !isNaN(checkOutDate) ? format(checkOutDate, "MMM dd, yyyy") : "-"}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {booking.customerDetails.email}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-sm">
+                        {booking?.guests?.adults || 0}A
+                        {(booking?.guests?.children || 0) > 0 &&
+                          `, ${booking.guests.children}C`}
+                      </span>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
+                  </TableCell>
+                  <TableCell>
                     <div>
-                      {format(new Date(booking.checkIn), "MMM dd, yyyy")}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      to {format(new Date(booking.checkOut), "MMM dd, yyyy")}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-sm">
-                      {booking.guests.adults}A
-                      {booking.guests.children > 0 &&
-                        `, ${booking.guests.children}C`}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-semibold text-sm">
-                      {formatCurrency(
-                        booking.pricing.totalAmount,
-                        booking.pricing.currency
+                      <div className="font-semibold text-sm">
+                        {formatCurrency(
+                          booking?.pricing?.totalAmount || 0,
+                          booking?.pricing?.currency || "INR"
+                        )}
+                      </div>
+                      {booking?.coupon?.applied && (
+                        <div className="text-xs text-success">
+                          -{formatCurrency(booking?.coupon?.discountAmount || 0)}
+                        </div>
                       )}
                     </div>
-                    {booking.coupon.applied && (
-                      <div className="text-xs text-success">
-                        -{formatCurrency(booking.coupon.discountAmount)}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={booking.status} type="booking" />
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={booking.paymentStatus} type="payment" />
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={
-                      booking.bookingMode === "online"
-                        ? "bg-primary/10 text-primary border-primary/30"
-                        : "bg-secondary text-secondary-foreground"
-                    }
-                  >
-                    {booking.bookingMode}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    onClick={() => onViewBooking(booking)}
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={booking?.status || "pending"} type="booking" />
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={booking?.paymentStatus || "pending"} type="payment" />
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={
+                        booking?.bookingMode === "online"
+                          ? "bg-primary/10 text-primary border-primary/30"
+                          : "bg-secondary text-secondary-foreground"
+                      }
+                    >
+                      {booking?.bookingMode || "standard"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      onClick={() => onViewBooking && onViewBooking(booking)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

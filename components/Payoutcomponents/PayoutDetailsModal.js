@@ -24,15 +24,17 @@ import {
 const formatCurrency = (amount, currency = "INR") => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: currency,
+    currency: currency || "INR",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(amount || 0);
 };
 
 const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
   if (!payout) return null;
 
-  const { financials } = payout;
+  const financials = payout?.financials || {};
+  const checkInDate = payout?.checkIn ? new Date(payout.checkIn) : null;
+  const checkOutDate = payout?.checkOut ? new Date(payout.checkOut) : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -40,7 +42,7 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span className="text-xl">Payout Details</span>
-            <PayoutStatusBadge status={payout.payoutStatus} type="payout" />
+            <PayoutStatusBadge status={payout?.payoutStatus || "pending"} type="payout" />
           </DialogTitle>
         </DialogHeader>
 
@@ -53,13 +55,13 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                 <span className="text-sm font-medium">Property</span>
               </div>
               <p className="font-semibold text-foreground">
-                {payout.propertyName}
+                {payout?.propertyName || "Property"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {payout.propertyType}
+                {payout?.propertyType || ""}
               </p>
               <p className="text-xs text-muted-foreground mt-1 font-mono">
-                Ref: #{payout.bookingReference}
+                Ref: #{payout?.bookingReference || "N/A"}
               </p>
             </div>
 
@@ -69,10 +71,10 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                 <span className="text-sm font-medium">Owner</span>
               </div>
               <p className="font-semibold text-foreground">
-                {payout.ownerDetails.name}
+                {payout?.ownerDetails?.name || "Host"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {payout.ownerDetails.email}
+                {payout?.ownerDetails?.email || ""}
               </p>
             </div>
           </div>
@@ -87,19 +89,19 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
               <div>
                 <p className="text-xs text-muted-foreground">Check-in</p>
                 <p className="font-medium text-foreground">
-                  {format(new Date(payout.checkIn), "dd MMM yyyy")}
+                  {checkInDate && !isNaN(checkInDate) ? format(checkInDate, "dd MMM yyyy") : "-"}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Check-out</p>
                 <p className="font-medium text-foreground">
-                  {format(new Date(payout.checkOut), "dd MMM yyyy")}
+                  {checkOutDate && !isNaN(checkOutDate) ? format(checkOutDate, "dd MMM yyyy") : "-"}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Booking Status</p>
                 <PayoutStatusBadge
-                  status={payout.bookingStatus}
+                  status={payout?.bookingStatus || "confirmed"}
                   type="booking"
                 />
               </div>
@@ -121,8 +123,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                 <span className="text-muted-foreground">Booking Amount</span>
                 <span className="font-semibold text-foreground">
                   {formatCurrency(
-                    financials.bookingAmount,
-                    financials.currency
+                    financials?.bookingAmount || 0,
+                    financials?.currency
                   )}
                 </span>
               </div>
@@ -138,20 +140,20 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                   </div>
                   <span className="text-info font-semibold">
                     {formatCurrency(
-                      financials.commissionAmount,
-                      financials.currency
+                      financials?.commissionAmount || 0,
+                      financials?.currency
                     )}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Rate</span>
-                    <span>{financials.commissionRate}%</span>
+                    <span>{financials?.commissionRate || 0}%</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Type</span>
                     <span className="capitalize">
-                      {financials.commissionType}
+                      {financials?.commissionType || "percentage"}
                     </span>
                   </div>
                 </div>
@@ -164,20 +166,20 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                 </p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between text-muted-foreground">
-                    <span>TDS ({financials.taxOnCommission.tdsRate}%)</span>
+                    <span>TDS ({financials?.taxOnCommission?.tdsRate || 0}%)</span>
                     <span>
                       {formatCurrency(
-                        financials.taxOnCommission.tdsAmount,
-                        financials.currency
+                        financials?.taxOnCommission?.tdsAmount || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
-                    <span>GST ({financials.taxOnCommission.gstRate}%)</span>
+                    <span>GST ({financials?.taxOnCommission?.gstRate || 0}%)</span>
                     <span>
                       {formatCurrency(
-                        financials.taxOnCommission.gstAmount,
-                        financials.currency
+                        financials?.taxOnCommission?.gstAmount || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -186,8 +188,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>Total Tax</span>
                     <span>
                       {formatCurrency(
-                        financials.taxOnCommission.totalTax,
-                        financials.currency
+                        financials?.taxOnCommission?.totalTax || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -195,15 +197,15 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
               </div>
 
               {/* Payment Gateway Fee */}
-              {financials.paymentGatewayFee.amount > 0 && (
+              {(financials?.paymentGatewayFee?.amount || 0) > 0 && (
                 <div className="flex justify-between items-center py-2 px-3 bg-muted/20 rounded">
                   <span className="text-muted-foreground">
-                    Gateway Fee ({financials.paymentGatewayFee.rate}%)
+                    Gateway Fee ({financials?.paymentGatewayFee?.rate || 0}%)
                   </span>
                   <span className="text-foreground">
                     {formatCurrency(
-                      financials.paymentGatewayFee.amount,
-                      financials.currency
+                      financials?.paymentGatewayFee?.amount || 0,
+                      financials?.currency
                     )}
                   </span>
                 </div>
@@ -217,8 +219,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>Commission</span>
                     <span>
                       {formatCurrency(
-                        financials.adminEarnings.commission,
-                        financials.currency
+                        financials?.adminEarnings?.commission || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -226,8 +228,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>Tax Collected</span>
                     <span>
                       {formatCurrency(
-                        financials.adminEarnings.tax,
-                        financials.currency
+                        financials?.adminEarnings?.tax || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -237,8 +239,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                   <span>Total Admin Earnings</span>
                   <span>
                     {formatCurrency(
-                      financials.adminEarnings.total,
-                      financials.currency
+                      financials?.adminEarnings?.total || 0,
+                      financials?.currency
                     )}
                   </span>
                 </div>
@@ -251,8 +253,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>Gross Payout</span>
                     <span>
                       {formatCurrency(
-                        financials.grossPayout,
-                        financials.currency
+                        financials?.grossPayout || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -261,8 +263,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>
                       -{" "}
                       {formatCurrency(
-                        financials.deductions,
-                        financials.currency
+                        financials?.deductions || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -271,8 +273,8 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
                     <span>Net Payout</span>
                     <span>
                       {formatCurrency(
-                        financials.netPayout,
-                        financials.currency
+                        financials?.netPayout || 0,
+                        financials?.currency
                       )}
                     </span>
                   </div>
@@ -293,13 +295,13 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
               <div>
                 <p className="text-xs text-muted-foreground">Type</p>
                 <p className="font-medium text-foreground capitalize">
-                  {payout.payoutSchedule.type.replace("_", " ")}
+                  {payout?.payoutSchedule?.type ? String(payout.payoutSchedule.type).replace("_", " ") : "Standard"}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Hold Period</p>
                 <p className="font-medium text-foreground">
-                  {payout.payoutSchedule.holdPeriod} days
+                  {payout?.payoutSchedule?.holdPeriod || 0} days
                 </p>
               </div>
             </div>
@@ -309,11 +311,11 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
           <div className="grid grid-cols-2 gap-4">
             <div
               className={`rounded-lg p-4 ${
-                payout.refund.isRefunded ? "bg-destructive/10" : "bg-muted/30"
+                payout?.refund?.isRefunded ? "bg-destructive/10" : "bg-muted/30"
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
-                {payout.refund.isRefunded ? (
+                {payout?.refund?.isRefunded ? (
                   <XCircle className="h-4 w-4 text-destructive" />
                 ) : (
                   <CheckCircle2 className="h-4 w-4 text-success" />
@@ -324,20 +326,20 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
               </div>
               <p
                 className={`font-medium ${
-                  payout.refund.isRefunded ? "text-destructive" : "text-success"
+                  payout?.refund?.isRefunded ? "text-destructive" : "text-success"
                 }`}
               >
-                {payout.refund.isRefunded ? "Refunded" : "No Refund"}
+                {payout?.refund?.isRefunded ? "Refunded" : "No Refund"}
               </p>
             </div>
 
             <div
               className={`rounded-lg p-4 ${
-                payout.dispute.isDisputed ? "bg-warning/10" : "bg-muted/30"
+                payout?.dispute?.isDisputed ? "bg-warning/10" : "bg-muted/30"
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
-                {payout.dispute.isDisputed ? (
+                {payout?.dispute?.isDisputed ? (
                   <AlertTriangle className="h-4 w-4 text-warning" />
                 ) : (
                   <CheckCircle2 className="h-4 w-4 text-success" />
@@ -348,19 +350,19 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
               </div>
               <p
                 className={`font-medium ${
-                  payout.dispute.isDisputed ? "text-warning" : "text-success"
+                  payout?.dispute?.isDisputed ? "text-warning" : "text-success"
                 }`}
               >
-                {payout.dispute.isDisputed ? "Disputed" : "No Dispute"}
+                {payout?.dispute?.isDisputed ? "Disputed" : "No Dispute"}
               </p>
             </div>
           </div>
 
           {/* Action Button */}
-          {payout.payoutStatus === "pending" && (
+          {payout?.payoutStatus === "pending" && (
             <div className="pt-4">
               <Button
-                onClick={() => onRequestPayout(payout)}
+                onClick={() => onRequestPayout && onRequestPayout(payout)}
                 className="w-full bg-success hover:bg-success/90 text-success-foreground"
               >
                 <Send className="h-4 w-4 mr-2" />

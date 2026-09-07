@@ -12,8 +12,40 @@ import {
 } from "recharts";
 import { TrendingUp, Calendar, Layers } from "lucide-react";
 
-export default function RevenueVelocityChart({ data = [], onPeriodChange, period = "month" }) {
+export default function RevenueVelocityChart({ data = [], onPeriodChange, period = "month", loading = false }) {
   const [activeMetric, setActiveMetric] = useState("revenue"); // "revenue" | "bookings"
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 p-6 shadow-sm animate-pulse">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="space-y-2">
+            <div className="h-5 w-48 bg-neutral-200 dark:bg-neutral-800 rounded-md" />
+            <div className="h-3.5 w-72 bg-neutral-100 dark:bg-neutral-800/60 rounded-md" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-8 w-32 bg-neutral-200 dark:bg-neutral-800 rounded-xl" />
+            <div className="h-8 w-28 bg-neutral-200 dark:bg-neutral-800 rounded-xl" />
+          </div>
+        </div>
+        <div className="h-[280px] w-full bg-neutral-100/70 dark:bg-neutral-900/40 rounded-xl mb-6" />
+        <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-3 gap-4">
+          <div className="space-y-1.5 flex flex-col items-center">
+            <div className="h-3 w-28 bg-neutral-100 dark:bg-neutral-800/60 rounded" />
+            <div className="h-5 w-20 bg-neutral-200 dark:bg-neutral-800 rounded" />
+          </div>
+          <div className="space-y-1.5 flex flex-col items-center">
+            <div className="h-3 w-28 bg-neutral-100 dark:bg-neutral-800/60 rounded" />
+            <div className="h-5 w-16 bg-neutral-200 dark:bg-neutral-800 rounded" />
+          </div>
+          <div className="space-y-1.5 flex flex-col items-center">
+            <div className="h-3 w-28 bg-neutral-100 dark:bg-neutral-800/60 rounded" />
+            <div className="h-5 w-20 bg-neutral-200 dark:bg-neutral-800 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const formatCurrency = (val) => {
     if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
@@ -21,32 +53,33 @@ export default function RevenueVelocityChart({ data = [], onPeriodChange, period
     return `₹${val}`;
   };
 
-  const chartData = data.map((item) => ({
-    name: item._id,
-    revenue: item.revenue || 0,
-    bookings: item.bookings || 0,
-    formattedRevenue: `₹${(item.revenue || 0).toLocaleString()}`,
+  const safeData = Array.isArray(data) ? data : [];
+  const chartData = safeData.map((item) => ({
+    name: item?._id || "",
+    revenue: item?.revenue || 0,
+    bookings: item?.bookings || 0,
+    formattedRevenue: `₹${(item?.revenue || 0).toLocaleString()}`,
   }));
 
-  const totalRev = chartData.reduce((acc, curr) => acc + curr.revenue, 0);
-  const totalBk = chartData.reduce((acc, curr) => acc + curr.bookings, 0);
+  const totalRev = chartData.reduce((acc, curr) => acc + (curr?.revenue || 0), 0);
+  const totalBk = chartData.reduce((acc, curr) => acc + (curr?.bookings || 0), 0);
   const avgOrderValue = totalBk > 0 ? Math.round(totalRev / totalBk) : 0;
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
-      const d = payload[0].payload;
+      const d = payload[0]?.payload;
       return (
         <div className="rounded-xl bg-[#171717] p-3 text-white shadow-xl border border-neutral-800 text-xs min-w-[140px]">
           <p className="font-semibold text-neutral-300 mb-1 border-b border-neutral-800 pb-1">
-            {d.name}
+            {d?.name || label || ""}
           </p>
           <div className="flex items-center justify-between gap-3 my-1">
             <span className="text-[#FF6900] font-medium">Revenue:</span>
-            <span className="font-bold">{d.formattedRevenue}</span>
+            <span className="font-bold">{d?.formattedRevenue || "₹0"}</span>
           </div>
           <div className="flex items-center justify-between gap-3 text-neutral-400">
             <span>Bookings:</span>
-            <span className="font-semibold text-white">{d.bookings}</span>
+            <span className="font-semibold text-white">{d?.bookings || 0}</span>
           </div>
         </div>
       );
@@ -142,7 +175,7 @@ export default function RevenueVelocityChart({ data = [], onPeriodChange, period
                   <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#888888" strokeOpacity={0.15} />
               <XAxis
                 dataKey="name"
                 axisLine={false}

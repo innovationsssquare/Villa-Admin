@@ -1,30 +1,32 @@
-// app/api/keepalive/route.js  (Next.js 13+ app directory)
+// app/cron/route.js  (Next.js keepalive route)
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Ping your backend server
-    const backendUrl = 'https://villa-camping-backend.onrender.com/keepalive';
-    const response = await fetch(backendUrl);
+    const backendUrl = process.env.NEXT_PUBLIC_PRODUCTION_URL 
+      ? `${process.env.NEXT_PUBLIC_PRODUCTION_URL.replace(/\/api\/v1\/?$/, '')}/keepalive` 
+      : null;
+
+    if (!backendUrl) {
+      return NextResponse.json({ ok: true, message: 'Keepalive not configured for current environment' });
+    }
+
+    const response = await fetch(backendUrl, { cache: 'no-store' });
 
     if (!response.ok) {
-      throw new Error(`Backend ping failed with status ${response.status}`);
+      return NextResponse.json({ ok: false, message: `Status ${response.status}` }, { status: 200 });
     }
 
     const data = await response.json();
-    console.log('Keepalive successful:', data);
-
     return NextResponse.json({
       ok: true,
       message: 'Keepalive ping sent successfully',
       backendResponse: data
     });
   } catch (error) {
-    console.error('Error in keepalive:', error);
-
     return NextResponse.json(
-      { ok: false, error: error.message },
-      { status: 500 }
+      { ok: false, message: error?.message || 'Ping bypassed' },
+      { status: 200 }
     );
   }
 }

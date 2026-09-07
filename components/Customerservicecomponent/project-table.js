@@ -119,28 +119,31 @@ export default function ProjectTable() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="border rounded-md px-4 py-2 flex items-center gap-2 col-end-6"
+                    className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 rounded-md px-4 py-2 flex items-center gap-2 col-end-6 cursor-pointer"
                   >
                     {statusFilter}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setStatusFilter("New")}>
+                <DropdownMenuContent align="end" className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800">
+                  <DropdownMenuItem onClick={() => setStatusFilter("New")} className="cursor-pointer">
                     New
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Quote Sent")}
+                    className="cursor-pointer"
                   >
                     Quote Sent
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Quote Accepted")}
+                    className="cursor-pointer"
                   >
                     Quote Accepted
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Assigned Provider")}
+                    className="cursor-pointer"
                   >
                     Assigned Provider
                   </DropdownMenuItem>
@@ -153,25 +156,28 @@ export default function ProjectTable() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="border rounded-md px-4 py-2 flex items-center gap-2 col-end-6"
+                    className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 rounded-md px-4 py-2 flex items-center gap-2 col-end-6 cursor-pointer"
                   >
                     {statusFilter}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800">
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Completing soon")}
+                    className="cursor-pointer"
                   >
                     Completing soon
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Recently updated")}
+                    className="cursor-pointer"
                   >
                     Recently updated
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setStatusFilter("Oldest first")}
+                    className="cursor-pointer"
                   >
                     Oldest first
                   </DropdownMenuItem>
@@ -181,51 +187,51 @@ export default function ProjectTable() {
           </TabsList>
 
           <TabsContent value="all-works" className={"w-full"}>
-            <div className=" rounded-lg overflow-hidden mt-4">
+            <div className="rounded-xl overflow-hidden mt-4 border border-gray-200 dark:border-neutral-800">
               <ScrollArea className="h-full w-full">
                 <Table>
-                  <TableHeader className="bg-gray-100 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-800">
-                    <TableRow>
-                      <TableHead className="w-[200px] text-gray-700 dark:text-neutral-300">PROJECT</TableHead>
-                      <TableHead className="text-gray-700 dark:text-neutral-300">CLIENT</TableHead>
-                      <TableHead className="text-gray-700 dark:text-neutral-300">REQUESTED DATE</TableHead>
-                      <TableHead className="text-gray-700 dark:text-neutral-300">REQUIREMENTS</TableHead>
-                      <TableHead className="text-gray-700 dark:text-neutral-300">STATUS</TableHead>
-                      <TableHead className="text-right text-gray-700 dark:text-neutral-300">ACTIONS</TableHead>
+                  <TableHeader className="bg-gray-50/90 dark:bg-neutral-900/80 border-b border-gray-200 dark:border-neutral-800">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-[200px] text-gray-700 dark:text-neutral-300 font-semibold">PROJECT</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300 font-semibold">CLIENT</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300 font-semibold">REQUESTED DATE</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300 font-semibold">REQUIREMENTS</TableHead>
+                      <TableHead className="text-gray-700 dark:text-neutral-300 font-semibold">STATUS</TableHead>
+                      <TableHead className="text-right text-gray-700 dark:text-neutral-300 font-semibold">ACTIONS</TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
                     {projects.map((project) => (
                       <TableRow
                         key={project.id}
-                        className="border-t border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800/40 h-14"
+                        className="hover:bg-gray-50/80 dark:hover:bg-neutral-800/40 h-14 transition-colors"
                       >
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium text-neutral-900 dark:text-white">
                           {project.name}
                         </TableCell>
-                        <TableCell>{project.client}</TableCell>
-                        <TableCell>{project.requestedDate}</TableCell>
+                        <TableCell className="text-neutral-700 dark:text-neutral-300">{project.client}</TableCell>
+                        <TableCell className="text-neutral-500 dark:text-neutral-400">{project.requestedDate}</TableCell>
                         <TableCell>
                           <ViewRequirementModal />
                         </TableCell>
                         <TableCell>
                           {project.status === "New" && (
-                            <span className="text-[#34A853] font-medium">
+                            <span className="text-[#34A853] dark:text-emerald-400 font-semibold">
                               New
                             </span>
                           )}
                           {project.status === "Quote Sent" && (
-                            <span className="text-blue-500 font-medium">
+                            <span className="text-blue-600 dark:text-blue-400 font-semibold">
                               Quote Sent
                             </span>
                           )}
                           {project.status === "Quote Accepted" && (
-                            <span className="text-amber-500 font-medium">
+                            <span className="text-amber-600 dark:text-amber-400 font-semibold">
                               Quote Accepted
                             </span>
                           )}
                           {project.status === "Assigned Provider" && (
-                            <span className="text-purple-600 font-medium">
+                            <span className="text-purple-600 dark:text-purple-400 font-semibold">
                               Assigned Provider
                             </span>
                           )}

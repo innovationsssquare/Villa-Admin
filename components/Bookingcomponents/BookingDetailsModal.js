@@ -25,9 +25,9 @@ import {
 const formatCurrency = (amount, currency = "INR") => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency,
+    currency: currency || "INR",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(amount || 0);
 };
 
 function InfoRow({ icon: Icon, label, value }) {
@@ -36,9 +36,9 @@ function InfoRow({ icon: Icon, label, value }) {
       <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium text-foreground break-words">
+        <div className="text-sm font-medium text-foreground break-words">
           {value}
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -53,9 +53,18 @@ function SectionTitle({ children }) {
 export function BookingDetailsModal({ booking, open, onClose }) {
   if (!booking) return null;
 
-  const customerName = `${booking.customerDetails.firstName} ${
-    booking.customerDetails.lastName || ""
-  }`.trim();
+  const customerName = `${booking?.customerDetails?.firstName || ""} ${
+    booking?.customerDetails?.lastName || ""
+  }`.trim() || "Guest";
+
+  const checkInDate = booking?.checkIn ? new Date(booking.checkIn) : null;
+  const checkOutDate = booking?.checkOut ? new Date(booking.checkOut) : null;
+  const createdDate = booking?.createdAt ? new Date(booking.createdAt) : null;
+  const updatedDate = booking?.updatedAt ? new Date(booking.updatedAt) : null;
+  const idStr = booking?._id ? String(booking._id).slice(-8).toUpperCase() : "N/A";
+
+  const items = Array.isArray(booking?.items) ? booking.items : [];
+  const payments = Array.isArray(booking?.payments) ? booking.payments : [];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -67,12 +76,12 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                 Booking Details
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1 font-mono">
-                ID: {booking._id.slice(-8).toUpperCase()}
+                ID: {idStr}
               </p>
             </div>
             <div className="flex gap-2">
-              <StatusBadge status={booking.status} type="booking" />
-              <StatusBadge status={booking.paymentStatus} type="payment" />
+              <StatusBadge status={booking?.status || "pending"} type="booking" />
+              <StatusBadge status={booking?.paymentStatus || "pending"} type="payment" />
             </div>
           </div>
         </DialogHeader>
@@ -89,7 +98,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                     label="Property Type"
                     value={
                       <Badge variant="outline" className="font-medium">
-                        {booking.propertyType}
+                        {booking?.propertyType || "Property"}
                       </Badge>
                     }
                   />
@@ -97,30 +106,32 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                     icon={Tag}
                     label="Booking Mode"
                     value={
-                      <span className="capitalize">{booking.bookingMode}</span>
+                      <span className="capitalize">{booking?.bookingMode || "standard"}</span>
                     }
                   />
                   <InfoRow
                     icon={Calendar}
                     label="Check-in"
-                    value={format(
-                      new Date(booking.checkIn),
-                      "EEEE, MMMM dd, yyyy"
-                    )}
+                    value={
+                      checkInDate && !isNaN(checkInDate)
+                        ? format(checkInDate, "EEEE, MMMM dd, yyyy")
+                        : "-"
+                    }
                   />
                   <InfoRow
                     icon={Calendar}
                     label="Check-out"
-                    value={format(
-                      new Date(booking.checkOut),
-                      "EEEE, MMMM dd, yyyy"
-                    )}
+                    value={
+                      checkOutDate && !isNaN(checkOutDate)
+                        ? format(checkOutDate, "EEEE, MMMM dd, yyyy")
+                        : "-"
+                    }
                   />
                   <InfoRow
                     icon={Users}
                     label="Guests"
-                    value={`${booking.guests.adults} Adult(s)${
-                      booking.guests.children > 0
+                    value={`${booking?.guests?.adults || 0} Adult(s)${
+                      (booking?.guests?.children || 0) > 0
                         ? `, ${booking.guests.children} Child(ren)`
                         : ""
                     }`}
@@ -135,14 +146,14 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                   <InfoRow
                     icon={Mail}
                     label="Email"
-                    value={booking.customerDetails.email}
+                    value={booking?.customerDetails?.email || "-"}
                   />
                   <InfoRow
                     icon={Phone}
                     label="Mobile"
-                    value={booking.customerDetails.mobile}
+                    value={booking?.customerDetails?.mobile || "-"}
                   />
-                  {booking.customerDetails.city && (
+                  {booking?.customerDetails?.city && (
                     <InfoRow
                       icon={MapPin}
                       label="City"
@@ -159,29 +170,33 @@ export function BookingDetailsModal({ booking, open, onClose }) {
             <div>
               <SectionTitle>Booked Items</SectionTitle>
               <div className="space-y-2">
-                {booking.items.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {item.typeName || item.unitType}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.unitType} • Qty: {item.quantity}
-                      </p>
+                {items.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No item details available</p>
+                ) : (
+                  items.map((item, idx) => (
+                    <div
+                      key={item?._id || idx}
+                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {item?.typeName || item?.unitType || "Unit"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {item?.unitType || "standard"} • Qty: {item?.quantity || 1}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(item?.totalPrice || 0)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatCurrency(item?.pricePerNight || 0)}/night
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">
-                        {formatCurrency(item.totalPrice)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatCurrency(item.pricePerNight)}/night
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
@@ -195,10 +210,10 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="text-foreground">
-                      {formatCurrency(booking.pricing.subtotal)}
+                      {formatCurrency(booking?.pricing?.subtotal || 0)}
                     </span>
                   </div>
-                  {booking.pricing.discountAmount > 0 && (
+                  {(booking?.pricing?.discountAmount || 0) > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-success">Discount</span>
                       <span className="text-success">
@@ -209,20 +224,20 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax</span>
                     <span className="text-foreground">
-                      {formatCurrency(booking.pricing.taxAmount)}
+                      {formatCurrency(booking?.pricing?.taxAmount || 0)}
                     </span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between font-semibold">
                     <span className="text-foreground">Total</span>
                     <span className="text-primary text-lg">
-                      {formatCurrency(booking.pricing.totalAmount)}
+                      {formatCurrency(booking?.pricing?.totalAmount || 0)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {booking.coupon.applied && (
+              {booking?.coupon?.applied && (
                 <div>
                   <SectionTitle>Coupon Applied</SectionTitle>
                   <div className="bg-success/10 border border-success/20 p-4 rounded-lg">
@@ -238,7 +253,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         : formatCurrency(booking.coupon.discountValue || 0)}
                     </p>
                     <p className="text-sm font-medium text-success mt-1">
-                      Saved: {formatCurrency(booking.coupon.discountAmount)}
+                      Saved: {formatCurrency(booking.coupon.discountAmount || 0)}
                     </p>
                   </div>
                 </div>
@@ -251,45 +266,49 @@ export function BookingDetailsModal({ booking, open, onClose }) {
             <div>
               <SectionTitle>Payment History</SectionTitle>
               <div className="space-y-2">
-                {booking.payments.map((payment) => (
-                  <div
-                    key={payment._id}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-primary/10">
-                        <CreditCard className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground capitalize">
-                          {payment.paymentType} Payment
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          {payment.transactionId}
-                        </p>
-                        {payment.paidAt && (
-                          <p className="text-xs text-muted-foreground">
-                            {format(
-                              new Date(payment.paidAt),
-                              "MMM dd, yyyy 'at' hh:mm a"
+                {payments.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No payment transaction records</p>
+                ) : (
+                  payments.map((payment, idx) => {
+                    const paidDate = payment?.paidAt ? new Date(payment.paidAt) : null;
+                    return (
+                      <div
+                        key={payment?._id || idx}
+                        className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-primary/10">
+                            <CreditCard className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground capitalize">
+                              {payment?.paymentType || "Card"} Payment
+                            </p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {payment?.transactionId || "N/A"}
+                            </p>
+                            {paidDate && !isNaN(paidDate) && (
+                              <p className="text-xs text-muted-foreground">
+                                {format(paidDate, "MMM dd, yyyy 'at' hh:mm a")}
+                              </p>
                             )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-foreground">
+                            {formatCurrency(payment?.amount || 0, payment?.currency)}
                           </p>
-                        )}
+                          <StatusBadge status={payment?.status || "pending"} type="payment" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">
-                        {formatCurrency(payment.amount, payment.currency)}
-                      </p>
-                      <StatusBadge status={payment.status} type="payment" />
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                )}
               </div>
             </div>
 
             {/* Payout Information */}
-            {booking.payoutId && (
+            {booking?.payoutId && (
               <>
                 <Separator />
                 <div>
@@ -300,7 +319,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         Payout Status
                       </span>
                       <StatusBadge
-                        status={booking.payoutId.payoutStatus}
+                        status={booking.payoutId.payoutStatus || "pending"}
                         type="payout"
                       />
                     </div>
@@ -310,18 +329,18 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         <p className="text-muted-foreground">Booking Amount</p>
                         <p className="font-medium text-foreground">
                           {formatCurrency(
-                            booking.payoutId.financials.bookingAmount
+                            booking.payoutId.financials?.bookingAmount || 0
                           )}
                         </p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">
                           Commission (
-                          {booking.payoutId.financials.commissionRate}%)
+                          {booking.payoutId.financials?.commissionRate || 0}%)
                         </p>
                         <p className="font-medium text-foreground">
                           {formatCurrency(
-                            booking.payoutId.financials.commissionAmount
+                            booking.payoutId.financials?.commissionAmount || 0
                           )}
                         </p>
                       </div>
@@ -329,7 +348,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         <p className="text-muted-foreground">Gross Payout</p>
                         <p className="font-medium text-foreground">
                           {formatCurrency(
-                            booking.payoutId.financials.grossPayout
+                            booking.payoutId.financials?.grossPayout || 0
                           )}
                         </p>
                       </div>
@@ -338,7 +357,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         <p className="font-medium text-destructive">
                           -
                           {formatCurrency(
-                            booking.payoutId.financials.deductions
+                            booking.payoutId.financials?.deductions || 0
                           )}
                         </p>
                       </div>
@@ -352,7 +371,7 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                         </span>
                       </div>
                       <span className="text-xl font-bold text-success">
-                        {formatCurrency(booking.payoutId.financials.netPayout)}
+                        {formatCurrency(booking.payoutId.financials?.netPayout || 0)}
                       </span>
                     </div>
                   </div>
@@ -368,12 +387,12 @@ export function BookingDetailsModal({ booking, open, onClose }) {
                 <InfoRow
                   icon={User}
                   label="Name"
-                  value={booking.ownerId.name}
+                  value={booking?.ownerId?.name || "Host"}
                 />
                 <InfoRow
                   icon={Mail}
                   label="Email"
-                  value={booking.ownerId.email}
+                  value={booking?.ownerId?.email || "-"}
                 />
               </div>
             </div>
@@ -384,19 +403,17 @@ export function BookingDetailsModal({ booking, open, onClose }) {
               <div>
                 <p>
                   Created:{" "}
-                  {format(
-                    new Date(booking.createdAt),
-                    "MMM dd, yyyy 'at' hh:mm a"
-                  )}
+                  {createdDate && !isNaN(createdDate)
+                    ? format(createdDate, "MMM dd, yyyy 'at' hh:mm a")
+                    : "-"}
                 </p>
               </div>
               <div>
                 <p>
                   Updated:{" "}
-                  {format(
-                    new Date(booking.updatedAt),
-                    "MMM dd, yyyy 'at' hh:mm a"
-                  )}
+                  {updatedDate && !isNaN(updatedDate)
+                    ? format(updatedDate, "MMM dd, yyyy 'at' hh:mm a")
+                    : "-"}
                 </p>
               </div>
             </div>

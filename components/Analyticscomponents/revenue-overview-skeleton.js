@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Revenueskeleton() {
   return (
-    <div className="p-2 bg-white rounded-lg border">
+    <div className="p-4 bg-white dark:bg-[#121215] rounded-xl border border-gray-200 dark:border-neutral-800 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-6">
@@ -18,7 +18,7 @@ export default function Revenueskeleton() {
             </div>
           </div>
         </div>
-        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-8 w-32 rounded-xl" />
       </div>
 
       {/* Chart Area */}
@@ -36,7 +36,7 @@ export default function Revenueskeleton() {
         {/* Chart container */}
         <div className="ml-16 relative">
           {/* Chart background */}
-          <div className="h-60 bg-gray-50 rounded relative overflow-hidden">
+          <div className="h-60 bg-gray-50 dark:bg-neutral-900/40 rounded-xl relative overflow-hidden">
          
           </div>
 

@@ -40,58 +40,59 @@ export default function AdminBookings() {
     );
   }, [filters.page, filters.limit, dispatch]);
 
+  const safeBookings = useMemo(() => {
+    return Array.isArray(bookings) ? bookings : [];
+  }, [bookings]);
+
   // Filter bookings based on current filters (client-side for demo)
   const filteredBookings = useMemo(() => {
-    let result = [...bookings];
+    let result = [...safeBookings];
 
-    if (filters.status) {
-      result = result.filter((b) => b.status === filters.status);
+    if (filters?.status) {
+      result = result.filter((b) => b?.status === filters.status);
     }
-    if (filters.paymentStatus) {
-      result = result.filter((b) => b.paymentStatus === filters.paymentStatus);
+    if (filters?.paymentStatus) {
+      result = result.filter((b) => b?.paymentStatus === filters.paymentStatus);
     }
-    if (filters.propertyType) {
-      result = result.filter((b) => b.propertyType === filters.propertyType);
+    if (filters?.propertyType) {
+      result = result.filter((b) => b?.propertyType === filters.propertyType);
     }
-    if (filters.startDate) {
+    if (filters?.startDate) {
       result = result.filter(
-        (b) => new Date(b.checkIn) >= new Date(filters.startDate)
+        (b) => b?.checkIn && new Date(b.checkIn) >= new Date(filters.startDate)
       );
     }
-    if (filters.endDate) {
+    if (filters?.endDate) {
       result = result.filter(
-        (b) => new Date(b.checkOut) <= new Date(filters.endDate)
+        (b) => b?.checkOut && new Date(b.checkOut) <= new Date(filters.endDate)
       );
     }
 
     return result;
-  }, [filters, bookings]);
-
-  // Paginate
-
+  }, [filters, safeBookings]);
 
   // Calculate stats
-const stats = useMemo(() => {
-  const totalRevenue = bookings.reduce(
-    (sum, b) => sum + (b.pricing?.totalAmount || 0),
-    0
-  );
+  const stats = useMemo(() => {
+    const totalRevenue = safeBookings.reduce(
+      (sum, b) => sum + (b?.pricing?.totalAmount || 0),
+      0
+    );
 
-  const completedBookings = bookings.filter(
-    (b) => b.status === "completed"
-  ).length;
+    const completedBookings = safeBookings.filter(
+      (b) => b?.status === "completed"
+    ).length;
 
-  const paidBookings = bookings.filter(
-    (b) => b.paymentStatus === "fully_paid"
-  ).length;
+    const paidBookings = safeBookings.filter(
+      (b) => b?.paymentStatus === "fully_paid"
+    ).length;
 
-  return {
-    totalBookings: bookings.length,
-    totalRevenue,
-    completedBookings,
-    paidBookings,
-  };
-}, [bookings]);
+    return {
+      totalBookings: safeBookings.length,
+      totalRevenue,
+      completedBookings,
+      paidBookings,
+    };
+  }, [safeBookings]);
 
 
   const formatCurrency = (amount) => {
@@ -178,10 +179,10 @@ const stats = useMemo(() => {
 
         {/* Pagination */}
         <BookingsPagination
-          page={pagination.page}
-          totalPages={pagination.totalPages}
-          total={pagination.total}
-          limit={pagination.limit}
+          page={pagination?.page || 1}
+          totalPages={pagination?.totalPages || 1}
+          total={pagination?.total || 0}
+          limit={pagination?.limit || 10}
           onPageChange={handlePageChange}
           onLimitChange={handleLimitChange}
         />

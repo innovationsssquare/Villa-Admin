@@ -249,15 +249,29 @@ export default function SellersManagement() {
         <TabsList className="p-0 bg-transparent space-x-2 h-auto mb-4">
           <TabsTrigger
             value="applications"
-            onClick={() => setisapproved("")}
-            className="rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
+            onClick={() => {
+              setTab("applications");
+              setisapproved("");
+            }}
+            className={`rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm ${
+              Tab === "applications"
+                ? "!bg-[#FF6900] !text-white"
+                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            }`}
           >
             {` Owner's Properties`}
           </TabsTrigger>
           <TabsTrigger
             value="active"
-            onClick={() => setisapproved("approved")}
-            className="rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all data-[state=active]:bg-[#FF6900] data-[state=active]:text-white data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-neutral-900 data-[state=inactive]:border data-[state=inactive]:border-gray-200 dark:data-[state=inactive]:border-neutral-800 data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-neutral-300 dark:data-[state=inactive]:hover:bg-neutral-800/50"
+            onClick={() => {
+              setTab("active");
+              setisapproved("approved");
+            }}
+            className={`rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all shadow-sm ${
+              Tab === "active"
+                ? "!bg-[#FF6900] !text-white"
+                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+            }`}
           >
             Approved Properties
           </TabsTrigger>

@@ -13,9 +13,9 @@ import { IndianRupee, Send, User, Building2 } from "lucide-react";
 const formatCurrency = (amount, currency = "INR") => {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: currency,
+    currency: currency || "INR",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(amount || 0);
 };
 
 const RequestPayoutModal = ({
@@ -47,10 +47,10 @@ const RequestPayoutModal = ({
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {payout.propertyName}
+                      {payout?.propertyName || "Property"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Ref: #{payout.bookingReference}
+                      Ref: #{payout?.bookingReference || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -59,10 +59,10 @@ const RequestPayoutModal = ({
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {payout.ownerDetails.name}
+                      {payout?.ownerDetails?.name || "Host"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {payout.ownerDetails.email}
+                      {payout?.ownerDetails?.email || ""}
                     </p>
                   </div>
                 </div>
@@ -75,8 +75,8 @@ const RequestPayoutModal = ({
                     </p>
                     <p className="text-lg font-bold text-success">
                       {formatCurrency(
-                        payout.financials.netPayout,
-                        payout.financials.currency
+                        payout?.financials?.netPayout || 0,
+                        payout?.financials?.currency
                       )}
                     </p>
                   </div>
@@ -93,7 +93,7 @@ const RequestPayoutModal = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => onConfirm(payout)}
+            onClick={() => onConfirm && onConfirm(payout)}
             disabled={isLoading}
             className="bg-success hover:bg-success/90 text-success-foreground"
           >

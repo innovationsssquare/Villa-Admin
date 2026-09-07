@@ -190,26 +190,26 @@ export default function SupportHelpdeskPage() {
     switch (p) {
       case "urgent":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-100 text-rose-800 border border-rose-200">
-            <Flame className="w-3 h-3 text-rose-600 animate-pulse" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-50 text-rose-700 border border-rose-200/80 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800/70 shadow-sm">
+            <Flame className="w-3 h-3 text-rose-600 dark:text-rose-400 animate-pulse" />
             URGENT
           </span>
         );
       case "high":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF1E6] text-[#FF6900] border border-[#FF6900]/30">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-50 text-[#FF6900] border border-orange-200/80 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800/70 shadow-sm">
             HIGH
           </span>
         );
       case "medium":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/80 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/70 shadow-sm">
             MEDIUM
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-600">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200/80 dark:bg-neutral-800/80 dark:text-neutral-400 dark:border-neutral-700/70 shadow-sm">
             LOW
           </span>
         );
@@ -220,48 +220,48 @@ export default function SupportHelpdeskPage() {
     switch (s) {
       case "open":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            <AlertCircle className="w-3 h-3 text-amber-500" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/70 shadow-sm">
+            <AlertCircle className="w-3 h-3 text-amber-500 dark:text-amber-400" />
             Open
           </span>
         );
       case "in_progress":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-            <Clock className="w-3 h-3 text-blue-500" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800/70 shadow-sm">
+            <Clock className="w-3 h-3 text-blue-500 dark:text-blue-400" />
             In Progress
           </span>
         );
       case "resolved":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800/70 shadow-sm">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             Resolved
           </span>
         );
       case "closed":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200/80 dark:bg-neutral-800/80 dark:text-neutral-400 dark:border-neutral-700/70 shadow-sm">
             Closed
           </span>
         );
       default:
-        return <span className="text-xs text-neutral-500">{s}</span>;
+        return <span className="text-xs text-neutral-500 dark:text-neutral-400">{s}</span>;
     }
   };
 
   const getSourceBadge = (source) => {
     if (source === "owner_app") {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
-          <Smartphone className="w-3 h-3 text-purple-600" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200/80 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800/70 shadow-sm">
+          <Smartphone className="w-3 h-3 text-purple-600 dark:text-purple-400" />
           Owner App (Host)
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
-        <Globe className="w-3 h-3 text-teal-600" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800/70 shadow-sm">
+        <Globe className="w-3 h-3 text-teal-600 dark:text-teal-400" />
         Villa Web (Guest)
       </span>
     );
@@ -301,12 +301,14 @@ export default function SupportHelpdeskPage() {
         {/* KPI Summary Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Total Open */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700/80 shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                 Open Tickets
               </span>
-              <AlertCircle className="w-4 h-4 text-amber-500" />
+              <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-500 dark:text-amber-400">
+                <AlertCircle className="w-3.5 h-3.5" />
+              </div>
             </div>
             <span className="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight block">
               {stats?.open || 0}
@@ -317,12 +319,14 @@ export default function SupportHelpdeskPage() {
           </div>
 
           {/* Owner App Issues */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700/80 shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                 Host Issues
               </span>
-              <Smartphone className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <div className="p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                <Smartphone className="w-3.5 h-3.5" />
+              </div>
             </div>
             <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight block">
               {stats?.ownerAppCount || 0}
@@ -333,12 +337,14 @@ export default function SupportHelpdeskPage() {
           </div>
 
           {/* Website Inquiries */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700/80 shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                 Web Inquiries
               </span>
-              <Globe className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <div className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
+                <Globe className="w-3.5 h-3.5" />
+              </div>
             </div>
             <span className="text-2xl font-black text-teal-700 dark:text-teal-400 tracking-tight block">
               {stats?.websiteCount || 0}
@@ -349,12 +355,14 @@ export default function SupportHelpdeskPage() {
           </div>
 
           {/* In Progress */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700/80 shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                 In Progress
               </span>
-              <Clock className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+              <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-500 dark:text-blue-400">
+                <Clock className="w-3.5 h-3.5" />
+              </div>
             </div>
             <span className="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tight block">
               {stats?.inProgress || 0}
@@ -365,12 +373,14 @@ export default function SupportHelpdeskPage() {
           </div>
 
           {/* Resolved */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800/80 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700/80 shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                 Resolved
               </span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+              <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 dark:text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+              </div>
             </div>
             <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight block">
               {stats?.resolved || 0}
@@ -385,13 +395,13 @@ export default function SupportHelpdeskPage() {
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
             {/* Origin Tabs */}
-            <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl text-xs font-semibold w-full sm:w-auto">
+            <div className="flex bg-neutral-100 dark:bg-neutral-900/90 p-1 rounded-xl text-xs font-semibold w-full sm:w-auto border border-neutral-200/70 dark:border-neutral-800">
               <button
                 onClick={() => setSourceTab("all")}
                 className={`flex-1 sm:flex-none px-4 py-2 rounded-lg transition-all cursor-pointer ${
                   sourceTab === "all"
-                    ? "bg-[#FF6900] text-white shadow-sm font-bold"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "bg-[#FF6900] text-white shadow-sm font-bold shadow-orange-500/20"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50"
                 }`}
               >
                 All Tickets ({stats?.total || 0})
@@ -400,8 +410,8 @@ export default function SupportHelpdeskPage() {
                 onClick={() => setSourceTab("owner_app")}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all cursor-pointer ${
                   sourceTab === "owner_app"
-                    ? "bg-[#FF6900] text-white shadow-sm font-bold"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "bg-[#FF6900] text-white shadow-sm font-bold shadow-orange-500/20"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50"
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -411,8 +421,8 @@ export default function SupportHelpdeskPage() {
                 onClick={() => setSourceTab("villa_web")}
                 className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all cursor-pointer ${
                   sourceTab === "villa_web"
-                    ? "bg-[#FF6900] text-white shadow-sm font-bold"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "bg-[#FF6900] text-white shadow-sm font-bold shadow-orange-500/20"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50"
                 }`}
               >
                 <Globe className="w-3.5 h-3.5" />
@@ -425,52 +435,52 @@ export default function SupportHelpdeskPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-300 font-medium outline-none cursor-pointer shadow-sm"
+                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 font-medium outline-none cursor-pointer shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700 focus:border-[#FF6900] dark:focus:border-[#FF6900] transition-colors"
               >
-                <option value="all">All Statuses</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-                <option value="closed">Closed</option>
+                <option value="all" className="dark:bg-neutral-900">All Statuses</option>
+                <option value="open" className="dark:bg-neutral-900">Open</option>
+                <option value="in_progress" className="dark:bg-neutral-900">In Progress</option>
+                <option value="resolved" className="dark:bg-neutral-900">Resolved</option>
+                <option value="closed" className="dark:bg-neutral-900">Closed</option>
               </select>
 
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-300 font-medium outline-none cursor-pointer shadow-sm"
+                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 font-medium outline-none cursor-pointer shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700 focus:border-[#FF6900] dark:focus:border-[#FF6900] transition-colors"
               >
-                <option value="all">All Priorities</option>
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="all" className="dark:bg-neutral-900">All Priorities</option>
+                <option value="urgent" className="dark:bg-neutral-900">Urgent</option>
+                <option value="high" className="dark:bg-neutral-900">High</option>
+                <option value="medium" className="dark:bg-neutral-900">Medium</option>
+                <option value="low" className="dark:bg-neutral-900">Low</option>
               </select>
 
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-300 font-medium outline-none cursor-pointer shadow-sm"
+                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 font-medium outline-none cursor-pointer shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700 focus:border-[#FF6900] dark:focus:border-[#FF6900] transition-colors"
               >
-                <option value="all">All Categories</option>
-                <option value="payment">Payment & Payouts</option>
-                <option value="booking">Bookings</option>
-                <option value="property">Property Listing</option>
-                <option value="cancellation">Cancellation & Refunds</option>
-                <option value="account">Account & KYC</option>
-                <option value="technical">Technical Glitch</option>
-                <option value="general">General Inquiry</option>
+                <option value="all" className="dark:bg-neutral-900">All Categories</option>
+                <option value="payment" className="dark:bg-neutral-900">Payment & Payouts</option>
+                <option value="booking" className="dark:bg-neutral-900">Bookings</option>
+                <option value="property" className="dark:bg-neutral-900">Property Listing</option>
+                <option value="cancellation" className="dark:bg-neutral-900">Cancellation & Refunds</option>
+                <option value="account" className="dark:bg-neutral-900">Account & KYC</option>
+                <option value="technical" className="dark:bg-neutral-900">Technical Glitch</option>
+                <option value="general" className="dark:bg-neutral-900">General Inquiry</option>
               </select>
             </div>
           </div>
 
           {/* Search Bar */}
           <div className="relative w-full">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-neutral-400 dark:text-neutral-500 absolute left-3.5 top-3" />
             <Input
               placeholder="Search by Ticket ID, Subject, Name, Email, or Issue description..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl h-10 shadow-sm"
+              className="pl-10 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-[#FF6900] focus-visible:border-[#FF6900]"
             />
           </div>
         </div>
@@ -479,7 +489,7 @@ export default function SupportHelpdeskPage() {
         <div className="bg-white dark:bg-[#121215] rounded-2xl border border-neutral-200 dark:border-neutral-800/80 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50/80 dark:bg-neutral-900/60 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-semibold uppercase tracking-wider">
+              <thead className="bg-neutral-50/90 dark:bg-neutral-900/80 border-b border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-4">Ticket ID</th>
                   <th className="py-3.5 px-4">Origin / Channel</th>
@@ -494,15 +504,15 @@ export default function SupportHelpdeskPage() {
               <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-neutral-400">
+                    <td colSpan={8} className="py-12 text-center text-neutral-500 dark:text-neutral-400">
                       <RefreshCw className="w-6 h-6 animate-spin text-[#FF6900] mx-auto mb-2" />
                       Loading support tickets...
                     </td>
                   </tr>
                 ) : tickets.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-neutral-400">
-                      <LifeBuoy className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
+                    <td colSpan={8} className="py-12 text-center text-neutral-500 dark:text-neutral-400">
+                      <LifeBuoy className="w-8 h-8 text-neutral-300 dark:text-neutral-600 mx-auto mb-2" />
                       No matching support tickets found.
                     </td>
                   </tr>
@@ -527,15 +537,15 @@ export default function SupportHelpdeskPage() {
                     return (
                       <tr
                         key={ticket._id}
-                        className="hover:bg-neutral-50/60 transition-colors"
+                        className="group hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60 transition-colors"
                       >
                         {/* Ticket ID */}
                         <td className="py-3.5 px-4">
-                          <div className="font-mono font-bold text-neutral-900 text-xs">
+                          <div className="font-mono font-bold text-neutral-900 dark:text-white text-xs group-hover:text-[#FF6900] dark:group-hover:text-[#FF6900] transition-colors">
                             {ticket.ticketId || ticket._id.slice(-8).toUpperCase()}
                           </div>
                           {ticket.replies?.length > 0 && (
-                            <div className="text-[10px] text-[#FF6900] font-semibold flex items-center gap-1 mt-0.5">
+                            <div className="inline-flex items-center gap-1 text-[10px] text-[#FF6900] dark:text-orange-400 font-semibold mt-1 bg-orange-50 dark:bg-orange-950/40 px-1.5 py-0.5 rounded border border-orange-200/60 dark:border-orange-900/40">
                               <MessageSquare className="w-2.5 h-2.5" />
                               {ticket.replies.length} repl{ticket.replies.length > 1 ? "ies" : "y"}
                             </div>
@@ -549,19 +559,19 @@ export default function SupportHelpdeskPage() {
 
                         {/* Sender */}
                         <td className="py-3.5 px-4">
-                          <div className="font-bold text-neutral-900">{senderName}</div>
-                          <div className="text-neutral-400 text-[11px]">{senderEmail}</div>
+                          <div className="font-bold text-neutral-900 dark:text-white text-xs">{senderName}</div>
+                          <div className="text-neutral-500 dark:text-neutral-400 text-[11px]">{senderEmail}</div>
                           {senderPhone && senderPhone !== "N/A" && (
-                            <div className="text-neutral-500 text-[11px] font-mono">{senderPhone}</div>
+                            <div className="text-neutral-500 dark:text-neutral-400 text-[11px] font-mono">{senderPhone}</div>
                           )}
                         </td>
 
                         {/* Subject & Category */}
                         <td className="py-3.5 px-4 max-w-xs">
-                          <div className="font-bold text-neutral-900 text-xs truncate">
+                          <div className="font-bold text-neutral-900 dark:text-white text-xs truncate" title={ticket.subject}>
                             {ticket.subject}
                           </div>
-                          <div className="inline-flex items-center gap-1 text-[10px] uppercase font-semibold text-neutral-500 mt-0.5">
+                          <div className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 mt-1 bg-neutral-100 dark:bg-neutral-800/80 px-1.5 py-0.5 rounded border border-neutral-200/50 dark:border-neutral-700/50">
                             <Tag className="w-2.5 h-2.5" />
                             {ticket.category}
                           </div>
@@ -578,12 +588,15 @@ export default function SupportHelpdeskPage() {
                         </td>
 
                         {/* Created At */}
-                        <td className="py-3.5 px-4 text-neutral-500 text-[11px]">
-                          {new Date(ticket.createdAt).toLocaleDateString("en-IN", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                          <div className="text-[10px] text-neutral-400">
+                        <td className="py-3.5 px-4 text-[11px]">
+                          <div className="text-neutral-700 dark:text-neutral-300 font-medium">
+                            {new Date(ticket.createdAt).toLocaleDateString("en-IN", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <div className="text-[10px] text-neutral-400 dark:text-neutral-500">
                             {new Date(ticket.createdAt).toLocaleTimeString("en-IN", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -595,7 +608,7 @@ export default function SupportHelpdeskPage() {
                         <td className="py-3.5 px-4 text-right">
                           <Button
                             onClick={() => openTicketDrawer(ticket)}
-                            className="bg-neutral-900 hover:bg-[#FF6900] text-white text-xs font-semibold px-3 py-1.5 h-8 rounded-xl shadow-sm transition-all cursor-pointer"
+                            className="bg-neutral-900 hover:bg-[#FF6900] dark:bg-neutral-800 dark:hover:bg-[#FF6900] text-white text-xs font-semibold px-3.5 py-1.5 h-8 rounded-xl shadow-sm border border-neutral-800 dark:border-neutral-700 hover:border-transparent dark:hover:border-transparent transition-all cursor-pointer"
                           >
                             Review & Reply
                           </Button>
@@ -607,14 +620,28 @@ export default function SupportHelpdeskPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Summary Footer */}
+          <div className="p-3.5 px-5 bg-neutral-50/60 dark:bg-neutral-900/40 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                {tickets.length} {tickets.length === 1 ? "ticket" : "tickets"}
+              </span>
+              <span>•</span>
+              <span>Live synchronized across Host App & Guest Web</span>
+            </div>
+            <div className="text-[11px] text-neutral-400 dark:text-neutral-500">
+              Channel: {sourceTab === "all" ? "All Channels" : sourceTab === "owner_app" ? "Owner App (Host)" : "Villa Web (Guest)"}
+            </div>
+          </div>
         </div>
 
         {/* TICKET DETAIL & REPLY DIALOG */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-2xl bg-white dark:bg-[#0E0E11] border border-neutral-200 dark:border-neutral-800 max-h-[90vh] flex flex-col p-0 overflow-hidden text-neutral-900 dark:text-neutral-100">
+          <DialogContent className="sm:max-w-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 max-h-[90vh] flex flex-col p-0 overflow-hidden text-neutral-900 dark:text-neutral-100 shadow-2xl">
             {selectedTicket && (
               <>
-                <DialogHeader className="p-5 pb-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/60">
+                <DialogHeader className="p-5 pb-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-900/80">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <DialogTitle className="text-base font-bold text-neutral-900 dark:text-white">
@@ -624,7 +651,7 @@ export default function SupportHelpdeskPage() {
                     </div>
                     <div>{getStatusBadge(selectedTicket.status)}</div>
                   </div>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-1">
+                  <p className="text-xs text-neutral-600 dark:text-neutral-300 font-semibold mt-1">
                     {selectedTicket.subject}
                   </p>
                 </DialogHeader>
@@ -633,7 +660,7 @@ export default function SupportHelpdeskPage() {
                   {/* Sender Profile Bar */}
                   <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center font-black text-[#FF6900] text-sm">
+                      <div className="w-10 h-10 rounded-full bg-[#FFF1E6] dark:bg-orange-950/60 text-[#FF6900] dark:text-orange-400 border border-[#FF6900]/25 dark:border-[#FF6900]/40 flex items-center justify-center font-black text-sm shrink-0">
                         {(
                           selectedTicket.owner?.name?.[0] ||
                           selectedTicket.user?.name?.[0] ||
@@ -647,7 +674,7 @@ export default function SupportHelpdeskPage() {
                             selectedTicket.user?.name ||
                             selectedTicket.guestDetails?.name ||
                             "Guest User"}
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-200/80 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-300/50 dark:border-neutral-700/50">
                             {selectedTicket.senderType === "host" ? "Host / Owner" : "Customer"}
                           </span>
                         </div>
@@ -684,16 +711,16 @@ export default function SupportHelpdeskPage() {
 
                   {/* Original Description */}
                   <div className="space-y-1.5">
-                    <span className="font-bold text-neutral-800 dark:text-neutral-300 uppercase tracking-wider text-[10px] block">
+                    <span className="font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider text-[10px] block">
                       Issue Description
                     </span>
-                    <div className="p-3.5 rounded-xl bg-white dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 leading-relaxed text-xs">
+                    <div className="p-3.5 rounded-xl bg-neutral-50/50 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 leading-relaxed text-xs">
                       {selectedTicket.description}
                     </div>
                   </div>
 
                   {/* Status & Resolution Controls */}
-                  <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 space-y-2">
+                  <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 space-y-2.5">
                     <span className="font-bold text-neutral-800 dark:text-neutral-200 text-[11px] block">
                       Quick Status Lifecycle
                     </span>
@@ -702,10 +729,10 @@ export default function SupportHelpdeskPage() {
                         type="button"
                         onClick={() => handleUpdateStatus("open")}
                         disabled={updatingStatus || selectedTicket.status === "open"}
-                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer ${
+                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer transition-all ${
                           selectedTicket.status === "open"
-                            ? "bg-amber-600 text-white font-bold"
-                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
+                            ? "bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-sm"
+                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700/80"
                         }`}
                       >
                         Open
@@ -714,10 +741,10 @@ export default function SupportHelpdeskPage() {
                         type="button"
                         onClick={() => handleUpdateStatus("in_progress")}
                         disabled={updatingStatus || selectedTicket.status === "in_progress"}
-                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer ${
+                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer transition-all ${
                           selectedTicket.status === "in_progress"
-                            ? "bg-blue-600 text-white font-bold"
-                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
+                            ? "bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm"
+                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700/80"
                         }`}
                       >
                         In Progress
@@ -726,10 +753,10 @@ export default function SupportHelpdeskPage() {
                         type="button"
                         onClick={() => handleUpdateStatus("resolved")}
                         disabled={updatingStatus || selectedTicket.status === "resolved"}
-                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer ${
+                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer transition-all ${
                           selectedTicket.status === "resolved"
-                            ? "bg-emerald-600 text-white font-bold"
-                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
+                            ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm"
+                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700/80"
                         }`}
                       >
                         <Check className="w-3 h-3 mr-1" />
@@ -739,10 +766,10 @@ export default function SupportHelpdeskPage() {
                         type="button"
                         onClick={() => handleUpdateStatus("closed")}
                         disabled={updatingStatus || selectedTicket.status === "closed"}
-                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer ${
+                        className={`text-xs h-7 px-3 rounded-lg cursor-pointer transition-all ${
                           selectedTicket.status === "closed"
-                            ? "bg-neutral-800 text-white font-bold"
-                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700"
+                            ? "bg-neutral-900 dark:bg-neutral-700 text-white font-bold border border-neutral-900 dark:border-neutral-600 shadow-sm"
+                            : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700/80"
                         }`}
                       >
                         Close Ticket
@@ -755,7 +782,7 @@ export default function SupportHelpdeskPage() {
                         placeholder="Internal resolution note / audit remark..."
                         value={resolutionNotes}
                         onChange={(e) => setResolutionNotes(e.target.value)}
-                        className="text-xs bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 h-8"
+                        className="text-xs bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 h-8 rounded-lg focus-visible:ring-1 focus-visible:ring-[#FF6900] focus-visible:border-[#FF6900]"
                       />
                     </div>
                   </div>
@@ -767,7 +794,7 @@ export default function SupportHelpdeskPage() {
                     </span>
 
                     {(!selectedTicket.replies || selectedTicket.replies.length === 0) ? (
-                      <div className="p-4 text-center text-neutral-400 dark:text-neutral-500 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
+                      <div className="p-4 text-center text-neutral-500 dark:text-neutral-400 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
                         No responses logged yet. Be the first to answer this inquiry below.
                       </div>
                     ) : (
@@ -775,10 +802,10 @@ export default function SupportHelpdeskPage() {
                         {selectedTicket.replies.map((reply, idx) => (
                           <div
                             key={idx}
-                            className={`p-3 rounded-xl border text-xs leading-relaxed ${
+                            className={`p-3.5 rounded-xl border text-xs leading-relaxed shadow-sm ${
                               reply.senderRole === "admin"
-                                ? "bg-[#FFF9F5] dark:bg-orange-950/20 border-[#FF6900]/20 dark:border-[#FF6900]/30 ml-6"
-                                : "bg-neutral-50 dark:bg-neutral-900/60 border-neutral-200 dark:border-neutral-800 mr-6"
+                                ? "bg-[#FFF9F5] dark:bg-orange-950/20 border-[#FF6900]/25 dark:border-[#FF6900]/30 ml-6"
+                                : "bg-neutral-50 dark:bg-neutral-900/70 border-neutral-200 dark:border-neutral-800 mr-6"
                             }`}
                           >
                             <div className="flex items-center justify-between font-semibold text-[11px] mb-1">
@@ -803,20 +830,20 @@ export default function SupportHelpdeskPage() {
                 {/* Reply Composer Bar */}
                 <form
                   onSubmit={handleSendReply}
-                  className="p-3 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0E0E11] flex items-center gap-2"
+                  className="p-3 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#121215] flex items-center gap-2"
                 >
                   <Textarea
                     placeholder="Type your official reply to host / guest..."
                     value={replyMessage}
                     onChange={(e) => setReplyMessage(e.target.value)}
-                    className="min-h-[44px] max-h-[100px] text-xs resize-none bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500"
+                    className="min-h-[44px] max-h-[100px] text-xs resize-none bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl focus-visible:ring-1 focus-visible:ring-[#FF6900] focus-visible:border-[#FF6900]"
                     rows={1}
                     required
                   />
                   <Button
                     type="submit"
                     disabled={submittingReply || !replyMessage.trim()}
-                    className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold h-11 px-4 rounded-xl cursor-pointer disabled:opacity-40 shrink-0"
+                    className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold h-11 px-4 rounded-xl cursor-pointer disabled:opacity-40 shrink-0 shadow-sm shadow-[#FF6900]/25 transition-all"
                   >
                     <Send className="w-3.5 h-3.5 mr-1" />
                     {submittingReply ? "Sending..." : "Reply"}

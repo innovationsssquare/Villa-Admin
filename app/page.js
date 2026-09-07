@@ -46,14 +46,26 @@ export default function Dashboard() {
         getAllDisputes({ limit: 1 }),
       ]);
 
-      if (summaryRes?.success) setSummary(summaryRes.data);
-      if (bookingStatusRes?.success) setBookingStatus(bookingStatusRes.data);
-      if (trendsRes?.success) setRevenueTrends(trendsRes.data);
-      if (categoriesRes?.success) setCategoryData(categoriesRes.data);
-      if (payoutRes?.success) setPayoutStats(payoutRes.stats);
-      if (disputeRes?.success) setDisputeStats(disputeRes.stats);
+      if (summaryRes?.success && summaryRes?.data) {
+        setSummary(summaryRes.data);
+      }
+      if (bookingStatusRes?.success && bookingStatusRes?.data) {
+        setBookingStatus(bookingStatusRes.data);
+      }
+      if (trendsRes?.success && Array.isArray(trendsRes?.data)) {
+        setRevenueTrends(trendsRes.data);
+      }
+      if (categoriesRes?.success && Array.isArray(categoriesRes?.data)) {
+        setCategoryData(categoriesRes.data);
+      }
+      if (payoutRes?.success && payoutRes?.stats) {
+        setPayoutStats(payoutRes.stats);
+      }
+      if (disputeRes?.success && disputeRes?.stats) {
+        setDisputeStats(disputeRes.stats);
+      }
     } catch (err) {
-      console.error("Failed to load dashboard metrics:", err);
+      console.warn("Failed to load dashboard metrics:", err?.message || err);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -122,23 +134,23 @@ export default function Dashboard() {
           loading={loading}
         />
 
-        {/* 2. Charts and Category Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          <div className="lg:col-span-2">
-            <RevenueVelocityChart
-              data={revenueTrends}
-              period={period}
-              onPeriodChange={(newPeriod) => {
-                setPeriod(newPeriod);
-              }}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <CategoryBreakdownCard data={categoryData} />
-          </div>
-        </div>
+        {/* 2. Revenue & Velocity Trajectory (Full-Width Row) */}
+        <RevenueVelocityChart
+          data={revenueTrends}
+          period={period}
+          onPeriodChange={(newPeriod) => {
+            setPeriod(newPeriod);
+          }}
+          loading={loading}
+        />
 
-        {/* 3. Operational Command Hub */}
+        {/* 3. Category Distribution (Full-Width Row) */}
+        <CategoryBreakdownCard
+          data={categoryData}
+          loading={loading}
+        />
+
+        {/* 4. Operational Command Hub */}
         <OperationalActionCenter
           payoutStats={payoutStats}
           disputeStats={disputeStats}

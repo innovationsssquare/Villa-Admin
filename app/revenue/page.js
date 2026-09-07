@@ -28,57 +28,61 @@ const AdminPayouts = () => {
     dispatch(fetchAllpayout(filters));
   }, [dispatch, filters]);
 
-const filteredData = useMemo(() => {
-  let data = [...payouts];
+  const safePayouts = useMemo(() => {
+    return Array.isArray(payouts) ? payouts : [];
+  }, [payouts]);
 
-  if (filters.payoutStatus) {
-    data = data.filter((p) => p.payoutStatus === filters.payoutStatus);
-  }
-  if (filters.propertyType) {
-    data = data.filter((p) => p.propertyType === filters.propertyType);
-  }
-  if (filters.startDate) {
-    data = data.filter(
-      (p) => new Date(p.checkIn) >= new Date(filters.startDate)
-    );
-  }
-  if (filters.endDate) {
-    data = data.filter(
-      (p) => new Date(p.checkOut) <= new Date(filters.endDate)
-    );
-  }
+  const filteredData = useMemo(() => {
+    let data = [...safePayouts];
 
-  return data;
-}, [filters, payouts]);   // 👈 add payouts
+    if (filters?.payoutStatus) {
+      data = data.filter((p) => p?.payoutStatus === filters.payoutStatus);
+    }
+    if (filters?.propertyType) {
+      data = data.filter((p) => p?.propertyType === filters.propertyType);
+    }
+    if (filters?.startDate) {
+      data = data.filter(
+        (p) => p?.checkIn && new Date(p.checkIn) >= new Date(filters.startDate)
+      );
+    }
+    if (filters?.endDate) {
+      data = data.filter(
+        (p) => p?.checkOut && new Date(p.checkOut) <= new Date(filters.endDate)
+      );
+    }
+
+    return data;
+  }, [filters, safePayouts]);
 
   // Calculate stats
-const stats = useMemo(() => {
-  const allData = payouts;
+  const stats = useMemo(() => {
+    const allData = safePayouts;
 
-  const totalPending = allData.filter(
-    (p) => p.payoutStatus === "pending"
-  ).length;
+    const totalPending = allData.filter(
+      (p) => p?.payoutStatus === "pending"
+    ).length;
 
-  const totalCompleted = allData.filter(
-    (p) => p.payoutStatus === "completed"
-  ).length;
+    const totalCompleted = allData.filter(
+      (p) => p?.payoutStatus === "completed"
+    ).length;
 
-  const pendingAmount = allData
-    .filter((p) => p.payoutStatus === "pending")
-    .reduce((sum, p) => sum + p.financials.netPayout, 0);
+    const pendingAmount = allData
+      .filter((p) => p?.payoutStatus === "pending")
+      .reduce((sum, p) => sum + (p?.financials?.netPayout || 0), 0);
 
-  const totalCommission = allData.reduce(
-    (sum, p) => sum + p.financials.commissionAmount,
-    0
-  );
+    const totalCommission = allData.reduce(
+      (sum, p) => sum + (p?.financials?.commissionAmount || 0),
+      0
+    );
 
-  return {
-    totalPending,
-    totalCompleted,
-    pendingAmount,
-    totalCommission,
-  };
-}, [payouts]);   // 👈 add payouts
+    return {
+      totalPending,
+      totalCompleted,
+      pendingAmount,
+      totalCommission,
+    };
+  }, [safePayouts]);
 
 
   // Pagination
