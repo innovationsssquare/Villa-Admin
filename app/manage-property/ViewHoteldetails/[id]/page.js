@@ -1,44 +1,28 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  ChevronLeft,
-  MapPin,
-  Clock,
-  Shield,
-  Utensils,
-  Play,
-  Hotel,
-  Bed,
-  Users,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Hotel, Bed, Users, IndianRupee, Sparkles, CheckCircle2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchhotelbyid } from "@/lib/Redux/Slices/hotelSlice";
 import { BaseUrl } from "@/lib/API/Baseurl";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/toast-provider";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PropertyVerificationShell from "@/components/Propertymanagecomponent/PropertyVerificationShell";
 
 export default function HotelDetailsPage() {
   const { addToast } = useToast();
   const params = useParams();
-  const router = useRouter();
   const dispatch = useDispatch();
   const { id } = params;
   const { data, loading, error } = useSelector((state) => state.hotel);
-  const [commission, setCommission] = useState(0);
+
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
-  const [selectedRoom, setSelectedRoom] = useState(0);
+  const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -46,13 +30,12 @@ export default function HotelDetailsPage() {
     }
   }, [dispatch, id]);
 
-  const handleHotelStatus = async (status) => {
-    if (status === "approved" && (!commission || commission <= 0)) {
+  const handleStatusUpdate = async ({ status, commission = 0, remarks = "" }) => {
+    if (status === "approved" && (!commission || Number(commission) <= 0)) {
       addToast({
-        title: "Commission is required to approve the hotel.",
-        description: "Please enter a valid commission percentage.",
+        title: "Commission Required",
+        description: "Please set a valid platform commission percentage to approve.",
         variant: "destructive",
-        duration: 5000,
       });
       return;
     }
@@ -60,20 +43,18 @@ export default function HotelDetailsPage() {
     const token = Cookies.get("token");
     const hotelId = id;
     const body = {
-      id:hotelId,
-      status:status,
-      commission:commission,
-      isLive:true,
+      id: hotelId,
+      status: status,
+      commission: Number(commission) || 0,
+      isLive: status === "approved",
+      remarks: remarks || "",
     };
 
-    if (status === "approved") {
-      setLoadingApprove(true);
-    } else if (status === "rejected") {
-      setLoadingReject(true);
-    }
+    if (status === "approved") setLoadingApprove(true);
+    if (status === "rejected") setLoadingReject(true);
 
     try {
-      let result = await fetch(`${BaseUrl}/Hotel/approve-reject/${hotelId}`, {
+      const res = await fetch(`${BaseUrl}/Hotel/approve-reject/${hotelId}`, {
         method: "PUT",
         headers: {
           "Content-type": "application/json",
@@ -81,31 +62,27 @@ export default function HotelDetailsPage() {
         },
         body: JSON.stringify(body),
       });
-      result = await result.json();
+      const result = await res.json();
 
       if (result.success) {
         addToast({
-          title: `Hotel ${status} Successfully`,
-          description: result.message || `Hotel has been ${status}`,
-          variant: "success",
-          duration: 5000,
+          title: `Hotel ${status === "approved" ? "Approved" : "Rejected"} Successfully`,
+          description: result.message || `Hotel status updated to ${status}.`,
+          variant: status === "approved" ? "success" : "default",
         });
-        // Refresh the data
         dispatch(fetchhotelbyid(id));
       } else {
         addToast({
-          title: `Failed to ${status} hotel`,
+          title: `Failed to update status`,
           description: result.message || "Something went wrong",
           variant: "destructive",
-          duration: 5000,
         });
       }
-    } catch (error) {
+    } catch (err) {
       addToast({
-        title: `Failed to ${status} hotel`,
-        description: error.message,
+        title: "Request Error",
+        description: err.message,
         variant: "destructive",
-        duration: 5000,
       });
     } finally {
       setLoadingApprove(false);
@@ -113,566 +90,178 @@ export default function HotelDetailsPage() {
     }
   };
 
-  const getRoomTypeIcon = (roomType) => {
-    switch (roomType.toLowerCase()) {
-      case "single":
-        return "🛏️";
+  const getRoomIcon = (type = "") => {
+    switch (type.toLowerCase()) {
+      case "suite":
+        return "✨";
+      case "deluxe":
+        return "👑";
       case "double":
         return "🛏️🛏️";
-      case "deluxe":
-        return "✨";
-      case "suite":
-        return "🏨";
+      case "single":
+        return "🛏️";
       case "family":
         return "👨‍👩‍👧‍👦";
-      case "presidential":
-        return "👑";
       default:
-        return "🛏️";
+        return "🏨";
     }
   };
 
-  const getRoomTypeColor = (roomType) => {
-    switch (roomType.toLowerCase()) {
-      case "single":
-        return "bg-[#FF6900]/10 text-[#FF6900]";
-      case "double":
-        return "bg-green-100 text-green-800";
-      case "deluxe":
-        return "bg-purple-100 text-purple-800";
-      case "suite":
-        return "bg-amber-100 text-amber-800";
-      case "family":
-        return "bg-pink-100 text-pink-800";
-      case "presidential":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getRoomTypeDescription = (roomType) => {
-    switch (roomType.toLowerCase()) {
-      case "single":
-        return "Comfortable accommodation for solo travelers.";
-      case "double":
-        return "Spacious room perfect for couples or two guests.";
-      case "deluxe":
-        return "Premium room with enhanced amenities and comfort.";
-      case "suite":
-        return "Luxurious suite with separate living area.";
-      case "family":
-        return "Large room designed for families with children.";
-      case "presidential":
-        return "Ultimate luxury experience with exclusive amenities.";
-      default:
-        return "Comfortable hotel accommodation.";
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="loader2"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Error loading hotel details</p>
-          <Button onClick={() => dispatch(fetchhotelbyid(id))}>Retry</Button>
+  // Render Hotel Rooms Section
+  const renderRoomsSection = () => {
+    const rooms = Array.isArray(data?.rooms) ? data.rooms : [];
+    if (rooms.length === 0) {
+      return (
+        <div className="text-center py-6 text-neutral-400 text-xs italic">
+          No individual room categories configured for this hotel.
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (!data) {
     return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <p>No hotel data found</p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center gap-2">
+            <Hotel className="w-5 h-5 text-[#FF6900]" />
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+                Hotel Room Categories
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {rooms.length} room type{rooms.length > 1 ? "s" : ""} available on property
+              </p>
+            </div>
+          </div>
+          <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-none font-bold">
+            Total Inventory: {rooms.reduce((acc, r) => acc + (r.totalRooms || 1), 0)} Rooms
+          </Badge>
+        </div>
+
+        <Tabs
+          value={selectedRoomIndex.toString()}
+          onValueChange={(val) => setSelectedRoomIndex(Number(val))}
+        >
+          <TabsList className="bg-neutral-100 dark:bg-neutral-900/80 p-1 rounded-xl flex gap-1 overflow-x-auto w-full justify-start h-auto">
+            {rooms.map((room, idx) => (
+              <TabsTrigger
+                key={idx}
+                value={idx.toString()}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-[#121215] data-[state=active]:text-[#FF6900] data-[state=active]:shadow-xs shrink-0"
+              >
+                <span className="mr-1.5">{getRoomIcon(room.roomType)}</span>
+                <span>{room.roomType || `Room #${idx + 1}`}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {rooms.map((room, idx) => (
+            <TabsContent key={idx} value={idx.toString()} className="mt-4 space-y-4">
+              {/* Room Photos Strip */}
+              {Array.isArray(room.images || room.roomImages) && (room.images || room.roomImages).length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(room.images || room.roomImages).map((img, imgIdx) => (
+                    <div
+                      key={imgIdx}
+                      className="relative h-28 sm:h-36 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800"
+                    >
+                      <Image
+                        src={img || "/placeholder.svg"}
+                        alt={`${room.roomType} photo ${imgIdx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Room Specifications Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Weekday Rate</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block">
+                    ₹{(room.pricing?.weekdayPrice ?? room.pricePerNight ?? 0).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-neutral-400">Mon - Thu / night</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Weekend Rate</span>
+                  <span className="text-base font-black text-[#FF6900] block">
+                    ₹{(room.pricing?.weekendPrice ?? room.pricing?.weekdayPrice ?? room.pricePerNight ?? 0).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-neutral-400">Fri - Sun / night</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Room Capacity</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block flex items-center gap-1">
+                    <Users className="w-4 h-4 text-[#FF6900]" />
+                    {room.maxCapacity || room.capacity || 2} Guests
+                  </span>
+                  <span className="text-[10px] text-neutral-400">maximum occupancy</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Inventory</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block">
+                    {room.totalRooms || 1} Rooms
+                  </span>
+                  <span className="text-[10px] text-neutral-400">total units</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 col-span-2 sm:col-span-1">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Status</span>
+                  <Badge
+                    className={`mt-0.5 font-bold text-[10px] ${
+                      room.isAvailable !== false
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        : "bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
+                    }`}
+                  >
+                    {room.isAvailable !== false ? "Active for Booking" : "Unavailable"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Room Amenities */}
+              {Array.isArray(room.amenities) && room.amenities.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider block">
+                    Room Amenities
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {room.amenities.map((item, aIdx) => (
+                      <Badge
+                        key={aIdx}
+                        variant="outline"
+                        className="border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs py-1 px-2.5 rounded-lg"
+                      >
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     );
-  }
+  };
 
   return (
-    <ScrollArea className="w-full mx-auto bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 px-4 text-neutral-900 dark:text-neutral-100 transition-colors">
-      {/* Header */}
-      <header className="py-4 flex items-center sticky top-0 bg-white dark:bg-[#09090B] z-10 border-b border-gray-200 dark:border-neutral-800">
-        <ChevronLeft
-          className="h-5 w-5 mr-2 cursor-pointer"
-          onClick={() => router.back()}
-        />
-        <h1 className="text-lg font-bold">Hotel Details</h1>
-        <Badge
-          className={
-            data?.isapproved === "approved"
-              ? "bg-green-50 text-green-500 ring-1 ring-green-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "rejected"
-              ? "bg-red-50 text-red-500 ring-1 ring-red-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "pending"
-              ? "bg-yellow-50 text-yellow-500 ring-1 ring-yellow-500 rounded-full ml-12 capitalize"
-              : "secondary"
-          }
-          // className="ml-auto capitalize"
-        >
-          {data.isapproved}
-        </Badge>
-      </header>
-
-      <div className="p-4">
-        {/* Hotel Images */}
-        <div className="mb-6">
-          <div className="rounded-lg overflow-hidden mb-4">
-            <Image
-              src={
-                data.images?.[imageIndex] ||
-                "/placeholder.svg?height=400&width=600"
-              }
-              alt="Hotel Image"
-              width={600}
-              height={400}
-              className="w-full h-80 object-cover"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto">
-            {data.images?.map((img, key) => (
-              <div
-                key={key}
-                onClick={() => setImageIndex(key)}
-                className={`flex-shrink-0 w-20 h-16 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                  key === imageIndex ? "border-[#FF6900]" : "border-gray-200"
-                }`}
-              >
-                <Image
-                  src={img || "/placeholder.svg"}
-                  alt={`Thumbnail ${key + 1}`}
-                  width={80}
-                  height={64}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Reel Video */}
-        {data.reelVideo && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Play className="h-5 w-5 mr-2" />
-              Hotel Reel
-            </h3>
-            <div className="rounded-lg overflow-hidden">
-              <video
-                controls
-                className="w-full h-64 object-cover"
-                poster={
-                  data.images?.[0] || "/placeholder.svg?height=256&width=400"
-                }
-              >
-                <source src={data.reelVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        )}
-
-        {/* Hotel Basic Info */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <Badge className="mb-2">Hotel</Badge>
-                <h2 className="text-2xl font-bold mb-2">{data.name}</h2>
-                <div className="flex items-center text-gray-600 mb-2">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">
-                    {data.location?.addressLine}, {data.location?.city}
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Hotel className="h-4 w-4 mr-1" />
-                  <span className="text-sm">
-                    {data.rooms?.length} room types available
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-[#FF6900]">
-                  From ₹
-                  {Math.min(
-                    ...(data.rooms?.map((room) => room.pricePerNight) || [0])
-                  )?.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">per night</div>
-              </div>
-            </div>
-
-            {/* Additional Charges */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Security Deposit:</span>
-                <span className="ml-2">₹{data.securityDeposit}</span>
-              </div>
-              <div>
-                <span className="font-medium">Late Checkout:</span>
-                <span className="ml-2">₹{data.lateCheckoutCharge}</span>
-              </div>
-              <div>
-                <span className="font-medium">Total Rooms:</span>
-                <span className="ml-2">
-                  {data.rooms?.reduce(
-                    (total, room) => total + room.totalRooms,
-                    0
-                  )}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Room Details */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Bed className="h-5 w-5 mr-2" />
-              Available Rooms
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              value={selectedRoom.toString()}
-              onValueChange={(value) => setSelectedRoom(Number.parseInt(value))}
-            >
-              <TabsList
-                className={`grid w-full ${
-                  data.rooms?.length <= 2
-                    ? "grid-cols-2"
-                    : data.rooms?.length === 3
-                    ? "grid-cols-3"
-                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                }`}
-              >
-                {data.rooms?.map((room, index) => (
-                  <TabsTrigger
-                    key={index}
-                    value={index.toString()}
-                    className="text-xs md:text-sm"
-                  >
-                    {room.roomType}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              {data.rooms?.map((room, index) => (
-                <TabsContent
-                  key={index}
-                  value={index.toString()}
-                  className="mt-4"
-                >
-                  <div className="space-y-4">
-                    {/* Room Images */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {room.images?.map((img, imgIndex) => (
-                        <div
-                          key={imgIndex}
-                          className="rounded-lg overflow-hidden"
-                        >
-                          <Image
-                            src={img || "/placeholder.svg"}
-                            alt={`${room.roomType} room`}
-                            width={200}
-                            height={150}
-                            className="w-full h-32 object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Room Info */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-2xl">
-                        {getRoomTypeIcon(room.roomType)}
-                      </span>
-                      <Badge className={getRoomTypeColor(room.roomType)}>
-                        {room.roomType} Room
-                      </Badge>
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 italic">
-                        {getRoomTypeDescription(room.roomType)}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold mb-2">Room Details</h4>
-                        <div className="space-y-1 text-sm">
-                          <div>
-                            <span className="font-medium">Type:</span>
-                            <span className="ml-2">{room.roomType}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">Room Number:</span>
-                            <span className="ml-2">{room.roomNumber}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">Total Rooms:</span>
-                            <span className="ml-2">{room.totalRooms}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">Max Capacity:</span>
-                            <div className="flex items-center ml-2">
-                              <Users className="h-3 w-3 mr-1" />
-                              <span>{room.maxCapacity} guests</span>
-                            </div>
-                          </div>
-                          <div>
-                            <span className="font-medium">Status:</span>
-                            <Badge
-                              variant={
-                                room.status === "available"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                              className="ml-2"
-                            >
-                              {room.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-2">Pricing</h4>
-                        <div className="text-2xl font-bold text-[#FF6900] mb-2">
-                          ₹{room.pricePerNight?.toLocaleString()}
-                        </div>
-                        <div className="text-sm text-gray-600">per night</div>
-                      </div>
-                    </div>
-
-                    {/* Room Amenities */}
-                    <div>
-                      <h4 className="font-semibold mb-2">Room Amenities</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {room.amenities?.map((amenity, amenityIndex) => (
-                          <Badge key={amenityIndex} variant="outline">
-                            {amenity}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Booked Dates */}
-                    {room.bookedDates && room.bookedDates.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2">Booked Dates</h4>
-                        <div className="text-sm text-gray-600">
-                          {room.bookedDates.length} booking(s) found
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Check-in/Check-out Times */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Clock className="h-5 w-5 mr-2" />
-              Check-in & Check-out
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="font-medium">Check-in:</span>
-                <span className="ml-2">{data.checkInTime}</span>
-              </div>
-              <div>
-                <span className="font-medium">Check-out:</span>
-                <span className="ml-2">{data.checkOutTime}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Description */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Description</h3>
-            <p className="text-gray-700 leading-relaxed">{data.description}</p>
-          </CardContent>
-        </Card>
-
-        {/* General Amenities */}
-        {data.amenities && data.amenities.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4">Hotel Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.amenities?.map((amenity, index) => (
-                  <Badge key={index} variant="outline">
-                    {amenity}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Hotel Rules */}
-        {data.HotelRules && data.HotelRules.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <Shield className="h-5 w-5 mr-2" />
-                Hotel Rules
-              </h3>
-              <ul className="space-y-2">
-                {data.HotelRules?.map((rule, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-gray-700 flex items-start"
-                  >
-                    <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    {rule}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Food Options */}
-        {data.foodOptions && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <Utensils className="h-5 w-5 mr-2" />
-                Food Options
-              </h3>
-              <p className="text-gray-700">{data.foodOptions}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cancellation Policy */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Cancellation Policy</h3>
-            <p className="text-gray-700">{data.cancellationPolicy}</p>
-          </CardContent>
-        </Card>
-
-        {/* Location Map */}
-        {data.location?.maplink && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <MapPin className="h-5 w-5 mr-2" />
-                Location
-              </h3>
-              <a
-                href={data.location.maplink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FF6900] hover:underline hover:text-[#0e5c6f]"
-              >
-                View on Google Maps
-              </a>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Hotel Stats */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Hotel Statistics</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Average Rating:</span>
-                <span className="ml-2">
-                  {data.averageRating || "No ratings yet"}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium">Total Reviews:</span>
-                <span className="ml-2">{data.totalReviews}</span>
-              </div>
-              <div>
-                <span className="font-medium">Status:</span>
-                <span className="ml-2 capitalize">{data.status}</span>
-              </div>
-              <div>
-                <span className="font-medium">Live Status:</span>
-                <span className="ml-2">
-                  {data.isLive ? "Live" : "Not Live"}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {data.isapproved === "pending" && (
-          <>
-            <Card className="my-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="commission" className="font-bold">
-                    Add Commission
-                  </Label>
-                  <div className="flex items-center">
-                    <Input
-                      id="commission"
-                      type="number"
-                      value={commission}
-                      onChange={(e) => setCommission(Number(e.target.value))}
-                      className="w-20 text-right mr-2"
-                      min="0"
-                      max="100"
-                    />
-                    <span>%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 mb-8">
-              <Button
-                onClick={() => handleHotelStatus("approved")}
-                className="flex-1 bg-[#FF6900] hover:bg-[#0e5c6f]"
-                disabled={loadingApprove}
-              >
-                {loadingApprove ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  "Approve Hotel"
-                )}
-              </Button>
-              <Button
-                onClick={() => handleHotelStatus("rejected")}
-                variant="outline"
-                className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
-                disabled={loadingReject}
-              >
-                {loadingReject ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                ) : (
-                  "Reject Hotel"
-                )}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </ScrollArea>
+    <PropertyVerificationShell
+      propertyType="hotel"
+      data={data}
+      loading={loading}
+      error={error}
+      onRefresh={() => id && dispatch(fetchhotelbyid(id))}
+      onApprove={({ commission }) => handleStatusUpdate({ status: "approved", commission })}
+      onReject={({ remarks }) => handleStatusUpdate({ status: "rejected", remarks })}
+      loadingApprove={loadingApprove}
+      loadingReject={loadingReject}
+      renderUnits={renderRoomsSection()}
+    />
   );
 }

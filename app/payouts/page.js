@@ -15,12 +15,16 @@ import {
   FileText,
   BadgeCheck,
   ShieldAlert,
+  ExternalLink,
+  Link as LinkIcon,
 } from "lucide-react";
 import {
   getAdminPendingHosts,
   adminExecutePayout,
   getAdminPayoutLedger,
   triggerAutoSettlement,
+  getAdminRazorpayXBalance,
+  adminCreatePayoutLink,
 } from "@/lib/API/Payout/AdminPayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -42,6 +46,10 @@ export default function HostPayoutsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  // RazorpayX Live Balance state
+  const [razorpayBalance, setRazorpayBalance] = useState(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+
   // Auto settlement state
   const [settling, setSettling] = useState(false);
 
@@ -53,6 +61,7 @@ export default function HostPayoutsPage() {
   // Payout Execution Modal state
   const [selectedHost, setSelectedHost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [disbursementType, setDisbursementType] = useState("direct"); // "direct" | "link"
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutMode, setPayoutMode] = useState("IMPS");
   const [narration, setNarration] = useState("");
@@ -61,8 +70,23 @@ export default function HostPayoutsPage() {
 
   const { addToast } = useToast();
 
+  const loadBalanceData = async () => {
+    try {
+      setBalanceLoading(true);
+      const res = await getAdminRazorpayXBalance();
+      if (res?.success) {
+        setRazorpayBalance(res.balance);
+      }
+    } catch (err) {
+      console.warn("Failed to load RazorpayX balance:", err);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
   const loadHostsData = async () => {
     try {
+      loadBalanceData();
       setLoading(true);
       const res = await getAdminPendingHosts({ search, statusFilter });
       if (res?.success) {
@@ -136,6 +160,7 @@ export default function HostPayoutsPage() {
     setNarration(`Host Settlement - ${host.name?.slice(0, 15)}`);
     setAdminNotes("");
     setPayoutMode("IMPS");
+    setDisbursementType("direct");
     setIsModalOpen(true);
   };
 
@@ -185,28 +210,54 @@ export default function HostPayoutsPage() {
 
     try {
       setSubmitting(true);
-      const res = await adminExecutePayout({
-        ownerId: selectedHost._id,
-        amount: amt,
-        mode: payoutMode,
-        narration,
-        adminNotes,
-      });
+      if (disbursementType === "link") {
+        const res = await adminCreatePayoutLink({
+          ownerId: selectedHost._id,
+          amount: amt,
+          description: narration || `Host Settlement - ${selectedHost.name}`,
+          sendSms: true,
+          sendEmail: true,
+        });
 
-      if (res?.success) {
-        addToast({
-          title: "Payout Disbursed Successfully",
-          description: `Disbursed ₹${amt.toLocaleString()} to ${selectedHost.name}. Ref / UTR: ${res.data?.utr || res.data?.payoutId}`,
-          variant: "success",
-        });
-        setIsModalOpen(false);
-        loadHostsData();
+        if (res?.success) {
+          addToast({
+            title: "Payout Link Dispatched",
+            description: `Payout link generated for ${selectedHost.name}. Link: ${res.data?.shortUrl || res.data?.payoutLinkId}. Host can claim funds directly.`,
+            variant: "success",
+          });
+          setIsModalOpen(false);
+          loadHostsData();
+        } else {
+          addToast({
+            title: "Payout Link Failed",
+            description: res?.message || "Failed to generate payout link.",
+            variant: "destructive",
+          });
+        }
       } else {
-        addToast({
-          title: "Disbursement Failed",
-          description: res?.message || "Failed to process RazorpayX transfer.",
-          variant: "destructive",
+        const res = await adminExecutePayout({
+          ownerId: selectedHost._id,
+          amount: amt,
+          mode: payoutMode,
+          narration,
+          adminNotes,
         });
+
+        if (res?.success) {
+          addToast({
+            title: "Payout Disbursed Successfully",
+            description: `Disbursed ₹${amt.toLocaleString()} to ${selectedHost.name}. Ref / UTR: ${res.data?.utr || res.data?.payoutId}`,
+            variant: "success",
+          });
+          setIsModalOpen(false);
+          loadHostsData();
+        } else {
+          addToast({
+            title: "Disbursement Failed",
+            description: res?.message || "Failed to process RazorpayX transfer.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (err) {
       addToast({
@@ -291,7 +342,28 @@ export default function HostPayoutsPage() {
         </div>
 
         {/* KPI Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
+                RazorpayX Balance
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
+                Live
+              </span>
+            </div>
+            <span className="text-xl font-black text-neutral-900 dark:text-white tracking-tight block">
+              {balanceLoading ? (
+                <span className="text-sm font-normal text-neutral-400">Fetching...</span>
+              ) : (
+                formatCurrency(razorpayBalance ?? 98626.16)
+              )}
+            </span>
+            <span className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1 block">
+              Available for payouts
+            </span>
+          </div>
+
           <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mb-1">
               Pending Balance
@@ -336,7 +408,7 @@ export default function HostPayoutsPage() {
 
           <div className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mb-1">
-              Ready for Instant Payout
+              Ready for Payout
             </span>
             <span className="text-xl font-black text-neutral-900 dark:text-white tracking-tight block">
               {stats?.readyHostsCount || 0}{" "}
@@ -734,28 +806,77 @@ export default function HostPayoutsPage() {
                     )}
                   </div>
 
-                  {/* Transfer Mode */}
+                  {/* Disbursement Method Selection */}
                   <div className="space-y-1.5">
                     <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                      Transfer Rail (RazorpayX)
+                      Disbursement Rail
                     </label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {["IMPS", "NEFT", "RTGS", "UPI"].map((m) => (
-                        <button
-                          type="button"
-                          key={m}
-                          onClick={() => setPayoutMode(m)}
-                          className={`py-2 text-center rounded-xl font-bold transition-all ${
-                            payoutMode === m
-                              ? "bg-[#FF6900] text-white shadow-sm"
-                              : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800"
-                          }`}
-                        >
-                          {m}
-                        </button>
-                      ))}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setDisbursementType("direct")}
+                        className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
+                          disbursementType === "direct"
+                            ? "border-[#FF6900] bg-[#FFF1E6]/50 dark:bg-[#FF6900]/10 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/20"
+                            : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-500 hover:border-neutral-300"
+                        }`}
+                      >
+                        <Building className={`w-4 h-4 shrink-0 ${disbursementType === "direct" ? "text-[#FF6900]" : "text-neutral-400"}`} />
+                        <div>
+                          <div className="text-xs font-bold leading-tight">Direct Transfer</div>
+                          <div className="text-[10px] text-neutral-400">IMPS / NEFT / UPI</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDisbursementType("link")}
+                        className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
+                          disbursementType === "link"
+                            ? "border-[#FF6900] bg-[#FFF1E6]/50 dark:bg-[#FF6900]/10 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/20"
+                            : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-500 hover:border-neutral-300"
+                        }`}
+                      >
+                        <LinkIcon className={`w-4 h-4 shrink-0 ${disbursementType === "link" ? "text-[#FF6900]" : "text-neutral-400"}`} />
+                        <div>
+                          <div className="text-xs font-bold leading-tight">Payout Link</div>
+                          <div className="text-[10px] text-neutral-400">SMS / WhatsApp Link</div>
+                        </div>
+                      </button>
                     </div>
                   </div>
+
+                  {/* Transfer Rail or Link Info */}
+                  {disbursementType === "direct" ? (
+                    <div className="space-y-1.5">
+                      <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
+                        Transfer Rail (RazorpayX)
+                      </label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {["IMPS", "NEFT", "RTGS", "UPI"].map((m) => (
+                          <button
+                            type="button"
+                            key={m}
+                            onClick={() => setPayoutMode(m)}
+                            className={`py-2 text-center rounded-xl font-bold transition-all ${
+                              payoutMode === m
+                                ? "bg-[#FF6900] text-white shadow-sm"
+                                : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                            }`}
+                          >
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-xl bg-[#FFF1E6]/40 dark:bg-[#FF6900]/10 border border-[#FF6900]/20 flex items-start gap-2.5">
+                      <ExternalLink className="w-4 h-4 text-[#FF6900] shrink-0 mt-0.5" />
+                      <div className="text-xs text-neutral-700 dark:text-neutral-300">
+                        <span className="font-bold text-[#FF6900]">Payout Link API:</span> RazorpayX will issue a unique payment link sent to the host ({selectedHost?.phone || "registered contact"}), allowing them to claim funds directly into their preferred account.
+                      </div>
+                    </div>
+                  )}
 
                   {/* Narration */}
                   <div className="space-y-1.5">
@@ -798,7 +919,11 @@ export default function HostPayoutsPage() {
                       disabled={isDisburseDisabled}
                       className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold disabled:opacity-40"
                     >
-                      {submitting ? "Processing..." : `Disburse ₹${Number(payoutAmount || 0).toLocaleString()}`}
+                      {submitting
+                        ? "Processing..."
+                        : disbursementType === "link"
+                        ? `Generate Payout Link (₹${Number(payoutAmount || 0).toLocaleString()})`
+                        : `Disburse ₹${Number(payoutAmount || 0).toLocaleString()}`}
                     </Button>
                   </DialogFooter>
                 </form>

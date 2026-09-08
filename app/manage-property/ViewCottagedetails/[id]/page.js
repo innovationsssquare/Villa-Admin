@@ -1,43 +1,28 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  ChevronLeft,
-  MapPin,
-  Clock,
-  Shield,
-  Utensils,
-  Play,
-  Home,
-  Users,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Home, Users, IndianRupee, Sparkles, CheckCircle2, Trees } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchcottagebyid } from "@/lib/Redux/Slices/cottageSlice";
 import { BaseUrl } from "@/lib/API/Baseurl";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/toast-provider";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PropertyVerificationShell from "@/components/Propertymanagecomponent/PropertyVerificationShell";
 
 export default function CottageDetailsPage() {
   const { addToast } = useToast();
   const params = useParams();
-  const router = useRouter();
   const dispatch = useDispatch();
   const { id } = params;
   const { data, loading, error } = useSelector((state) => state.cottage);
-  const [commission, setCommission] = useState(0);
+
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
-  const [selectedCottage, setSelectedCottage] = useState(0);
+  const [selectedCottageIndex, setSelectedCottageIndex] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -45,13 +30,12 @@ export default function CottageDetailsPage() {
     }
   }, [dispatch, id]);
 
-  const handleCottageStatus = async (status) => {
-    if (status === "approved" && (!commission || commission <= 0)) {
+  const handleStatusUpdate = async ({ status, commission = 0, remarks = "" }) => {
+    if (status === "approved" && (!commission || Number(commission) <= 0)) {
       addToast({
-        title: "Commission is required to approve the cottage.",
-        description: "Please enter a valid commission percentage.",
+        title: "Commission Required",
+        description: "Please set a valid platform commission percentage to approve.",
         variant: "destructive",
-        duration: 5000,
       });
       return;
     }
@@ -61,53 +45,44 @@ export default function CottageDetailsPage() {
     const body = {
       id: cottageId,
       status: status,
-      commission: commission,
-      isLive:true
+      commission: Number(commission) || 0,
+      isLive: status === "approved",
+      remarks: remarks || "",
     };
 
-    if (status === "approved") {
-      setLoadingApprove(true);
-    } else if (status === "rejected") {
-      setLoadingReject(true);
-    }
+    if (status === "approved") setLoadingApprove(true);
+    if (status === "rejected") setLoadingReject(true);
 
     try {
-      let result = await fetch(
-        `${BaseUrl}/Cottage/approve-reject/${cottageId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json",
-            token: token,
-          },
-          body: JSON.stringify(body),
-        }
-      );
-      result = await result.json();
+      const res = await fetch(`${BaseUrl}/Cottage/approve-reject/${cottageId}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json",
+          token: token,
+        },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
 
       if (result.success) {
         addToast({
-          title: `Cottage ${status} Successfully`,
-          description: result.message || `Cottage has been ${status}`,
-          variant: "success",
-          duration: 5000,
+          title: `Cottage ${status === "approved" ? "Approved" : "Rejected"} Successfully`,
+          description: result.message || `Cottage status updated to ${status}.`,
+          variant: status === "approved" ? "success" : "default",
         });
-        // Refresh the data
         dispatch(fetchcottagebyid(id));
       } else {
         addToast({
-          title: `Failed to ${status} cottage`,
+          title: `Failed to update status`,
           description: result.message || "Something went wrong",
           variant: "destructive",
-          duration: 5000,
         });
       }
-    } catch (error) {
+    } catch (err) {
       addToast({
-        title: `Failed to ${status} cottage`,
-        description: error.message,
+        title: "Request Error",
+        description: err.message,
         variant: "destructive",
-        duration: 5000,
       });
     } finally {
       setLoadingApprove(false);
@@ -115,572 +90,176 @@ export default function CottageDetailsPage() {
     }
   };
 
-  const getCottageTypeIcon = (cottageType) => {
-    switch (cottageType.toLowerCase()) {
-      case "single":
-        return "🏠";
+  const getCottageIcon = (type = "") => {
+    switch (type.toLowerCase()) {
+      case "wooden":
+        return "🪵";
+      case "luxury":
+        return "✨";
       case "family":
         return "👨‍👩‍👧‍👦";
       case "couple":
         return "💕";
-      case "deluxe":
-        return "✨";
-      case "luxury":
+      default:
         return "🏡";
-      case "premium":
-        return "👑";
-      default:
-        return "🏠";
     }
   };
 
-  const getCottageTypeColor = (cottageType) => {
-    switch (cottageType.toLowerCase()) {
-      case "single":
-        return "bg-[#FF6900]/10 text-[#FF6900]";
-      case "family":
-        return "bg-green-100 text-green-800";
-      case "couple":
-        return "bg-pink-100 text-pink-800";
-      case "deluxe":
-        return "bg-purple-100 text-purple-800";
-      case "luxury":
-        return "bg-amber-100 text-amber-800";
-      case "premium":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getCottageTypeDescription = (cottageType) => {
-    switch (cottageType.toLowerCase()) {
-      case "single":
-        return "Cozy cottage perfect for solo travelers or couples.";
-      case "family":
-        return "Spacious cottage designed for families with children.";
-      case "couple":
-        return "Romantic cottage getaway for couples.";
-      case "deluxe":
-        return "Premium cottage with enhanced amenities and comfort.";
-      case "luxury":
-        return "Luxurious cottage experience with high-end facilities.";
-      case "premium":
-        return "Ultimate cottage experience with exclusive amenities.";
-      default:
-        return "Comfortable cottage accommodation.";
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="loader2"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Error loading cottage details</p>
-          <Button onClick={() => dispatch(fetchcottagebyid(id))}>Retry</Button>
+  // Render Cottage Units Section
+  const renderCottagesSection = () => {
+    const cottages = Array.isArray(data?.cottages) ? data.cottages : [];
+    if (cottages.length === 0) {
+      return (
+        <div className="text-center py-6 text-neutral-400 text-xs italic">
+          No individual cottage categories configured for this property.
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (!data) {
     return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <p>No cottage data found</p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center gap-2">
+            <Home className="w-5 h-5 text-[#FF6900]" />
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+                Cottage Accommodations
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {cottages.length} cottage type{cottages.length > 1 ? "s" : ""} on site
+              </p>
+            </div>
+          </div>
+          <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-none font-bold">
+            Total Units: {cottages.reduce((acc, c) => acc + (c.totalCottages || 1), 0)} Cottages
+          </Badge>
+        </div>
+
+        <Tabs
+          value={selectedCottageIndex.toString()}
+          onValueChange={(val) => setSelectedCottageIndex(Number(val))}
+        >
+          <TabsList className="bg-neutral-100 dark:bg-neutral-900/80 p-1 rounded-xl flex gap-1 overflow-x-auto w-full justify-start h-auto">
+            {cottages.map((cottage, idx) => (
+              <TabsTrigger
+                key={idx}
+                value={idx.toString()}
+                className="px-3.5 py-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-[#121215] data-[state=active]:text-[#FF6900] data-[state=active]:shadow-xs shrink-0"
+              >
+                <span className="mr-1.5">{getCottageIcon(cottage.cottageType)}</span>
+                <span>{cottage.cottageType || `Cottage #${idx + 1}`}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {cottages.map((cottage, idx) => (
+            <TabsContent key={idx} value={idx.toString()} className="mt-4 space-y-4">
+              {/* Cottage Photos Strip */}
+              {Array.isArray(cottage.cottageimages || cottage.cottageImages || cottage.images) && (cottage.cottageimages || cottage.cottageImages || cottage.images).length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(cottage.cottageimages || cottage.cottageImages || cottage.images).map((img, imgIdx) => (
+                    <div
+                      key={imgIdx}
+                      className="relative h-28 sm:h-36 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800"
+                    >
+                      <Image
+                        src={img || "/placeholder.svg"}
+                        alt={`${cottage.cottageType} photo ${imgIdx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Specifications Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Weekday Rate</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block">
+                    ₹{(cottage.pricing?.weekdayPrice ?? cottage.pricePerNight ?? 0).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-neutral-400">Mon - Thu / night</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Weekend Rate</span>
+                  <span className="text-base font-black text-[#FF6900] block">
+                    ₹{(cottage.pricing?.weekendPrice ?? cottage.pricing?.weekdayPrice ?? cottage.pricePerNight ?? 0).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-[10px] text-neutral-400">Fri - Sun / night</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Capacity</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block flex items-center gap-1">
+                    <Users className="w-4 h-4 text-[#FF6900]" />
+                    {cottage.minCapacity ? `${cottage.minCapacity} - ${cottage.maxCapacity}` : (cottage.capacity || cottage.maxCapacity || 2)} Guests
+                  </span>
+                  <span className="text-[10px] text-neutral-400">per cottage</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Total Cottages</span>
+                  <span className="text-base font-black text-neutral-900 dark:text-white block">
+                    {cottage.totalcottage || cottage.totalCottages || 1} Units
+                  </span>
+                  <span className="text-[10px] text-neutral-400">on site</span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 col-span-2 sm:col-span-1">
+                  <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Status</span>
+                  <Badge
+                    className={`mt-0.5 font-bold text-[10px] ${
+                      cottage.isAvailable !== false
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        : "bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
+                    }`}
+                  >
+                    {cottage.isAvailable !== false ? "Active for Booking" : "Unavailable"}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Cottage Amenities */}
+              {Array.isArray(cottage.amenities) && cottage.amenities.length > 0 && (
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider block">
+                    Cottage Amenities
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cottage.amenities.map((item, aIdx) => (
+                      <Badge
+                        key={aIdx}
+                        variant="outline"
+                        className="border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs py-1 px-2.5 rounded-lg"
+                      >
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     );
-  }
+  };
 
   return (
-    <ScrollArea className="w-full mx-auto bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 px-4 text-neutral-900 dark:text-neutral-100 transition-colors">
-      {/* Header */}
-      <header className="py-4 flex items-center sticky top-0 bg-white dark:bg-[#09090B] z-10 border-b border-gray-200 dark:border-neutral-800">
-        <ChevronLeft
-          className="h-5 w-5 mr-2 cursor-pointer"
-          onClick={() => router.back()}
-        />
-        <h1 className="text-lg font-bold">Cottage Details</h1>
-        <Badge
-          className={
-            data?.isapproved === "approved"
-              ? "bg-green-50 text-green-500 ring-1 ring-green-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "rejected"
-              ? "bg-red-50 text-red-500 ring-1 ring-red-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "pending"
-              ? "bg-yellow-50 text-yellow-500 ring-1 ring-yellow-500 rounded-full ml-12 capitalize"
-              : "secondary"
-          }
-          // className="ml-auto capitalize"
-        >
-          {data.isapproved}
-        </Badge>
-      </header>
-
-      <div className="p-4">
-        {/* Cottage Images */}
-        <div className="mb-6">
-          <div className="rounded-lg overflow-hidden mb-4">
-            <Image
-              src={
-                data.images?.[imageIndex] ||
-                "/placeholder.svg?height=400&width=600"
-              }
-              alt="Cottage Image"
-              width={600}
-              height={400}
-              className="w-full h-80 object-cover"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto">
-            {data.images?.map((img, key) => (
-              <div
-                key={key}
-                onClick={() => setImageIndex(key)}
-                className={`flex-shrink-0 w-20 h-16 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                  key === imageIndex ? "border-[#FF6900]" : "border-gray-200"
-                }`}
-              >
-                <Image
-                  src={img || "/placeholder.svg"}
-                  alt={`Thumbnail ${key + 1}`}
-                  width={80}
-                  height={64}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Reel Video */}
-        {data.reelVideo && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Play className="h-5 w-5 mr-2" />
-              Cottage Reel
-            </h3>
-            <div className="rounded-lg overflow-hidden">
-              <video
-                controls
-                className="w-full h-64 object-cover"
-                poster={
-                  data.images?.[0] || "/placeholder.svg?height=256&width=400"
-                }
-              >
-                <source src={data.reelVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        )}
-
-        {/* Cottage Basic Info */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <Badge className="mb-2">Cottage</Badge>
-                <h2 className="text-2xl font-bold mb-2">{data.name}</h2>
-                <div className="flex items-center text-gray-600 mb-2">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">
-                    {data.location?.addressLine}, {data.location?.city}
-                  </span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Home className="h-4 w-4 mr-1" />
-                  <span className="text-sm">
-                    {data.cottages?.length} cottage types available
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-[#FF6900]">
-                  From ₹
-                  {Math.min(
-                    ...(data.cottages?.map(
-                      (cottage) => cottage.pricePerNight
-                    ) || [0])
-                  )?.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-600">per night</div>
-              </div>
-            </div>
-
-            {/* Additional Charges */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Security Deposit:</span>
-                <span className="ml-2">₹{data.securityDeposit}</span>
-              </div>
-              <div>
-                <span className="font-medium">Late Checkout:</span>
-                <span className="ml-2">₹{data.lateCheckoutCharge}</span>
-              </div>
-              <div>
-                <span className="font-medium">Total Cottages:</span>
-                <span className="ml-2">
-                  {data.cottages?.reduce(
-                    (total, cottage) => total + cottage.totalcottage,
-                    0
-                  )}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Cottage Details */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Home className="h-5 w-5 mr-2" />
-              Available Cottages
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              value={selectedCottage.toString()}
-              onValueChange={(value) =>
-                setSelectedCottage(Number.parseInt(value))
-              }
-            >
-              <TabsList
-                className={`grid w-full ${
-                  data.cottages?.length <= 2
-                    ? "grid-cols-2"
-                    : data.cottages?.length === 3
-                    ? "grid-cols-3"
-                    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                }`}
-              >
-                {data.cottages?.map((cottage, index) => (
-                  <TabsTrigger
-                    key={index}
-                    value={index.toString()}
-                    className="text-xs md:text-sm"
-                  >
-                    {cottage.cottageType}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              {data.cottages?.map((cottage, index) => (
-                <TabsContent
-                  key={index}
-                  value={index.toString()}
-                  className="mt-4"
-                >
-                  <div className="space-y-4">
-                    {/* Cottage Images */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {cottage.cottageimages?.map((img, imgIndex) => (
-                        <div
-                          key={imgIndex}
-                          className="rounded-lg overflow-hidden"
-                        >
-                          <Image
-                            src={img || "/placeholder.svg"}
-                            alt={`${cottage.cottageType} cottage`}
-                            width={200}
-                            height={150}
-                            className="w-full h-32 object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Cottage Info */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-2xl">
-                        {getCottageTypeIcon(cottage.cottageType)}
-                      </span>
-                      <Badge
-                        className={getCottageTypeColor(cottage.cottageType)}
-                      >
-                        {cottage.cottageType} Cottage
-                      </Badge>
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 italic">
-                        {getCottageTypeDescription(cottage.cottageType)}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold mb-2">Cottage Details</h4>
-                        <div className="space-y-1 text-sm">
-                          <div>
-                            <span className="font-medium">Type:</span>
-                            <span className="ml-2">{cottage.cottageType}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">Total Cottages:</span>
-                            <span className="ml-2">{cottage.totalcottage}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">Capacity:</span>
-                            <div className="flex items-center ml-2">
-                              <Users className="h-3 w-3 mr-1" />
-                              <span>
-                                {cottage.minCapacity} - {cottage.maxCapacity}{" "}
-                                guests
-                              </span>
-                            </div>
-                          </div>
-                          <div>
-                            <span className="font-medium">Status:</span>
-                            <Badge
-                              variant={
-                                cottage.status === "available"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                              className="ml-2"
-                            >
-                              {cottage.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-2">Pricing</h4>
-                        <div className="text-2xl font-bold text-[#FF6900] mb-2">
-                          ₹{cottage.pricePerNight?.toLocaleString()}
-                        </div>
-                        <div className="text-sm text-gray-600">per night</div>
-                      </div>
-                    </div>
-
-                    {/* Cottage Amenities */}
-                    <div>
-                      <h4 className="font-semibold mb-2">Cottage Amenities</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {cottage.amenities?.map((amenity, amenityIndex) => (
-                          <Badge key={amenityIndex} variant="outline">
-                            {amenity}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Booked Dates */}
-                    {cottage.bookedDates && cottage.bookedDates.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2">Booked Dates</h4>
-                        <div className="text-sm text-gray-600">
-                          {cottage.bookedDates.length} booking(s) found
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        {/* Check-in/Check-out Times */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Clock className="h-5 w-5 mr-2" />
-              Check-in & Check-out
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="font-medium">Check-in:</span>
-                <span className="ml-2">{data.checkInTime}</span>
-              </div>
-              <div>
-                <span className="font-medium">Check-out:</span>
-                <span className="ml-2">{data.checkOutTime}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Description */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Description</h3>
-            <p className="text-gray-700 leading-relaxed">{data.description}</p>
-          </CardContent>
-        </Card>
-
-        {/* General Amenities */}
-        {data.amenities && data.amenities.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4">Cottage Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.amenities?.map((amenity, index) => (
-                  <Badge key={index} variant="outline">
-                    {amenity}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cottage Rules */}
-        {data.CottageRules && data.CottageRules.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <Shield className="h-5 w-5 mr-2" />
-                Cottage Rules
-              </h3>
-              <ul className="space-y-2">
-                {data.CottageRules?.map((rule, index) => (
-                  <li
-                    key={index}
-                    className="text-sm text-gray-700 flex items-start"
-                  >
-                    <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    {rule}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Food Options */}
-        {data.foodOptions && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <Utensils className="h-5 w-5 mr-2" />
-                Food Options
-              </h3>
-              <p className="text-gray-700">{data.foodOptions}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cancellation Policy */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Cancellation Policy</h3>
-            <p className="text-gray-700">{data.cancellationPolicy}</p>
-          </CardContent>
-        </Card>
-
-        {/* Location Map */}
-        {data.location?.maplink && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <MapPin className="h-5 w-5 mr-2" />
-                Location
-              </h3>
-              <a
-                href={data.location.maplink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FF6900] hover:underline hover:text-[#0e5c6f]"
-              >
-                View on Google Maps
-              </a>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cottage Stats */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Cottage Statistics</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Average Rating:</span>
-                <span className="ml-2">
-                  {data.averageRating || "No ratings yet"}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium">Total Reviews:</span>
-                <span className="ml-2">{data.totalReviews}</span>
-              </div>
-              <div>
-                <span className="font-medium">Status:</span>
-                <span className="ml-2 capitalize">{data.status}</span>
-              </div>
-              <div>
-                <span className="font-medium">Live Status:</span>
-                <span className="ml-2">
-                  {data.isLive ? "Live" : "Not Live"}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Commission Section - Only show if cottage is pending approval */}
-        {data.isapproved === "pending" && (
-          <>
-            <Card className="my-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="commission" className="font-bold">
-                    Add Commission
-                  </Label>
-                  <div className="flex items-center">
-                    <Input
-                      id="commission"
-                      type="number"
-                      value={commission}
-                      onChange={(e) => setCommission(Number(e.target.value))}
-                      className="w-20 text-right mr-2"
-                      min="0"
-                      max="100"
-                    />
-                    <span>%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 mb-8">
-              <Button
-                onClick={() => handleCottageStatus("approved")}
-                className="flex-1 bg-[#FF6900] hover:bg-[#0e5c6f]"
-                disabled={loadingApprove}
-              >
-                {loadingApprove ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  "Approve Cottage"
-                )}
-              </Button>
-              <Button
-                onClick={() => handleCottageStatus("rejected")}
-                variant="outline"
-                className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
-                disabled={loadingReject}
-              >
-                {loadingReject ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                ) : (
-                  "Reject Cottage"
-                )}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </ScrollArea>
+    <PropertyVerificationShell
+      propertyType="cottage"
+      data={data}
+      loading={loading}
+      error={error}
+      onRefresh={() => id && dispatch(fetchcottagebyid(id))}
+      onApprove={({ commission }) => handleStatusUpdate({ status: "approved", commission })}
+      onReject={({ remarks }) => handleStatusUpdate({ status: "rejected", remarks })}
+      loadingApprove={loadingApprove}
+      loadingReject={loadingReject}
+      renderUnits={renderCottagesSection()}
+    />
   );
 }

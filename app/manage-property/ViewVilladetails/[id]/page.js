@@ -1,41 +1,25 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import {
-  ChevronLeft,
-  MapPin,
-  Users,
-  Clock,
-  Shield,
-  Utensils,
-  Play,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Home, Users, Calendar, UtensilsCrossed, UserPlus, Clock } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchvillabyid } from "@/lib/Redux/Slices/villaSlice";
 import { BaseUrl } from "@/lib/API/Baseurl";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/toast-provider";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import VideoModal from "@/components/Propertymanagecomponent/VideoModal";
+import PropertyVerificationShell from "@/components/Propertymanagecomponent/PropertyVerificationShell";
 
 export default function VillaDetailsPage() {
   const { addToast } = useToast();
   const params = useParams();
-  const router = useRouter();
   const dispatch = useDispatch();
   const { id } = params;
   const { data, loading, error } = useSelector((state) => state.villa);
-  const [commission, setCommission] = useState(0);
+
   const [loadingApprove, setLoadingApprove] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -43,34 +27,29 @@ export default function VillaDetailsPage() {
     }
   }, [dispatch, id]);
 
-  const handleVillaStatus = async (status) => {
+  const handleStatusUpdate = async ({ status, commission = 0 }) => {
     if (status === "approved" && (!commission || commission <= 0)) {
       addToast({
-        title: "Commission is required to approve the villa.",
-        description: "Please enter a valid commission percentage.",
+        title: "Commission Required",
+        description: "Please set a valid platform commission percentage to approve.",
         variant: "destructive",
-        duration: 5000,
       });
       return;
     }
 
     const token = Cookies.get("token");
     const villaId = id;
-
     const body = {
       status: status,
       commission: commission,
-      isLive: status === "approved" ? true : false,
+      isLive: status === "approved",
     };
 
-    if (status === "approved") {
-      setLoadingApprove(true);
-    } else if (status === "rejected") {
-      setLoadingReject(true);
-    }
+    if (status === "approved") setLoadingApprove(true);
+    if (status === "rejected") setLoadingReject(true);
 
     try {
-      let result = await fetch(`${BaseUrl}/Villa/approve-reject/${villaId}`, {
+      const res = await fetch(`${BaseUrl}/Villa/approve-reject/${villaId}`, {
         method: "PUT",
         headers: {
           "Content-type": "application/json",
@@ -78,31 +57,27 @@ export default function VillaDetailsPage() {
         },
         body: JSON.stringify(body),
       });
-      result = await result.json();
+      const result = await res.json();
 
       if (result.success) {
         addToast({
-          title: `Villa ${status} Successfully`,
-          description: result.message || `Villa has been ${status}`,
-          variant: "success",
-          duration: 5000,
+          title: `Villa ${status === "approved" ? "Approved" : "Rejected"} Successfully`,
+          description: result.message || `Villa status updated to ${status}.`,
+          variant: status === "approved" ? "success" : "default",
         });
-        // Refresh the data
         dispatch(fetchvillabyid(id));
       } else {
         addToast({
-          title: `Failed to ${status} villa`,
+          title: `Failed to update status`,
           description: result.message || "Something went wrong",
           variant: "destructive",
-          duration: 5000,
         });
       }
-    } catch (error) {
+    } catch (err) {
       addToast({
-        title: `Failed to ${status} villa`,
-        description: error.message,
+        title: "Request Error",
+        description: err.message,
         variant: "destructive",
-        duration: 5000,
       });
     } finally {
       setLoadingApprove(false);
@@ -110,429 +85,113 @@ export default function VillaDetailsPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="loader2"></div>
-      </div>
-    );
-  }
+  // Render Villa-Specific Unit & Pricing Breakdown
+  const renderVillaDetails = () => {
+    if (!data) return null;
 
-  if (error) {
     return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Error loading villa details</p>
-          <Button onClick={() => dispatch(fetchvillabyid(id))}>Retry</Button>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center gap-2">
+            <Home className="w-5 h-5 text-[#FF6900]" />
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+                Villa Layout & Pricing Structure
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Exclusive entire-villa accommodation details
+              </p>
+            </div>
+          </div>
+          <Badge className="bg-[#FFF1E6] dark:bg-[#FF6900]/10 text-[#FF6900] border-none font-bold text-xs">
+            {data.bhkType || "Luxury Villa"}
+          </Badge>
+        </div>
+
+        {/* Pricing & Capacity Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+            <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-[#FF6900]" />
+              Weekday Price
+            </span>
+            <span className="text-lg font-black text-[#FF6900] block">
+              ₹{data.pricing?.weekdayPrice?.toLocaleString("en-IN") || 0}
+            </span>
+            <span className="text-[10px] text-neutral-400">Mon - Thu per night</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+            <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              Weekend Price
+            </span>
+            <span className="text-lg font-black text-neutral-900 dark:text-white block">
+              ₹{data.pricing?.weekendPrice?.toLocaleString("en-IN") || 0}
+            </span>
+            <span className="text-[10px] text-neutral-400">Fri - Sun per night</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+            <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium flex items-center gap-1">
+              <Users className="w-3.5 h-3.5 text-[#FF6900]" />
+              Max Guest Capacity
+            </span>
+            <span className="text-lg font-black text-neutral-900 dark:text-white block">
+              {data.maxCapacity || 8} Guests
+            </span>
+            <span className="text-[10px] text-neutral-400">full villa capacity</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
+            <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium flex items-center gap-1">
+              <UserPlus className="w-3.5 h-3.5 text-blue-500" />
+              Extra Guest Charge
+            </span>
+            <span className="text-lg font-black text-neutral-900 dark:text-white block">
+              ₹{data.extraPersonCharge?.toLocaleString("en-IN") || 0}
+            </span>
+            <span className="text-[10px] text-neutral-400">per extra person</span>
+          </div>
+        </div>
+
+        {/* Additional Charges Banner */}
+        <div className="p-3.5 rounded-xl bg-neutral-100/70 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span className="text-neutral-500 dark:text-neutral-400 font-medium block">Kitchen Usage Charge:</span>
+            <span className="font-bold text-neutral-900 dark:text-white text-sm">
+              {data.kitchenCharge ? `₹${data.kitchenCharge.toLocaleString("en-IN")}` : "Free / Included"}
+            </span>
+          </div>
+          <div>
+            <span className="text-neutral-500 dark:text-neutral-400 font-medium block">Security Deposit:</span>
+            <span className="font-bold text-neutral-900 dark:text-white text-sm">
+              {data.securityDeposit ? `₹${data.securityDeposit.toLocaleString("en-IN")}` : "₹0 (No deposit)"}
+            </span>
+          </div>
+          <div>
+            <span className="text-neutral-500 dark:text-neutral-400 font-medium block">Late Checkout Charge:</span>
+            <span className="font-bold text-neutral-900 dark:text-white text-sm">
+              {data.lateCheckoutCharge ? `₹${data.lateCheckoutCharge.toLocaleString("en-IN")}` : "₹0"}
+            </span>
+          </div>
         </div>
       </div>
     );
-  }
-
-  if (!data) {
-    return (
-      <div className="w-full flex justify-center items-center h-screen">
-        <p>No villa data found</p>
-      </div>
-    );
-  }
+  };
 
   return (
-    <ScrollArea className="w-full mx-auto bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 px-4 text-neutral-900 dark:text-neutral-100 transition-colors">
-      {/* Header */}
-      <header className="py-4 flex items-center sticky top-0 bg-white dark:bg-[#09090B] z-10 border-b border-gray-200 dark:border-neutral-800">
-        <ChevronLeft
-          className="h-5 w-5 mr-2 cursor-pointer"
-          onClick={() => router.back()}
-        />
-        <h1 className="text-lg font-bold">Villa Details</h1>
-        <Badge
-          className={
-            data?.isapproved === "approved"
-              ? "bg-green-50 text-green-500 ring-1 ring-green-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "rejected"
-              ? "bg-red-50 text-red-500 ring-1 ring-red-500 rounded-full ml-12 capitalize"
-              : data.isapproved === "pending"
-              ? "bg-yellow-50 text-yellow-500 ring-1 ring-yellow-500 rounded-full ml-12 capitalize"
-              : "secondary"
-          }
-          // className="ml-auto capitalize"
-        >
-          {data.isapproved}
-        </Badge>
-      </header>
-
-      <div className="p-4">
-        {/* Villa Images */}
-        <div className="mb-6">
-          <div className="rounded-lg overflow-hidden mb-4">
-            <Image
-              src={
-                data.images?.[imageIndex] ||
-                "/placeholder.svg?height=400&width=600"
-              }
-              alt="Villa Image"
-              width={600}
-              height={400}
-              className="w-full h-80 object-cover"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto items-center justify-between">
-            {data.images?.map((img, key) => (
-              <div
-                key={key}
-                onClick={() => setImageIndex(key)}
-                className={`flex-shrink-0 w-20 h-16 cursor-pointer rounded-lg overflow-hidden border-2 ${
-                  key === imageIndex ? "border-[#FF6900]" : "border-gray-200"
-                }`}
-              >
-                <Image
-                  src={img || "/placeholder.svg"}
-                  alt={`Thumbnail ${key + 1}`}
-                  width={80}
-                  height={64}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-            {data?.reelVideo && (
-              <div className="">
-                <VideoModal
-                  thumbnailSrc={data?.images[0]}
-                  videoUrl={data?.reelVideo}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Villa Basic Info */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <Badge className="mb-2">{data?.bhkType}</Badge>
-                <h2 className="text-2xl font-bold mb-2">{data?.name}</h2>
-                <div className="flex items-center text-gray-600 mb-2">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="text-sm">
-                    {data?.address?.addressLine}, {data?.address?.area},{" "}
-                    {data?.address?.city}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <Users className="h-4 w-4 mr-1" />
-                  <span className="text-sm">Max {data.maxCapacity} guests</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-[#FF6900]">
-                  ₹{data.pricing?.weekdayPrice.toLocaleString("en-IN")} / ₹
-                  {data.pricing?.weekendPrice.toLocaleString("en-IN")}
-                </div>
-                <div className="text-sm text-gray-600">
-                  weekday / weekend per night
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Charges */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Extra Person:</span>
-                <span className="ml-2">₹{data.extraPersonCharge}</span>
-              </div>
-              <div>
-                <span className="font-medium">Kitchen Charge:</span>
-                <span className="ml-2">₹{data.kitchenCharge}</span>
-              </div>
-              <div>
-                <span className="font-medium">Security Deposit:</span>
-                <span className="ml-2">₹{data.securityDeposit}</span>
-              </div>
-              <div>
-                <span className="font-medium">Late Checkout:</span>
-                <span className="ml-2">₹{data.lateCheckoutCharge}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Check-in/Check-out Times */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Clock className="h-5 w-5 mr-2" />
-              Check-in & Check-out
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="font-medium">Check-in:</span>
-                <span className="ml-2">{data.checkInTime}</span>
-              </div>
-              <div>
-                <span className="font-medium">Check-out:</span>
-                <span className="ml-2">{data.checkOutTime}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Description */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Description</h3>
-            <p className="text-gray-700 leading-relaxed">{data.description}</p>
-          </CardContent>
-        </Card>
-
-        {/* Amenities */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Amenities</h3>
-            <div className="flex flex-wrap gap-2">
-              {data?.amenities?.map((amenity, index) => (
-                <Badge key={index} variant="outline">
-                  {amenity}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* House Rules */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4 flex items-center">
-              <Shield className="h-5 w-5 mr-2" />
-              House Rules
-            </h3>
-            <ul className="space-y-2">
-              {data?.houseRules?.map((rule, index) => (
-                <li
-                  key={index}
-                  className="text-sm text-gray-700 flex items-start"
-                >
-                  <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Food Options */}
-        {data.foodOptions && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <Utensils className="h-5 w-5 mr-2" />
-                Food Options
-              </h3>
-
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium">Available:</span>{" "}
-                  {data.foodOptions.available.join(", ")}
-                </div>
-
-                <div>
-                  <span className="font-medium">Adult Price:</span> ₹
-                  {data.foodOptions.adultPrice}
-                </div>
-
-                <div>
-                  <span className="font-medium">Child Price:</span> ₹
-                  {data.foodOptions.childPrice}
-                </div>
-
-                {data.foodOptions.note && (
-                  <p className="text-gray-600">{data.foodOptions.note}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Cancellation Policy */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Cancellation Policy</h3>
-            <ul className="space-y-2 text-sm">
-              {data.cancellationPolicy.map((policy, i) => (
-                <li key={i} className="flex items-start">
-                  <span className="w-2 h-2 bg-[#FF6900] rounded-full mt-2 mr-3" />
-                  {policy}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {data.topamenities?.length > 0 && (
-          <div className="mb-4">
-            <h4 className="font-medium mb-2">Top Amenities</h4>
-            <div className="flex flex-wrap gap-2">
-              {data.topamenities.map((a, i) => (
-                <Badge key={i} className="bg-[#FF6900]/10 text-[#FF6900]">
-                  {a}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {data.reviews?.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4">Reviews ({data.totalReviews})</h3>
-
-              <div className="space-y-4">
-                {data.reviews.map((review) => (
-                  <div key={review._id} className="border-b pb-4">
-                    <div className="flex justify-between">
-                      <span className="font-medium">
-                        {review.userId?.fullName}
-                      </span>
-                      <span>⭐ {review.rating}</span>
-                    </div>
-
-                    <p className="text-sm text-gray-700 mt-1">
-                      {review.comment}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {data.nearbyattractions?.length > 0 && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4">Nearby Attractions</h3>
-              <ul className="space-y-2 text-sm">
-                {data.nearbyattractions.map((place) => (
-                  <li key={place._id}>
-                    • {place.nearbylocation} – {place.distance}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Location Map */}
-        {/* {data.location?.maplink && (
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-4 flex items-center">
-                <MapPin className="h-5 w-5 mr-2" />
-                Location
-              </h3>
-              <a
-                href={data.location.maplink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FF6900] hover:underline"
-              >
-                View on Google Maps
-              </a>
-            </CardContent>
-          </Card>
-        )} */}
-
-        {/* Commission Section - Only show if villa is pending approval */}
-
-        {/* Villa Stats */}
-        <Card className={"mb-4"}>
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-4">Villa Statistics</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Average Rating:</span>
-                <span className="ml-2">
-                  {data.averageRating || "No ratings yet"}
-                </span>
-              </div>
-              <div>
-                <span className="font-medium">Total Reviews:</span>
-                <span className="ml-2">{data.totalReviews}</span>
-              </div>
-              <div>
-                <span className="font-medium">Status:</span>
-                <span className="ml-2 capitalize">{data.status}</span>
-              </div>
-              <div>
-                <span className="font-medium">Live Status:</span>
-                <span className="ml-2">
-                  {data.isLive ? "Live" : "Not Live"}
-                </span>
-              </div>
-              {data?.commission && (
-                <div>
-                  <span className="font-medium">commission:</span>
-                  <span className="ml-2">{data?.commission}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {data.isapproved === "pending" && (
-          <>
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="commission" className="font-bold">
-                    Add Commission
-                  </Label>
-                  <div className="flex items-center">
-                    <Input
-                      id="commission"
-                      type="number"
-                      value={commission}
-                      onChange={(e) => setCommission(Number(e.target.value))}
-                      className="w-20 text-right mr-2"
-                      min="0"
-                      max="100"
-                    />
-                    <span>%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 mb-8">
-              <Button
-                onClick={() => handleVillaStatus("approved")}
-                className="flex-1 bg-[#FF6900] hover:bg-[#0d5a6e]"
-                disabled={loadingApprove}
-              >
-                {loadingApprove ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  "Approve Villa"
-                )}
-              </Button>
-              <Button
-                onClick={() => handleVillaStatus("rejected")}
-                variant="outline"
-                className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
-                disabled={loadingReject}
-              >
-                {loadingReject ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                ) : (
-                  "Reject Villa"
-                )}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    </ScrollArea>
+    <PropertyVerificationShell
+      propertyType="villa"
+      data={data}
+      loading={loading}
+      error={error}
+      onRefresh={() => id && dispatch(fetchvillabyid(id))}
+      onApprove={({ commission }) => handleStatusUpdate({ status: "approved", commission })}
+      onReject={({ remarks }) => handleStatusUpdate({ status: "rejected", remarks })}
+      loadingApprove={loadingApprove}
+      loadingReject={loadingReject}
+      renderUnits={renderVillaDetails()}
+    />
   );
 }
