@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import DocumentApprovalPage from "./document-approval";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Mail, Phone, Store, ChevronRight } from "lucide-react";
+import { MapPin, Mail, Phone, Store, ChevronRight, PhoneCall } from "lucide-react";
 import dashiconsstore from "@/public/Asset/dashiconsstore.png";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -263,6 +263,13 @@ export default function SellersManagement() {
           >
             Verified Owners
           </TabsTrigger>
+          <Link
+            href="/host-inquiries"
+            className="rounded-xl px-4 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm bg-orange-50 dark:bg-orange-950/40 border border-[#FF6900]/30 text-[#FF6900] hover:bg-orange-100 flex items-center gap-1.5"
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            <span>Host Inquiries (Leads)</span>
+          </Link>
         </TabsList>
 
         <TabsContent value="all">
