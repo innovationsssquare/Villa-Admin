@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarDays, Tag, Plus, Edit, Trash2, Upload, X } from "lucide-react"
+import { CalendarDays, Tag, Plus, Edit, Trash2, Upload, X, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -55,6 +55,30 @@ export function Categoriestable() {
   const [isDeleting, setIsDeleting] = useState(false)
   const seasons = ["Spring", "Summer", "Fall", "Winter"]
   const demandLevels = ["Low", "Medium", "High", "Very High"]
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
+  const filteredCategories = (categories || []).filter((cat) => {
+    if (!searchQuery.trim()) return true
+    const q = searchQuery.toLowerCase()
+    return (
+      cat.name?.toLowerCase().includes(q) ||
+      cat.description?.toLowerCase().includes(q) ||
+      cat._id?.toLowerCase().includes(q)
+    )
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filteredCategories.length / itemsPerPage))
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   useEffect(() => {
     dispatch(fetchAllCategories())
@@ -317,7 +341,7 @@ export function Categoriestable() {
     <div className="w-full space-y-4">
       <Card className="border border-gray-200 dark:border-neutral-800 bg-white dark:bg-[#121215] transition-colors">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Tag className="h-5 w-5" />
@@ -325,13 +349,32 @@ export function Categoriestable() {
               </CardTitle>
               <CardDescription className="text-gray-500 dark:text-neutral-400">Manage and view all categories</CardDescription>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer">
-                  <Plus className="h-4 w-4" />
-                  Add New
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-3">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                  placeholder="Search categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-8 h-9 text-xs border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2 bg-[#FF6900] rounded-sm text-white cursor-pointer shrink-0">
+                    <Plus className="h-4 w-4" />
+                    Add New
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[600px] h-[95vh] overflow-hidden">
                 <DialogHeader>
                   <DialogTitle>Create New Category</DialogTitle>
@@ -498,6 +541,7 @@ export function Categoriestable() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -518,14 +562,14 @@ export function Categoriestable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {categories?.length === 0 ? (
+                  {filteredCategories.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground dark:text-neutral-400">
-                        No categories found
+                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground dark:text-neutral-400">
+                        {searchQuery ? `No categories matching "${searchQuery}"` : "No categories found"}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    categories?.map((subcategory) => (
+                    paginatedCategories.map((subcategory) => (
                       <TableRow key={subcategory._id} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 transition-colors">
                         <TableCell>
                           <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted dark:bg-neutral-800">
@@ -829,6 +873,39 @@ export function Categoriestable() {
                   )}
                 </TableBody>
               </Table>
+
+              {filteredCategories.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/30">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Showing <span className="font-semibold text-neutral-700 dark:text-neutral-300">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                    <span className="font-semibold text-neutral-700 dark:text-neutral-300">{Math.min(currentPage * itemsPerPage, filteredCategories.length)}</span> of{" "}
+                    <span className="font-semibold text-neutral-700 dark:text-neutral-300">{filteredCategories.length}</span> categories
+                  </p>
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage <= 1}
+                        className="inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                      </button>
+                      <span className="text-xs font-semibold px-2 text-neutral-600 dark:text-neutral-300">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage >= totalPages}
+                        className="inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                      >
+                        Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </CardContent>

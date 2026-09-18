@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Filter } from "lucide-react";
 import {
@@ -19,8 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Mail, Phone, Store, ChevronRight } from "lucide-react";
+import { MapPin, Mail, Phone, Store, ChevronRight, Search, X } from "lucide-react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllProperties } from "@/lib/Redux/Slices/sellarSlice";
@@ -49,11 +50,33 @@ export default function SellersManagement() {
   const { data, loading, error, datapagination } = useSelector(
     (state) => state.sellar
   );
-  const [filteredData, setFilteredData] = useState([]);
   const { analytics, loadinganalytics, analyticserror } = useSelector(
     (state) => state.sellar
   );
   const { categories } = useSelector((state) => state.master);
+
+  const filteredProperties = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+    if (!searchQuery || searchQuery.trim() === "") return data;
+    const q = searchQuery.toLowerCase().trim();
+    return data.filter((item) => {
+      const name = (item?.name || item?.title || "").toLowerCase();
+      const ownerName = (item?.owner?.name || "").toLowerCase();
+      const categoryName = (item?.category?.name || "").toLowerCase();
+      const locationArea = (item?.location?.area || item?.location?.city || "").toLowerCase();
+      const phone = (item?.Number || item?.owner?.phoneNumber || "").toLowerCase();
+      const propId = (item?._id || "").toLowerCase();
+
+      return (
+        name.includes(q) ||
+        ownerName.includes(q) ||
+        categoryName.includes(q) ||
+        locationArea.includes(q) ||
+        phone.includes(q) ||
+        propId.includes(q)
+      );
+    });
+  }, [data, searchQuery]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -314,7 +337,29 @@ export default function SellersManagement() {
                 </button>
               </div>
             </div>
-            <div className="flex items-center gap-2 ml-4 shrink-0">
+            <div className="flex items-center gap-2.5 ml-4 shrink-0">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search properties, owner..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-8 pr-8 h-9 text-xs bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 rounded-xl"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
               <Select value={selectedValue} onValueChange={handleSelectChange}>
                 <SelectTrigger className="h-9 w-44 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-xl text-xs font-medium focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder="All Categories" />
@@ -346,9 +391,21 @@ export default function SellersManagement() {
               <div className="flex items-center justify-center py-10 text-red-500">
                 {error}
               </div>
-            ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
-                No data available
+            ) : filteredProperties?.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-neutral-400">
+                {searchQuery ? (
+                  <div className="space-y-2">
+                    <p>No properties matching &quot;{searchQuery}&quot;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs text-[#FF6900] hover:underline font-medium cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  "No data available"
+                )}
               </div>
             ) : (
               <Table>
@@ -378,7 +435,7 @@ export default function SellersManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
-                  {data?.map((application, index) => (
+                  {filteredProperties?.map((application, index) => (
                     <TableRow
                       key={index}
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
@@ -446,7 +503,29 @@ export default function SellersManagement() {
                 </button>
               </div>
             </div>
-            <div className="flex items-center gap-2 ml-4 shrink-0">
+            <div className="flex items-center gap-2.5 ml-4 shrink-0">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search properties, owner..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-8 pr-8 h-9 text-xs bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 rounded-xl"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
               <Select value={selectedValue} onValueChange={handleSelectChange}>
                 <SelectTrigger className="h-9 w-44 border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-xl text-xs font-medium focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder="All Categories" />
@@ -477,9 +556,21 @@ export default function SellersManagement() {
               <div className="flex items-center justify-center py-10 text-red-500">
                 {error}
               </div>
-            ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
-                No data available
+            ) : filteredProperties?.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-neutral-400">
+                {searchQuery ? (
+                  <div className="space-y-2">
+                    <p>No properties matching &quot;{searchQuery}&quot;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs text-[#FF6900] hover:underline font-medium cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  "No data available"
+                )}
               </div>
             ) : (
               <Table>
@@ -509,7 +600,7 @@ export default function SellersManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
-                  {data?.map((application, index) => (
+                  {filteredProperties?.map((application, index) => (
                     <TableRow
                       key={index}
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"

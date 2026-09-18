@@ -48,6 +48,54 @@ export default function AdminBookings() {
   const filteredBookings = useMemo(() => {
     let result = [...safeBookings];
 
+    if (filters?.search && filters.search.trim() !== "") {
+      const q = filters.search.toLowerCase().trim();
+      result = result.filter((b) => {
+        const guestName = (
+          b?.guestDetails?.name ||
+          b?.user?.name ||
+          b?.customerDetails?.name ||
+          b?.customerName ||
+          ""
+        ).toLowerCase();
+        const guestEmail = (
+          b?.guestDetails?.email ||
+          b?.user?.email ||
+          b?.customerDetails?.email ||
+          b?.email ||
+          ""
+        ).toLowerCase();
+        const guestPhone = (
+          b?.guestDetails?.phoneNumber ||
+          b?.user?.phoneNumber ||
+          b?.customerDetails?.mobile ||
+          b?.phoneNumber ||
+          ""
+        ).toLowerCase();
+        const bookingId = (
+          b?.bookingId ||
+          b?._id ||
+          ""
+        ).toLowerCase();
+        const propertyTitle = (
+          b?.propertyId?.title ||
+          b?.propertyId?.name ||
+          b?.property?.title ||
+          b?.property?.name ||
+          b?.propertyTitle ||
+          ""
+        ).toLowerCase();
+
+        return (
+          guestName.includes(q) ||
+          guestEmail.includes(q) ||
+          guestPhone.includes(q) ||
+          bookingId.includes(q) ||
+          propertyTitle.includes(q)
+        );
+      });
+    }
+
     if (filters?.status) {
       result = result.filter((b) => b?.status === filters.status);
     }

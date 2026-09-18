@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Filter } from "lucide-react";
 import {
@@ -19,9 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import DocumentApprovalPage from "./document-approval";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Mail, Phone, Store, ChevronRight, PhoneCall } from "lucide-react";
+import { MapPin, Mail, Phone, Store, ChevronRight, PhoneCall, Search, X } from "lucide-react";
 import dashiconsstore from "@/public/Asset/dashiconsstore.png";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,8 +53,26 @@ export default function SellersManagement() {
   const { data, loading, error, datapagination } = useSelector(
     (state) => state.owner
   );
-  const [filteredData, setFilteredData] = useState([]);
   const { categories } = useSelector((state) => state.master);
+
+  const filteredOwners = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+    if (!searchQuery || searchQuery.trim() === "") return data;
+    const q = searchQuery.toLowerCase().trim();
+    return data.filter((owner) => {
+      const name = (owner?.name || "").toLowerCase();
+      const email = (owner?.email || "").toLowerCase();
+      const phone = (owner?.bankDetails?.phone || owner?.phone || owner?.phoneNumber || "").toLowerCase();
+      const id = (owner?._id || "").toLowerCase();
+
+      return (
+        name.includes(q) ||
+        email.includes(q) ||
+        phone.includes(q) ||
+        id.includes(q)
+      );
+    });
+  }, [data, searchQuery]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -234,43 +253,68 @@ export default function SellersManagement() {
     <div className="w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 h-full bg-white dark:bg-[#121215] p-4 shadow-sm transition-colors">
       {/* Main Tabs */}
       <Tabs value={Tab} onValueChange={handletabchange} className="">
-        <TabsList className="p-0 bg-transparent space-x-2 h-auto mb-4">
-          <TabsTrigger
-            value="all"
-            onClick={() => {
-              setTab("all");
-              setisVerified(undefined);
-            }}
-            className={`rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm ${
-              Tab === "all"
-                ? "!bg-[#FF6900] !text-white"
-                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
-            }`}
-          >
-           All Owners
-          </TabsTrigger>
-          <TabsTrigger
-            value="verified"
-            onClick={() => {
-              setTab("verified");
-              setisVerified(true);
-            }}
-            className={`rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all shadow-sm ${
-              Tab === "verified"
-                ? "!bg-[#FF6900] !text-white"
-                : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
-            }`}
-          >
-            Verified Owners
-          </TabsTrigger>
-          <Link
-            href="/host-inquiries"
-            className="rounded-xl px-4 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm bg-orange-50 dark:bg-orange-950/40 border border-[#FF6900]/30 text-[#FF6900] hover:bg-orange-100 flex items-center gap-1.5"
-          >
-            <PhoneCall className="w-3.5 h-3.5" />
-            <span>Host Inquiries (Leads)</span>
-          </Link>
-        </TabsList>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <TabsList className="p-0 bg-transparent space-x-2 h-auto">
+            <TabsTrigger
+              value="all"
+              onClick={() => {
+                setTab("all");
+                setisVerified(undefined);
+              }}
+              className={`rounded-xl px-5 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm ${
+                Tab === "all"
+                  ? "!bg-[#FF6900] !text-white"
+                  : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+              }`}
+            >
+             All Owners
+            </TabsTrigger>
+            <TabsTrigger
+              value="verified"
+              onClick={() => {
+                setTab("verified");
+                setisVerified(true);
+              }}
+              className={`rounded-xl px-5 py-2 text-sm cursor-pointer font-semibold transition-all shadow-sm ${
+                Tab === "verified"
+                  ? "!bg-[#FF6900] !text-white"
+                  : "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800/50"
+              }`}
+            >
+              Verified Owners
+            </TabsTrigger>
+            <Link
+              href="/host-inquiries"
+              className="rounded-xl px-4 py-2 cursor-pointer text-sm font-semibold transition-all shadow-sm bg-orange-50 dark:bg-orange-950/40 border border-[#FF6900]/30 text-[#FF6900] hover:bg-orange-100 flex items-center gap-1.5"
+            >
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span>Host Inquiries (Leads)</span>
+            </Link>
+          </TabsList>
+
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search owners by name, email, phone..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-8 pr-8 h-9 text-xs bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 rounded-xl"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+        </div>
 
         <TabsContent value="all">
           {/* Table */}
@@ -283,9 +327,21 @@ export default function SellersManagement() {
               <div className="flex items-center justify-center py-10 text-red-500">
                 {error}
               </div>
-            ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
-                No Owners available
+            ) : filteredOwners?.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-neutral-400">
+                {searchQuery ? (
+                  <div className="space-y-2">
+                    <p>No owners matching &quot;{searchQuery}&quot;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs text-[#FF6900] hover:underline font-medium cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  "No Owners available"
+                )}
               </div>
             ) : (
               <Table>
@@ -312,7 +368,7 @@ export default function SellersManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
-                  {data?.map((application, index) => (
+                  {filteredOwners?.map((application, index) => (
                     <TableRow
                       key={index}
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
@@ -366,9 +422,21 @@ export default function SellersManagement() {
               <div className="flex items-center justify-center py-10 text-red-500">
                 {error}
               </div>
-            ) : data?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-neutral-400">
-                No Owners available
+            ) : filteredOwners?.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-neutral-400">
+                {searchQuery ? (
+                  <div className="space-y-2">
+                    <p>No owners matching &quot;{searchQuery}&quot;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs text-[#FF6900] hover:underline font-medium cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  "No Owners available"
+                )}
               </div>
             ) : (
               <Table>
@@ -395,7 +463,7 @@ export default function SellersManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-gray-100 dark:divide-neutral-800/60">
-                  {data?.map((application, index) => (
+                  {filteredOwners?.map((application, index) => (
                     <TableRow
                       key={index}
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"

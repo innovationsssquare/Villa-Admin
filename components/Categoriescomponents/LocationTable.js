@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card } from "@/components/ui/card";
-import { Pencil, Trash2, Plus, Search, MapPin } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, MapPin, X, ChevronLeft, ChevronRight } from "lucide-react";
 import LocationForm from "./LocationForm";
 import { toast } from "sonner";
 
@@ -45,6 +45,8 @@ const LocationTable = () => {
   const { locations, loading } = useSelector((state) => state.location);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -54,12 +56,22 @@ const LocationTable = () => {
     dispatch(fetchLocations());
   }, [dispatch]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   // Search filter
   const filteredLocations = locations.filter(
     (location) =>
       location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredLocations.length / itemsPerPage));
+  const paginatedLocations = filteredLocations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   // Handle Create
@@ -132,8 +144,17 @@ const LocationTable = () => {
             placeholder="Search locations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 pr-9"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <Button
           onClick={() => setIsFormOpen(true)}
@@ -176,11 +197,11 @@ const LocationTable = () => {
                     colSpan={6}
                     className="text-center py-8 text-muted-foreground dark:text-neutral-400"
                   >
-                    No locations found
+                    {searchQuery ? `No locations matching "${searchQuery}"` : "No locations found"}
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredLocations?.map((location) => (
+                paginatedLocations?.map((location) => (
                   <TableRow
                     key={location?._id}
                     className="hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-800 transition-colors"
@@ -243,6 +264,42 @@ const LocationTable = () => {
             </TableBody>
           </Table>
         </div>
+
+        {/* Pagination Bar */}
+        {filteredLocations.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/30">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              Showing <span className="font-semibold text-neutral-700 dark:text-neutral-300">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+              <span className="font-semibold text-neutral-700 dark:text-neutral-300">{Math.min(currentPage * itemsPerPage, filteredLocations.length)}</span> of{" "}
+              <span className="font-semibold text-neutral-700 dark:text-neutral-300">{filteredLocations.length}</span> locations
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                </Button>
+                <span className="text-xs font-semibold px-2 text-neutral-600 dark:text-neutral-300">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                >
+                  Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </Card>
 
       {/* Form Dialog */}

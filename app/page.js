@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ExecutiveKpiGrid from "@/components/Analyticscomponents/ExecutiveKpiGrid";
+import BusinessFinancialTally from "@/components/Analyticscomponents/BusinessFinancialTally";
 import RevenueVelocityChart from "@/components/Analyticscomponents/RevenueVelocityChart";
 import CategoryBreakdownCard from "@/components/Analyticscomponents/CategoryBreakdownCard";
 import OperationalActionCenter from "@/components/Analyticscomponents/OperationalActionCenter";
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const [disputeStats, setDisputeStats] = useState(null);
   const [period, setPeriod] = useState("month");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tallyRefreshKey, setTallyRefreshKey] = useState(0);
 
   const loadAllAnalytics = async (selectedPeriod = period) => {
     try {
@@ -79,6 +81,7 @@ export default function Dashboard() {
     const unsubscribe = subscribeAdminEvents(() => {
       // Re-fetch metrics silently when an administrative event arrives
       loadAllAnalytics(period);
+      setTallyRefreshKey((k) => k + 1);
     });
 
     return () => {
@@ -89,6 +92,7 @@ export default function Dashboard() {
   const handleManualRefresh = () => {
     setIsRefreshing(true);
     loadAllAnalytics(period);
+    setTallyRefreshKey((k) => k + 1);
   };
 
   return (
@@ -125,7 +129,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 1. Top Executive KPIs */}
+        {/* 1. Business Financial Tally & Actual Revenue (Strictly Confirmed Bookings) */}
+        <BusinessFinancialTally refreshTrigger={tallyRefreshKey} />
+
+        {/* 2. Top Executive KPIs */}
         <ExecutiveKpiGrid
           summary={summary}
           bookingStatus={bookingStatus}

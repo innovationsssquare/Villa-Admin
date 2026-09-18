@@ -14,6 +14,7 @@ import {
   MapPin,
   Bed,
   ExternalLink,
+  ChevronLeft,
   ChevronRight,
   Filter,
   Trash2,
@@ -104,6 +105,14 @@ export default function HostInquiriesPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [propertyTypeFilter, setPropertyTypeFilter] = useState("all");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, search, propertyTypeFilter]);
 
   // Notes Modal state
   const [selectedInquiry, setSelectedInquiry] = useState(null);
@@ -266,6 +275,12 @@ export default function HostInquiriesPage() {
     });
   };
 
+  const totalPages = Math.max(1, Math.ceil(inquiries.length / itemsPerPage));
+  const paginatedInquiries = inquiries.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <ScrollArea className="bg-gray-50/60 dark:bg-[#09090B] h-[calc(100vh-64px)] pb-14 text-neutral-900 dark:text-neutral-100 transition-colors">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
@@ -405,8 +420,17 @@ export default function HostInquiriesPage() {
                 placeholder="Search by owner name, phone number, or location..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:bg-white dark:focus:bg-[#121215] focus:outline-none focus:ring-2 focus:ring-[#FF6900]/30 focus:border-[#FF6900] transition-all"
+                className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:bg-white dark:focus:bg-[#121215] focus:outline-none focus:ring-2 focus:ring-[#FF6900]/30 focus:border-[#FF6900] transition-all"
               />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             <div className="sm:col-span-4">
@@ -454,7 +478,8 @@ export default function HostInquiriesPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-neutral-50/90 dark:bg-neutral-900/90 border-b border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 font-semibold uppercase tracking-wider text-[11px]">
                   <tr>
@@ -467,7 +492,7 @@ export default function HostInquiriesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
-                  {inquiries.map((item) => {
+                  {paginatedInquiries.map((item) => {
                     const statusCfg = STATUS_CONFIG[item.status] || STATUS_CONFIG.new;
                     const cleanPhone = formatCleanPhone(item.phone);
 
@@ -597,6 +622,43 @@ export default function HostInquiriesPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {inquiries.length > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  Showing <span className="font-semibold text-neutral-700 dark:text-neutral-300">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-300">{Math.min(currentPage * itemsPerPage, inquiries.length)}</span> of{" "}
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-300">{inquiries.length}</span> leads
+                </p>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                      className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                    </Button>
+                    <span className="text-xs font-semibold px-2 text-neutral-600 dark:text-neutral-300">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage >= totalPages}
+                      className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                    >
+                      Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+            </>
           )}
         </div>
       </div>

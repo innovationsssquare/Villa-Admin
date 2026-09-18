@@ -35,6 +35,54 @@ const AdminPayouts = () => {
   const filteredData = useMemo(() => {
     let data = [...safePayouts];
 
+    if (filters?.search && filters.search.trim() !== "") {
+      const q = filters.search.toLowerCase().trim();
+      data = data.filter((p) => {
+        const hostName = (
+          p?.hostDetails?.name ||
+          p?.hostName ||
+          p?.owner?.name ||
+          p?.seller?.name ||
+          ""
+        ).toLowerCase();
+        const hostEmail = (
+          p?.hostDetails?.email ||
+          p?.owner?.email ||
+          p?.email ||
+          ""
+        ).toLowerCase();
+        const propertyName = (
+          p?.propertyDetails?.title ||
+          p?.propertyDetails?.name ||
+          p?.propertyName ||
+          p?.property?.title ||
+          p?.property?.name ||
+          ""
+        ).toLowerCase();
+        const payoutId = (p?.payoutId || p?._id || "").toLowerCase();
+        const utr = (
+          p?.transactionDetails?.utr ||
+          p?.utr ||
+          p?.transactionId ||
+          ""
+        ).toLowerCase();
+        const bookingId = (
+          p?.bookingDetails?.bookingId ||
+          p?.bookingId ||
+          ""
+        ).toLowerCase();
+
+        return (
+          hostName.includes(q) ||
+          hostEmail.includes(q) ||
+          propertyName.includes(q) ||
+          payoutId.includes(q) ||
+          utr.includes(q) ||
+          bookingId.includes(q)
+        );
+      });
+    }
+
     if (filters?.payoutStatus) {
       data = data.filter((p) => p?.payoutStatus === filters.payoutStatus);
     }

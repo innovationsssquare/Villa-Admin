@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   ArrowRight,
   ExternalLink,
+  ChevronLeft,
   ChevronRight,
   Check,
   X,
@@ -51,6 +52,8 @@ export default function DisputesPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [priorityFilter, setPriorityFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1, limit: 10 });
 
   // Drawer / Detail Modal
   const [selectedDispute, setSelectedDispute] = useState(null);
@@ -97,12 +100,16 @@ export default function DisputesPage() {
         search,
         status: statusFilter,
         priority: priorityFilter,
-        limit: 50,
+        page,
+        limit: 10,
       });
 
       if (res?.success) {
         setDisputes(res.data || []);
         setStats(res.stats || null);
+        if (res.pagination) {
+          setPagination(res.pagination);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch disputes:", err);
@@ -110,6 +117,10 @@ export default function DisputesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, priorityFilter]);
 
   useEffect(() => {
     loadDisputes();
@@ -127,7 +138,7 @@ export default function DisputesPage() {
     return () => {
       if (typeof unsubscribe === "function") unsubscribe();
     };
-  }, [search, statusFilter, priorityFilter]);
+  }, [search, statusFilter, priorityFilter, page]);
 
   const openDisputeDetails = async (dispute) => {
     setSelectedDispute(dispute);
@@ -407,13 +418,22 @@ export default function DisputesPage() {
         {/* Filter Toolbar */}
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white dark:bg-[#121215] p-3 rounded-2xl border border-neutral-200 dark:border-neutral-800">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
+            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <Input
               placeholder="Search by Dispute ID, User, or Property..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-neutral-50 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white text-xs rounded-xl"
+              className="pl-9 pr-8 bg-neutral-50 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white text-xs rounded-xl"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -550,6 +570,43 @@ export default function DisputesPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Disputes Pagination */}
+          {pagination.total > 0 && (
+            <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#121215] border-t border-neutral-200 dark:border-neutral-800 rounded-b-2xl">
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                Showing {(page - 1) * pagination.limit + 1} to{" "}
+                {Math.min(page * pagination.limit, pagination.total)} of {pagination.total} disputes
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                  Previous
+                </Button>
+                <span className="px-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  {page} / {pagination.totalPages || 1}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setPage((p) => Math.min(pagination.totalPages || 1, p + 1))
+                  }
+                  disabled={page >= (pagination.totalPages || 1)}
+                  className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* DISPUTE INVESTIGATION & RESOLUTION MODAL */}

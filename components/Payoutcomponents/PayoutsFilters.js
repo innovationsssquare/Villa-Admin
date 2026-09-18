@@ -6,13 +6,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, RotateCcw } from "lucide-react";
+import { CalendarIcon, RotateCcw, Search, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,22 @@ const PayoutsFilters = ({ filters, onFilterChange, onReset }) => {
     onFilterChange({
       ...filters,
       [key]: value === "all" ? undefined : value,
+      page: 1,
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    onFilterChange({
+      ...filters,
+      search: e.target.value,
+      page: 1,
+    });
+  };
+
+  const handleClearSearch = () => {
+    onFilterChange({
+      ...filters,
+      search: "",
       page: 1,
     });
   };
@@ -34,9 +51,35 @@ const PayoutsFilters = ({ filters, onFilterChange, onReset }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 bg-card dark:bg-[#121215] rounded-lg border border-border dark:border-neutral-800 shadow-sm">
+    <div className="flex flex-wrap items-end gap-3 p-4 bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 shadow-sm">
+      {/* Search Input */}
+      <div className="flex flex-col gap-1.5 flex-1 min-w-[220px]">
+        <label className="text-xs font-medium text-muted-foreground">
+          Search Payouts
+        </label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Host, property, payout ID, UTR..."
+            value={filters.search || ""}
+            onChange={handleSearchChange}
+            className="pl-8 pr-8 h-10 text-xs bg-background dark:bg-neutral-900 border-border dark:border-neutral-800"
+          />
+          {filters.search && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Payout Status Filter */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 min-w-[150px]">
         <label className="text-xs font-medium text-muted-foreground">
           Payout Status
         </label>
@@ -44,7 +87,7 @@ const PayoutsFilters = ({ filters, onFilterChange, onReset }) => {
           value={filters.payoutStatus || "all"}
           onValueChange={(value) => handleFilterChange("payoutStatus", value)}
         >
-          <SelectTrigger className="w-[160px] bg-background">
+          <SelectTrigger className="w-full bg-background dark:bg-neutral-900 h-10">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>

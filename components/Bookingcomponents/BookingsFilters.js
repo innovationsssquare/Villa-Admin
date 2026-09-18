@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, RotateCcw } from "lucide-react";
+import { CalendarIcon, RotateCcw, Search, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -25,11 +26,63 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
     });
   };
 
+  const handleSearchChange = (e) => {
+    onFilterChange({
+      ...filters,
+      search: e.target.value,
+      page: 1,
+    });
+  };
+
+  const handleClearSearch = () => {
+    onFilterChange({
+      ...filters,
+      search: "",
+      page: 1,
+    });
+  };
+
+  const hasActiveFilters = Boolean(
+    filters.search ||
+    filters.status ||
+    filters.paymentStatus ||
+    filters.propertyType ||
+    filters.startDate ||
+    filters.endDate
+  );
+
   return (
-    <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 p-5 shadow-sm">
-      <div className="flex flex-wrap items-end gap-4">
+    <div className="bg-card dark:bg-[#121215] rounded-xl border border-border dark:border-neutral-800 p-5 shadow-sm space-y-4">
+      {/* Search and Filters Bar */}
+      <div className="flex flex-wrap items-end gap-3">
+        {/* Search Input */}
+        <div className="flex flex-col gap-1.5 flex-1 min-w-[240px]">
+          <label className="text-xs font-medium text-muted-foreground">
+            Search Bookings
+          </label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Guest, phone, email, booking ID, villa..."
+              value={filters.search || ""}
+              onChange={handleSearchChange}
+              className="pl-9 pr-9 h-10 text-sm bg-background dark:bg-neutral-900 border-border dark:border-neutral-800"
+            />
+            {filters.search && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-full"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Status Filter */}
-        <div className="flex flex-col gap-1.5 min-w-[160px]">
+        <div className="flex flex-col gap-1.5 min-w-[150px]">
           <label className="text-xs font-medium text-muted-foreground">
             Booking Status
           </label>
@@ -37,7 +90,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
             value={filters.status || "all"}
             onValueChange={(value) => handleChange("status", value)}
           >
-            <SelectTrigger className="h-10">
+            <SelectTrigger className="h-10 bg-background dark:bg-neutral-900">
               <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
@@ -51,7 +104,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* Payment Status Filter */}
-        <div className="flex flex-col gap-1.5 min-w-[160px]">
+        <div className="flex flex-col gap-1.5 min-w-[150px]">
           <label className="text-xs font-medium text-muted-foreground">
             Payment Status
           </label>
@@ -59,7 +112,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
             value={filters.paymentStatus || "all"}
             onValueChange={(value) => handleChange("paymentStatus", value)}
           >
-            <SelectTrigger className="h-10">
+            <SelectTrigger className="h-10 bg-background dark:bg-neutral-900">
               <SelectValue placeholder="All Payments" />
             </SelectTrigger>
             <SelectContent>
@@ -72,7 +125,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* Property Type Filter */}
-        <div className="flex flex-col gap-1.5 min-w-[160px]">
+        <div className="flex flex-col gap-1.5 min-w-[150px]">
           <label className="text-xs font-medium text-muted-foreground">
             Property Type
           </label>
@@ -80,7 +133,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
             value={filters.propertyType || "all"}
             onValueChange={(value) => handleChange("propertyType", value)}
           >
-            <SelectTrigger className="h-10">
+            <SelectTrigger className="h-10 bg-background dark:bg-neutral-900">
               <SelectValue placeholder="All Properties" />
             </SelectTrigger>
             <SelectContent>
@@ -94,7 +147,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* Start Date with Calendar */}
-        <div className="flex flex-col gap-1.5 min-w-[160px]">
+        <div className="flex flex-col gap-1.5 min-w-[140px]">
           <label className="text-xs font-medium text-muted-foreground">
             From Date
           </label>
@@ -103,7 +156,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
               <Button
                 variant="outline"
                 className={cn(
-                  "h-10 justify-start text-left font-normal",
+                  "h-10 justify-start text-left font-normal bg-background dark:bg-neutral-900",
                   !filters.startDate && "text-muted-foreground"
                 )}
               >
@@ -128,7 +181,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* End Date with Calendar */}
-        <div className="flex flex-col gap-1.5 min-w-[160px]">
+        <div className="flex flex-col gap-1.5 min-w-[140px]">
           <label className="text-xs font-medium text-muted-foreground">
             To Date
           </label>
@@ -137,7 +190,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
               <Button
                 variant="outline"
                 className={cn(
-                  "h-10 justify-start text-left font-normal",
+                  "h-10 justify-start text-left font-normal bg-background dark:bg-neutral-900",
                   !filters.endDate && "text-muted-foreground"
                 )}
               >
@@ -162,14 +215,16 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
         </div>
 
         {/* Reset Button */}
-        {/* <Button
-          variant="outline"
-          onClick={onReset}
-          className="h-10 gap-2"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Reset
-        </Button> */}
+        {hasActiveFilters && onReset && (
+          <Button
+            variant="outline"
+            onClick={onReset}
+            className="h-10 gap-2 border-dashed border-gray-300 dark:border-neutral-700 text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            Reset
+          </Button>
+        )}
       </div>
     </div>
   );

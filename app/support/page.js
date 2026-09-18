@@ -17,6 +17,7 @@ import {
   Phone,
   MessageSquare,
   ShieldCheck,
+  ChevronLeft,
   ChevronRight,
   ExternalLink,
   Tag,
@@ -55,6 +56,14 @@ export default function SupportHelpdeskPage() {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [search, setSearch] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sourceTab, statusFilter, priorityFilter, categoryFilter, search]);
 
   // Modal / Drawer state
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -266,6 +275,12 @@ export default function SupportHelpdeskPage() {
       </span>
     );
   };
+
+  const totalPages = Math.max(1, Math.ceil(tickets.length / itemsPerPage));
+  const paginatedTickets = tickets.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <ScrollArea className="bg-[#FAFAFA] dark:bg-[#09090B] h-[calc(100vh-64px)] pb-16 text-neutral-900 dark:text-neutral-100">
@@ -480,8 +495,17 @@ export default function SupportHelpdeskPage() {
               placeholder="Search by Ticket ID, Subject, Name, Email, or Issue description..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-[#FF6900] focus-visible:border-[#FF6900]"
+              className="pl-10 pr-9 bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-[#FF6900] focus-visible:border-[#FF6900]"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -517,7 +541,7 @@ export default function SupportHelpdeskPage() {
                     </td>
                   </tr>
                 ) : (
-                  tickets.map((ticket) => {
+                  paginatedTickets.map((ticket) => {
                     const senderName =
                       ticket.owner?.name ||
                       ticket.user?.name ||
@@ -621,18 +645,42 @@ export default function SupportHelpdeskPage() {
             </table>
           </div>
 
-          {/* Table Summary Footer */}
-          <div className="p-3.5 px-5 bg-neutral-50/60 dark:bg-neutral-900/40 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-            <div className="flex items-center gap-2">
+          {/* Table Summary & Pagination Footer */}
+          <div className="p-3.5 px-5 bg-neutral-50/60 dark:bg-neutral-900/40 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-neutral-700 dark:text-neutral-300">
-                {tickets.length} {tickets.length === 1 ? "ticket" : "tickets"}
+                {tickets.length === 0
+                  ? "0 tickets"
+                  : `Showing ${(currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, tickets.length)} of ${tickets.length} ${tickets.length === 1 ? "ticket" : "tickets"}`}
               </span>
               <span>•</span>
-              <span>Live synchronized across Host App & Guest Web</span>
+              <span className="hidden sm:inline">Channel: {sourceTab === "all" ? "All Channels" : sourceTab === "owner_app" ? "Owner App (Host)" : "Villa Web (Guest)"}</span>
             </div>
-            <div className="text-[11px] text-neutral-400 dark:text-neutral-500">
-              Channel: {sourceTab === "all" ? "All Channels" : sourceTab === "owner_app" ? "Owner App (Host)" : "Villa Web (Guest)"}
-            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                  className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Previous
+                </Button>
+                <span className="text-xs font-semibold px-2 text-neutral-600 dark:text-neutral-300">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                  className="h-8 text-xs border-neutral-200 dark:border-neutral-800 cursor-pointer"
+                >
+                  Next <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 

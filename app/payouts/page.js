@@ -17,6 +17,9 @@ import {
   ShieldAlert,
   ExternalLink,
   Link as LinkIcon,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import {
   getAdminPendingHosts,
@@ -34,6 +37,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast-provider";
@@ -45,6 +55,8 @@ export default function HostPayoutsPage() {
   const [stats, setStats] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [hostPage, setHostPage] = useState(1);
+  const hostLimit = 10;
 
   // RazorpayX Live Balance state
   const [razorpayBalance, setRazorpayBalance] = useState(null);
@@ -57,6 +69,9 @@ export default function HostPayoutsPage() {
   const [ledger, setLedger] = useState([]);
   const [ledgerLoading, setLedgerLoading] = useState(false);
   const [ledgerSearch, setLedgerSearch] = useState("");
+  const [ledgerStatusFilter, setLedgerStatusFilter] = useState("all");
+  const [ledgerPage, setLedgerPage] = useState(1);
+  const ledgerLimit = 10;
 
   // Payout Execution Modal state
   const [selectedHost, setSelectedHost] = useState(null);
@@ -103,7 +118,11 @@ export default function HostPayoutsPage() {
   const loadLedgerData = async () => {
     try {
       setLedgerLoading(true);
-      const res = await getAdminPayoutLedger({ search: ledgerSearch, limit: 50 });
+      const res = await getAdminPayoutLedger({
+        search: ledgerSearch,
+        status: ledgerStatusFilter,
+        limit: 100,
+      });
       if (res?.success) {
         setLedger(res.data || []);
       }
@@ -146,12 +165,26 @@ export default function HostPayoutsPage() {
   };
 
   useEffect(() => {
+    setHostPage(1);
+  }, [search, statusFilter]);
+
+  useEffect(() => {
+    setLedgerPage(1);
+  }, [ledgerSearch, ledgerStatusFilter]);
+
+  useEffect(() => {
     if (activeTab === "hosts") {
       loadHostsData();
     } else {
       loadLedgerData();
     }
-  }, [activeTab, search, statusFilter, ledgerSearch]);
+  }, [activeTab, search, statusFilter, ledgerSearch, ledgerStatusFilter]);
+
+  const paginatedHosts = hosts.slice((hostPage - 1) * hostLimit, hostPage * hostLimit);
+  const totalHostPages = Math.max(1, Math.ceil(hosts.length / hostLimit));
+
+  const paginatedLedger = ledger.slice((ledgerPage - 1) * ledgerLimit, ledgerPage * ledgerLimit);
+  const totalLedgerPages = Math.max(1, Math.ceil(ledger.length / ledgerLimit));
 
   const openPayoutModal = (host) => {
     setSelectedHost(host);
@@ -493,7 +526,7 @@ export default function HostPayoutsPage() {
                         </td>
                       </tr>
                     ) : (
-                      hosts.map((host) => (
+                      paginatedHosts.map((host) => (
                         <tr key={host._id} className="hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
                           <td className="py-3.5 px-4">
                             <div className="font-bold text-neutral-900 dark:text-white text-sm">{host.name}</div>
@@ -590,6 +623,43 @@ export default function HostPayoutsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Hosts Pagination */}
+              {hosts.length > 0 && (
+                <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#121215] border-t border-neutral-200 dark:border-neutral-800">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Showing {(hostPage - 1) * hostLimit + 1} to{" "}
+                    {Math.min(hostPage * hostLimit, hosts.length)} of {hosts.length} hosts
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setHostPage((p) => Math.max(1, p - 1))}
+                      disabled={hostPage === 1}
+                      className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                      Previous
+                    </Button>
+                    <span className="px-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                      {hostPage} / {totalHostPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setHostPage((p) => Math.min(totalHostPages, p + 1))
+                      }
+                      disabled={hostPage >= totalHostPages}
+                      className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      Next
+                      <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -597,15 +667,37 @@ export default function HostPayoutsPage() {
         {/* TAB 2: DISBURSEMENT LEDGER (UTR HISTORY) */}
         {activeTab === "ledger" && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between bg-white dark:bg-[#121215] p-3 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#121215] p-3 rounded-2xl border border-neutral-200 dark:border-neutral-800">
               <div className="relative w-full sm:w-96">
-                <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
                   placeholder="Search ledger by UTR, Host Name, or Booking Reference..."
                   value={ledgerSearch}
                   onChange={(e) => setLedgerSearch(e.target.value)}
-                  className="pl-9 bg-neutral-50 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white text-xs rounded-xl"
+                  className="pl-9 pr-8 bg-neutral-50 dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white text-xs rounded-xl"
                 />
+                {ledgerSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setLedgerSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Status:</label>
+                <select
+                  value={ledgerStatusFilter}
+                  onChange={(e) => setLedgerStatusFilter(e.target.value)}
+                  className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl px-3 py-1.5 text-xs text-neutral-700 dark:text-neutral-200 font-medium outline-none cursor-pointer"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="completed">Completed / Disbursed</option>
+                  <option value="processing">Processing</option>
+                  <option value="failed">Failed</option>
+                </select>
               </div>
             </div>
 
@@ -637,7 +729,7 @@ export default function HostPayoutsPage() {
                         </td>
                       </tr>
                     ) : (
-                      ledger.map((txn, idx) => (
+                      paginatedLedger.map((txn, idx) => (
                         <tr key={idx} className="hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
                           <td className="py-3.5 px-4 font-mono font-bold text-[#FF6900]">
                             {txn.transactionId}
@@ -682,6 +774,43 @@ export default function HostPayoutsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Ledger Pagination */}
+              {ledger.length > 0 && (
+                <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#121215] border-t border-neutral-200 dark:border-neutral-800">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Showing {(ledgerPage - 1) * ledgerLimit + 1} to{" "}
+                    {Math.min(ledgerPage * ledgerLimit, ledger.length)} of {ledger.length} records
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setLedgerPage((p) => Math.max(1, p - 1))}
+                      disabled={ledgerPage === 1}
+                      className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+                      Previous
+                    </Button>
+                    <span className="px-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                      {ledgerPage} / {totalLedgerPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setLedgerPage((p) => Math.min(totalLedgerPages, p + 1))
+                      }
+                      disabled={ledgerPage >= totalLedgerPages}
+                      className="h-8 px-2.5 text-xs text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      Next
+                      <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

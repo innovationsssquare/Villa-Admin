@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Filter } from "lucide-react";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Mail, Phone, Store, ChevronRight } from "lucide-react";
+import { MapPin, Mail, Phone, Store, ChevronRight, Search, X } from "lucide-react";
 import dashiconsstore from "@/public/Asset/dashiconsstore.png";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,20 +39,61 @@ import { useRouter } from "next/navigation";
 
 export default function Ordersmanagement() {
   const [profileTab, setProfileTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
   const { data, loading, error } = useSelector((state) => state.order);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllorders({ page: 1, limit: 10 ,status:profileTab}));
+    dispatch(
+      fetchAllorders({
+        page: 1,
+        limit: 100,
+        status: profileTab === "all" ? "" : profileTab,
+      })
+    );
   }, [dispatch, profileTab]);
+
+  const filteredOrders = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+    if (!searchQuery || searchQuery.trim() === "") return data;
+    const q = searchQuery.toLowerCase().trim();
+    return data.filter((order) => {
+      const orderId = (order?.orderId || order?._id || "").toLowerCase();
+      const customerName = (
+        order?.userId?.name ||
+        order?.customerName ||
+        order?.billingAddress?.name ||
+        ""
+      ).toLowerCase();
+      const email = (
+        order?.userId?.email ||
+        order?.email ||
+        order?.billingAddress?.email ||
+        ""
+      ).toLowerCase();
+      const phone = (
+        order?.userId?.phone ||
+        order?.phone ||
+        order?.billingAddress?.phone ||
+        ""
+      ).toLowerCase();
+
+      return (
+        orderId.includes(q) ||
+        customerName.includes(q) ||
+        email.includes(q) ||
+        phone.includes(q)
+      );
+    });
+  }, [data, searchQuery]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data?.slice(indexOfFirstItem, indexOfLastItem) || [];
-  const totalPages = Math.ceil((data?.length || 0) / itemsPerPage);
+  const currentItems = filteredOrders?.slice(indexOfFirstItem, indexOfLastItem) || [];
+  const totalPages = Math.ceil((filteredOrders?.length || 0) / itemsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -72,12 +114,28 @@ export default function Ordersmanagement() {
 
         <TabsContent value="all">
           {/* Profile Tabs and Filters */}
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="border-b border-gray-200 dark:border-neutral-800 w-full">
-              <div className="flex -mb-px">
+              <div className="flex -mb-px flex-wrap">
                 <button
-                  onClick={() => setProfileTab("Delivered")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  onClick={() => {
+                    setProfileTab("all");
+                    setCurrentPage(1);
+                  }}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer transition-colors ${
+                    profileTab === "all"
+                      ? "border-b-2 border-[#FF6900] text-[#FF6900]"
+                      : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
+                  }`}
+                >
+                  All Orders
+                </button>
+                <button
+                  onClick={() => {
+                    setProfileTab("Delivered");
+                    setCurrentPage(1);
+                  }}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer transition-colors ${
                     profileTab === "Delivered"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
@@ -86,8 +144,11 @@ export default function Ordersmanagement() {
                  Delivered
                 </button>
                 <button
-                  onClick={() => setProfileTab("Pending")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  onClick={() => {
+                    setProfileTab("Pending");
+                    setCurrentPage(1);
+                  }}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer transition-colors ${
                     profileTab === "Pending"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
@@ -96,8 +157,11 @@ export default function Ordersmanagement() {
                   Pending Orders
                 </button>
                 <button
-                  onClick={() => setProfileTab("Processing")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  onClick={() => {
+                    setProfileTab("Processing");
+                    setCurrentPage(1);
+                  }}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer transition-colors ${
                     profileTab === "Processing"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
@@ -106,8 +170,11 @@ export default function Ordersmanagement() {
                   Processing Orders
                 </button>
                 <button
-                  onClick={() => setProfileTab("Cancelled")}
-                  className={`mr-8 py-4 text-sm font-medium cursor-pointer ${
+                  onClick={() => {
+                    setProfileTab("Cancelled");
+                    setCurrentPage(1);
+                  }}
+                  className={`mr-8 py-4 text-sm font-medium cursor-pointer transition-colors ${
                     profileTab === "Cancelled"
                       ? "border-b-2 border-[#FF6900] text-[#FF6900]"
                       : "text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200"
@@ -117,18 +184,29 @@ export default function Ordersmanagement() {
                 </button>
               </div>
             </div>
-            {/* <div className="flex items-center gap-2 ml-4 shrink-0">
-              <Select defaultValue="this-week">
-                <SelectTrigger className="w-[130px] border-gray-200 bg-white text-sm">
-                  <SelectValue placeholder="This Week" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="this-week">This Week</SelectItem>
-                  <SelectItem value="this-month">This Month</SelectItem>
-                  <SelectItem value="this-year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
+
+            <div className="relative w-full sm:w-72 shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search by order ID, customer..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-8 pr-8 h-9 text-xs bg-white dark:bg-neutral-900 border-gray-200 dark:border-neutral-800 rounded-xl"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Table */}
@@ -142,8 +220,20 @@ export default function Ordersmanagement() {
                 {error}
               </div>
             ) : currentItems?.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No seller applications available
+              <div className="text-center py-10 text-gray-500 dark:text-neutral-400">
+                {searchQuery ? (
+                  <div className="space-y-2">
+                    <p>No orders matching &quot;{searchQuery}&quot;</p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs text-[#FF6900] hover:underline font-medium cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  "No orders available"
+                )}
               </div>
             ) : (
               <Table>
