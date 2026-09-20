@@ -21,10 +21,20 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Mail, Phone, Store, ChevronRight, Search, X } from "lucide-react";
+import { MapPin, Mail, Phone, Store, ChevronRight, Search, X, Sparkles, Flame, Check } from "lucide-react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllProperties } from "@/lib/Redux/Slices/sellarSlice";
+import { UpdatePropertyPromotion } from "@/lib/API/Seller/Sellar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   Pagination,
   PaginationContent,
@@ -47,6 +57,74 @@ export default function SellersManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const router = useRouter();
+
+  // Promotion Management State
+  const [promoteModalOpen, setPromoteModalOpen] = useState(false);
+  const [selectedPropertyForPromotion, setSelectedPropertyForPromotion] = useState(null);
+  const [promoForm, setPromoForm] = useState({
+    isPromoted: false,
+    promotionPriority: 100,
+    customBadge: "Spotlight",
+    promotedUntil: "",
+  });
+  const [promoSaving, setPromoSaving] = useState(false);
+
+  const handleOpenPromote = (property) => {
+    setSelectedPropertyForPromotion(property);
+    const dateVal = property?.promotedUntil
+      ? new Date(property.promotedUntil).toISOString().split("T")[0]
+      : "";
+    setPromoForm({
+      isPromoted: Boolean(property?.isPromoted),
+      promotionPriority: property?.promotionPriority != null ? property.promotionPriority : 100,
+      customBadge: property?.customBadge || "Spotlight",
+      promotedUntil: dateVal,
+    });
+    setPromoteModalOpen(true);
+  };
+
+  const handleSavePromotion = async () => {
+    if (!selectedPropertyForPromotion) return;
+    setPromoSaving(true);
+    try {
+      const categoryName =
+        selectedPropertyForPromotion?.category?.name ||
+        categories.find((c) => c._id === selectedValue)?.name ||
+        "Villa";
+
+      const res = await UpdatePropertyPromotion({
+        category: categoryName,
+        id: selectedPropertyForPromotion._id,
+        data: {
+          isPromoted: promoForm.isPromoted,
+          promotionPriority: Number(promoForm.promotionPriority) || 0,
+          customBadge: promoForm.customBadge,
+          promotedUntil: promoForm.promotedUntil ? new Date(promoForm.promotedUntil).toISOString() : null,
+        },
+      });
+
+      if (res?.success) {
+        setPromoteModalOpen(false);
+        if (selectedValue) {
+          dispatch(
+            fetchAllProperties({
+              id: selectedValue,
+              isapproved,
+              page: currentPage,
+              limit: itemsPerPage,
+            })
+          );
+        }
+      } else {
+        alert(res?.message || "Failed to update property promotion");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving promotion: " + (err.message || err));
+    } finally {
+      setPromoSaving(false);
+    }
+  };
   const { data, loading, error, datapagination } = useSelector(
     (state) => state.sellar
   );
@@ -427,6 +505,9 @@ export default function SellersManagement() {
                       Phone No
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
+                      Promotion
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -441,12 +522,36 @@ export default function SellersManagement() {
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
                       <TableCell className="font-semibold text-neutral-900 dark:text-white">
-                        {application?.name}
+                        <div className="flex flex-col">
+                          <span>{application?.name}</span>
+                          {application?.isPromoted && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                              <Sparkles className="w-2.5 h-2.5" />
+                              {application?.customBadge || "Promoted"} (P{application?.promotionPriority || 0})
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.owner?.name}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.category?.name}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application.location?.area}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.Number}</TableCell>
+                      <TableCell>
+                        {application?.isPromoted ? (
+                          <div className="flex flex-col gap-0.5">
+                            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800 text-[10px] font-bold px-2 py-0.5 gap-1 w-fit shadow-2xs">
+                              <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                              {application?.customBadge || "Spotlight"}
+                            </Badge>
+                            <span className="text-[10px] text-neutral-500 font-medium">
+                              Priority {application?.promotionPriority || 0}
+                              {application?.promotedUntil && ` · Ends ${new Date(application.promotedUntil).toLocaleDateString("en-IN")}`}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-neutral-400 font-normal">Standard</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           className={`font-semibold text-xs px-2.5 py-0.5 rounded-full capitalize ${
@@ -463,21 +568,31 @@ export default function SellersManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <span
-                          onClick={() => {
-                            const selectedCategory = categories.find(
-                              (category) => category._id === selectedValue
-                            );
-                            if (selectedCategory) {
-                              router.push(
-                                `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenPromote(application)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 hover:bg-orange-100 text-[#FF6900] border border-orange-200/80 dark:bg-orange-950/30 dark:border-orange-900/50 dark:hover:bg-orange-950/50 transition-all cursor-pointer shadow-2xs"
+                          >
+                            <Sparkles className="w-3 h-3 text-[#FF6900]" />
+                            <span>{application?.isPromoted ? "Edit Promo" : "Promote"}</span>
+                          </button>
+                          <span
+                            onClick={() => {
+                              const selectedCategory = categories.find(
+                                (category) => category._id === selectedValue
                               );
-                            }
-                          }}
-                          className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
-                        >
-                          View Details
-                        </span>
+                              if (selectedCategory) {
+                                router.push(
+                                  `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                                );
+                              }
+                            }}
+                            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white cursor-pointer hover:underline font-medium text-xs whitespace-nowrap"
+                          >
+                            View Details
+                          </span>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -592,6 +707,9 @@ export default function SellersManagement() {
                       Phone No
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
+                      Promotion
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
                       Status
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -606,12 +724,36 @@ export default function SellersManagement() {
                       className="border-b border-gray-200 dark:border-neutral-800/60 hover:bg-gray-50/60 dark:hover:bg-neutral-800/30 h-12 transition-colors"
                     >
                       <TableCell className="font-semibold text-neutral-900 dark:text-white">
-                        {application?.name}
+                        <div className="flex flex-col">
+                          <span>{application?.name}</span>
+                          {application?.isPromoted && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                              <Sparkles className="w-2.5 h-2.5" />
+                              {application?.customBadge || "Promoted"} (P{application?.promotionPriority || 0})
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.owner?.name}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.category?.name}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application.location?.area}</TableCell>
                       <TableCell className="text-neutral-600 dark:text-neutral-300">{application?.Number}</TableCell>
+                      <TableCell>
+                        {application?.isPromoted ? (
+                          <div className="flex flex-col gap-0.5">
+                            <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800 text-[10px] font-bold px-2 py-0.5 gap-1 w-fit shadow-2xs">
+                              <Sparkles className="w-2.5 h-2.5 text-amber-600" />
+                              {application?.customBadge || "Spotlight"}
+                            </Badge>
+                            <span className="text-[10px] text-neutral-500 font-medium">
+                              Priority {application?.promotionPriority || 0}
+                              {application?.promotedUntil && ` · Ends ${new Date(application.promotedUntil).toLocaleDateString("en-IN")}`}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-neutral-400 font-normal">Standard</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           className={`font-semibold text-xs px-2.5 py-0.5 rounded-full capitalize ${
@@ -628,21 +770,31 @@ export default function SellersManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <span
-                          onClick={() => {
-                            const selectedCategory = categories.find(
-                              (category) => category._id === selectedValue
-                            );
-                            if (selectedCategory) {
-                              router.push(
-                                `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenPromote(application)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 hover:bg-orange-100 text-[#FF6900] border border-orange-200/80 dark:bg-orange-950/30 dark:border-orange-900/50 dark:hover:bg-orange-950/50 transition-all cursor-pointer shadow-2xs"
+                          >
+                            <Sparkles className="w-3 h-3 text-[#FF6900]" />
+                            <span>{application?.isPromoted ? "Edit Promo" : "Promote"}</span>
+                          </button>
+                          <span
+                            onClick={() => {
+                              const selectedCategory = categories.find(
+                                (category) => category._id === selectedValue
                               );
-                            }
-                          }}
-                          className="text-[#FF6900] hover:text-[#E05D00] cursor-pointer hover:underline font-bold text-xs"
-                        >
-                          View Details
-                        </span>
+                              if (selectedCategory) {
+                                router.push(
+                                  `/manage-property/View${selectedCategory?.name}details/${application._id}`
+                                );
+                              }
+                            }}
+                            className="text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white cursor-pointer hover:underline font-medium text-xs whitespace-nowrap"
+                          >
+                            View Details
+                          </span>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -654,6 +806,165 @@ export default function SellersManagement() {
 
         {renderPaginationAlways()}
       </Tabs>
+
+      {/* Promotion Management Modal Dialog */}
+      <Dialog open={promoteModalOpen} onOpenChange={setPromoteModalOpen}>
+        <DialogContent className="sm:max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl p-6">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-2 rounded-xl bg-orange-50 dark:bg-orange-950/50 text-[#FF6900] border border-orange-200 dark:border-orange-800/50">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <DialogTitle className="text-base font-bold text-neutral-900 dark:text-white">
+                Promote Property
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-xs text-neutral-500 dark:text-neutral-400">
+              Boost &quot;{selectedPropertyForPromotion?.name}&quot; to top positions on the homepage, weekend escapes carousel, and search listings.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            {/* 1. Promotion Toggle */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40">
+              <div>
+                <label className="text-xs font-bold text-neutral-900 dark:text-white block">
+                  Spotlight Promotion Active
+                </label>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                  Pin stay at Tier 1 above organic listings
+                </p>
+              </div>
+              <Switch
+                checked={promoForm.isPromoted}
+                onCheckedChange={(val) => setPromoForm((prev) => ({ ...prev, isPromoted: val }))}
+              />
+            </div>
+
+            {promoForm.isPromoted && (
+              <>
+                {/* 2. Promotion Priority */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Priority Tier
+                  </label>
+                  <Select
+                    value={String(promoForm.promotionPriority)}
+                    onValueChange={(val) => setPromoForm((prev) => ({ ...prev, promotionPriority: Number(val) }))}
+                  >
+                    <SelectTrigger className="h-9 text-xs rounded-xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                      <SelectValue placeholder="Select Priority" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+                      <SelectItem value="100" className="text-xs font-semibold">
+                        🔥 Top Spotlight (Priority 100 - Highest)
+                      </SelectItem>
+                      <SelectItem value="50" className="text-xs font-semibold">
+                        ⭐ Featured Stay (Priority 50 - High)
+                      </SelectItem>
+                      <SelectItem value="25" className="text-xs font-semibold">
+                        ⚡ Boosted Stay (Priority 25 - Moderate)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 3. Badge Label */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Promo Badge Label
+                  </label>
+                  <div className="flex flex-wrap gap-1.5 mb-1.5">
+                    {["Spotlight", "Featured", "Limited Deal", "Admin Pick", "Trending Now"].map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setPromoForm((prev) => ({ ...prev, customBadge: tag }))}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${
+                          promoForm.customBadge === tag
+                            ? "bg-[#FF6900] text-white border-[#FF6900]"
+                            : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:border-orange-300"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder="Or enter custom badge text..."
+                    value={promoForm.customBadge}
+                    onChange={(e) => setPromoForm((prev) => ({ ...prev, customBadge: e.target.value }))}
+                    className="h-9 text-xs rounded-xl"
+                  />
+                </div>
+
+                {/* 4. Expiration Date */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Active Duration / Expiry Date (Optional)
+                  </label>
+                  <div className="flex gap-1.5 mb-1.5">
+                    {[
+                      { label: "7 Days", days: 7 },
+                      { label: "14 Days", days: 14 },
+                      { label: "30 Days", days: 30 },
+                    ].map(({ label, days }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() + days);
+                          setPromoForm((prev) => ({
+                            ...prev,
+                            promotedUntil: d.toISOString().split("T")[0],
+                          }));
+                        }}
+                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-orange-50 hover:text-[#FF6900] transition-colors"
+                      >
+                        +{label}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setPromoForm((prev) => ({ ...prev, promotedUntil: "" }))}
+                      className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-red-500 transition-colors"
+                    >
+                      No Expiry
+                    </button>
+                  </div>
+                  <Input
+                    type="date"
+                    value={promoForm.promotedUntil}
+                    onChange={(e) => setPromoForm((prev) => ({ ...prev, promotedUntil: e.target.value }))}
+                    className="h-9 text-xs rounded-xl"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:justify-end">
+            <Button
+              variant="bordered"
+              size="sm"
+              onPress={() => setPromoteModalOpen(false)}
+              className="text-xs font-semibold rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              isLoading={promoSaving}
+              onPress={handleSavePromotion}
+              className="text-xs font-bold rounded-xl bg-[#FF6900] text-white shadow-xs"
+            >
+              Save Promotion
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
