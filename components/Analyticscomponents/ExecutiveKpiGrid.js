@@ -49,7 +49,7 @@ export default function ExecutiveKpiGrid({ summary, bookingStatus, payoutStats, 
   const totalRev = summary?.totalRevenue || 0;
   const paidRev = summary?.totalPaidAmount || 0;
   const pendingRev = summary?.totalPendingAmount || 0;
-  const collectionRate = totalRev > 0 ? Math.round((paidRev / totalRev) * 100) : 100;
+  const collectionRate = totalRev > 0 ? Math.round((paidRev / totalRev) * 100) : 0;
 
   const totalBookings = summary?.totalBookings || 0;
   const confirmedCount = (bookingStatus?.confirmed || 0) + (bookingStatus?.completed || 0);

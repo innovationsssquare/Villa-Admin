@@ -121,7 +121,16 @@ export default function AdminBookings() {
 
   // Calculate stats
   const stats = useMemo(() => {
-    const totalRevenue = safeBookings.reduce(
+    // Only calculate revenue for confirmed or completed transactions (exclude pending and unpaid)
+    const confirmedOrCompletedBookings = safeBookings.filter(
+      (b) =>
+        (b?.status === "confirmed" || b?.status === "completed") &&
+        b?.paymentStatus !== "unpaid" &&
+        b?.bookingMode !== "offline" &&
+        !b?.isOffline
+    );
+
+    const totalRevenue = confirmedOrCompletedBookings.reduce(
       (sum, b) => sum + (b?.pricing?.totalAmount || 0),
       0
     );
@@ -131,7 +140,7 @@ export default function AdminBookings() {
     ).length;
 
     const paidBookings = safeBookings.filter(
-      (b) => b?.paymentStatus === "fully_paid"
+      (b) => b?.paymentStatus === "fully_paid" || b?.paymentStatus === "paid"
     ).length;
 
     return {

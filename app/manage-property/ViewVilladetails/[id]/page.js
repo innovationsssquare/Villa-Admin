@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, Users, Calendar, UtensilsCrossed, UserPlus, Clock } from "lucide-react";
+import { Home, Users, Calendar, UtensilsCrossed, UserPlus, Clock, Sparkles } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchvillabyid } from "@/lib/Redux/Slices/villaSlice";
 import { BaseUrl } from "@/lib/API/Baseurl";
@@ -32,6 +32,17 @@ export default function VillaDetailsPage() {
       addToast({
         title: "Commission Required",
         description: "Please set a valid platform commission percentage to approve.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Pre-flight check: ensure property owner is verified before approval
+    const ownerObj = data?.owner && typeof data.owner === "object" ? data.owner : null;
+    if (status === "approved" && ownerObj && !ownerObj.isVerified) {
+      addToast({
+        title: "Owner Not Verified",
+        description: "Cannot approve property: Property owner is not verified. Please verify the owner first.",
         variant: "destructive",
       });
       return;
@@ -131,6 +142,19 @@ export default function VillaDetailsPage() {
             </span>
             <span className="text-[10px] text-neutral-400">Fri - Sun per night</span>
           </div>
+
+          {Boolean(data.pricing?.holidayPrice) && (
+            <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50">
+              <span className="text-[11px] text-amber-600 dark:text-amber-400 block mb-0.5 font-medium flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                Holiday Price
+              </span>
+              <span className="text-lg font-black text-amber-600 dark:text-amber-400 block">
+                ₹{data.pricing?.holidayPrice?.toLocaleString("en-IN") || 0}
+              </span>
+              <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">Peak festive dates</span>
+            </div>
+          )}
 
           <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
             <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium flex items-center gap-1">

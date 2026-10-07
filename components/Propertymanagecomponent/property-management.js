@@ -175,10 +175,10 @@ export default function SellersManagement() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (categories?.length > 0) {
+    if (categories?.length > 0 && !selectedValue) {
       setSelectedValue(categories[0]?._id);
     }
-  }, [categories]);
+  }, [categories, selectedValue]);
 
   const handleSelectChange = (value) => {
     setSelectedValue(value);

@@ -40,6 +40,17 @@ export default function CottageDetailsPage() {
       return;
     }
 
+    // Pre-flight check: ensure property owner is verified before approval
+    const ownerObj = data?.owner && typeof data.owner === "object" ? data.owner : null;
+    if (status === "approved" && ownerObj && !ownerObj.isVerified) {
+      addToast({
+        title: "Owner Not Verified",
+        description: "Cannot approve property: Property owner is not verified. Please verify the owner first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const token = Cookies.get("token");
     const cottageId = id;
     const body = {
@@ -190,6 +201,16 @@ export default function CottageDetailsPage() {
                   </span>
                   <span className="text-[10px] text-neutral-400">Fri - Sun / night</span>
                 </div>
+
+                {Boolean(cottage.pricing?.holidayPrice) && (
+                  <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50">
+                    <span className="text-[11px] text-amber-600 dark:text-amber-400 block mb-0.5 font-medium">Holiday Rate</span>
+                    <span className="text-base font-black text-amber-600 dark:text-amber-400 block">
+                      ₹{Number(cottage.pricing.holidayPrice).toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">Peak festive / night</span>
+                  </div>
+                )}
 
                 <div className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800">
                   <span className="text-[11px] text-neutral-400 block mb-0.5 font-medium">Capacity</span>

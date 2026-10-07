@@ -66,6 +66,11 @@ const Sidenav = () => {
     { label: "Categories", icon: List, path: "/categories" },
     { label: "All Booking", icon: PackageCheck, path: "/booking" },
     {
+      label: "Offline Bookings",
+      icon: Users,
+      path: "/offline-booking",
+    },
+    {
       label: "Revenue & Commission",
       icon: ReceiptIndianRupee,
       path: "/revenue",

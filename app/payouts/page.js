@@ -188,9 +188,10 @@ export default function HostPayoutsPage() {
 
   const openPayoutModal = (host) => {
     setSelectedHost(host);
-    const disbursable = typeof host.disbursableBalance === "number" ? host.disbursableBalance : (host.pendingBalance || 0);
+    const rawDisbursable = typeof host.disbursableBalance === "number" ? host.disbursableBalance : (host.pendingBalance || 0);
+    const disbursable = Math.round(rawDisbursable);
     setPayoutAmount(disbursable > 0 ? disbursable.toString() : "0");
-    setNarration(`Host Settlement - ${host.name?.slice(0, 15)}`);
+    setNarration(`Host Settlement - ${host.name?.slice(0, 15) || "Host"}`);
     setAdminNotes("");
     setPayoutMode("IMPS");
     setDisbursementType("direct");
@@ -201,7 +202,7 @@ export default function HostPayoutsPage() {
     e.preventDefault();
     if (!selectedHost) return;
 
-    const amt = Number(payoutAmount);
+    const amt = Math.round(Number(payoutAmount));
     if (!amt || amt <= 0) {
       addToast({
         title: "Invalid Amount",
@@ -211,9 +212,10 @@ export default function HostPayoutsPage() {
       return;
     }
 
-    const disbursable = typeof selectedHost.disbursableBalance === "number"
+    const rawDisbursable = typeof selectedHost.disbursableBalance === "number"
       ? selectedHost.disbursableBalance
       : Math.max(0, (selectedHost.pendingBalance || 0) - (selectedHost.disputedHold || 0));
+    const disbursable = Math.round(rawDisbursable);
 
     if (disbursable <= 0) {
       if ((selectedHost.pendingBalance || 0) <= 0) {
@@ -225,7 +227,7 @@ export default function HostPayoutsPage() {
       } else {
         addToast({
           title: "Disbursement Blocked by Dispute",
-          description: `All pending funds (₹${(selectedHost.pendingBalance || 0).toLocaleString()}) are currently frozen on hold due to active guest disputes.`,
+          description: `All pending funds (₹${Math.round(selectedHost.pendingBalance || 0).toLocaleString()}) are currently frozen on hold due to active guest disputes.`,
           variant: "destructive",
         });
       }
@@ -235,7 +237,7 @@ export default function HostPayoutsPage() {
     if (amt > disbursable) {
       addToast({
         title: "Amount Exceeds Disbursable Balance",
-        description: `Cannot disburse ₹${amt.toLocaleString()}. Maximum allowable disbursement backed by verified bookings is ₹${disbursable.toLocaleString()}${selectedHost.disputedHold > 0 ? ` (₹${selectedHost.disputedHold.toLocaleString()} frozen in dispute)` : ""}.`,
+        description: `Cannot disburse ₹${amt.toLocaleString()}. Maximum allowable disbursement backed by verified bookings is ₹${disbursable.toLocaleString()}${selectedHost.disputedHold > 0 ? ` (₹${Math.round(selectedHost.disputedHold).toLocaleString()} frozen in dispute)` : ""}.`,
         variant: "destructive",
       });
       return;
@@ -817,244 +819,385 @@ export default function HostPayoutsPage() {
 
         {/* PAYOUT EXECUTION MODAL */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-md bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <WalletCards className="w-5 h-5 text-[#FF6900]" />
-                Execute RazorpayX Payout
-              </DialogTitle>
-            </DialogHeader>
+          <DialogContent className="max-w-[96vw] sm:max-w-3xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-2xl rounded-2xl">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between shrink-0 bg-neutral-50/70 dark:bg-neutral-900/40 pr-12">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-[#FF6900]/15 flex items-center justify-center text-[#FF6900] border border-orange-200 dark:border-[#FF6900]/30 shrink-0">
+                  <WalletCards className="w-5 h-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-tight">
+                    Execute Host Payout
+                  </DialogTitle>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    Automated RazorpayX settlement backed by verified completed stays
+                  </p>
+                </div>
+              </div>
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
+                  <BadgeCheck className="w-3.5 h-3.5" /> RazorpayX Live
+                </span>
+              </div>
+            </div>
 
             {selectedHost && (() => {
-              const disbursable = typeof selectedHost.disbursableBalance === "number"
+              const rawDisbursable = typeof selectedHost.disbursableBalance === "number"
                 ? selectedHost.disbursableBalance
                 : Math.max(0, (selectedHost.pendingBalance || 0) - (selectedHost.disputedHold || 0));
-              const numAmt = Number(payoutAmount || 0);
+              const disbursable = Math.round(rawDisbursable);
+              const numAmt = Math.round(Number(payoutAmount || 0));
               const isAmountExceeded = numAmt > disbursable;
               const isDisburseDisabled = submitting || disbursable <= 0 || numAmt <= 0 || isAmountExceeded;
 
               return (
-                <form onSubmit={handleExecutePayout} className="space-y-4 py-2 text-xs">
-                  {/* Beneficiary Card with Balance Breakdown */}
-                  <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-neutral-900 dark:text-white text-sm">
-                        {selectedHost.name}
-                      </span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-black text-sm">
-                        Net Disbursable: {formatCurrency(disbursable)}
-                      </span>
-                    </div>
+                <form onSubmit={handleExecutePayout} className="flex flex-col flex-1 overflow-hidden">
+                  <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-neutral-200/70 dark:border-neutral-800/70">
-                      <div>
-                        <span className="text-neutral-400 dark:text-neutral-500 block">Gross Stays:</span>
-                        <span className="font-bold text-neutral-800 dark:text-neutral-200">{formatCurrency(selectedHost.pendingBalance)}</span>
-                      </div>
-                      <div>
-                        <span className="text-neutral-400 dark:text-neutral-500 block">Dispute Frozen:</span>
-                        <span className={`font-bold ${(selectedHost.disputedHold || 0) > 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-500 dark:text-neutral-400"}`}>
-                          - {formatCurrency(selectedHost.disputedHold || 0)}
-                        </span>
-                      </div>
-                    </div>
+                      {/* LEFT COLUMN: Host & Financial Breakdown (5 cols) */}
+                      <div className="lg:col-span-5 space-y-4">
+                        {/* Host Identity Card */}
+                        <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-full bg-[#FF6900]/10 border border-[#FF6900]/20 flex items-center justify-center text-[#FF6900] font-black text-sm shrink-0">
+                              {selectedHost.name ? selectedHost.name.slice(0, 2).toUpperCase() : "HO"}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-bold text-sm text-neutral-900 dark:text-white truncate">
+                                {selectedHost.name}
+                              </h4>
+                              <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                                {selectedHost.email || "No email"}
+                              </p>
+                              {selectedHost.phone && (
+                                <p className="text-[11px] text-neutral-400 font-mono">
+                                  {selectedHost.phone}
+                                </p>
+                              )}
+                            </div>
+                          </div>
 
-                    <div className="text-neutral-500 dark:text-neutral-400 font-mono text-[11px]">
-                      {selectedHost.bankDetails?.accountNumber || selectedHost.bankDetails?.upiId}
-                    </div>
-                    {selectedHost.bankDetails?.bankName && (
-                      <div className="text-neutral-400 dark:text-neutral-500 text-[11px]">
-                        {selectedHost.bankDetails.bankName} • IFSC: {selectedHost.bankDetails.ifscCode}
-                      </div>
-                    )}
-                  </div>
+                          {/* Prominent Disbursable Box */}
+                          <div className="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                                Net Disbursable Balance
+                              </span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                                Verified
+                              </span>
+                            </div>
+                            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                              {formatCurrency(disbursable)}
+                            </div>
+                            <p className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-0.5">
+                              Available for immediate on-demand settlement
+                            </p>
+                          </div>
 
-                  {/* Active Dispute Warning Banner */}
-                  {(selectedHost.disputedHold || 0) > 0 && (
-                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
-                      <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-bold text-rose-900 dark:text-rose-200">Active Dispute Hold in Effect</div>
-                        <p className="text-[11px] text-rose-700 dark:text-rose-300 mt-0.5 leading-relaxed">
-                          ₹{(selectedHost.disputedHold || 0).toLocaleString()} is frozen due to {selectedHost.activeDisputes?.length || 1} open guest dispute(s). Payout cannot exceed the verified net balance of ₹{disbursable.toLocaleString()}.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Zero Disbursable Blocking Banner */}
-                  {disbursable <= 0 && (
-                    <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
-                      <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                      <div>
-                        <div className="font-bold text-amber-900 dark:text-amber-200">Disbursement Blocked</div>
-                        <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
-                          {(selectedHost.pendingBalance || 0) <= 0
-                            ? "Host has no pending booking earnings. Arbitrary or random amount disbursements are blocked."
-                            : "All pending booking funds are frozen under active dispute investigations. Resolve disputes before disbursing."}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Amount Input */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                        Disbursement Amount (₹)
-                      </label>
-                      {disbursable > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setPayoutAmount(String(disbursable))}
-                          className="text-[11px] text-[#FF6900] hover:underline font-bold"
-                        >
-                          Set Full Disbursable ({formatCurrency(disbursable)})
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      type="number"
-                      value={payoutAmount}
-                      onChange={(e) => setPayoutAmount(e.target.value)}
-                      placeholder="Enter amount to transfer"
-                      className={`font-bold text-sm bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white ${isAmountExceeded ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : ""}`}
-                      max={disbursable}
-                      min={1}
-                      disabled={disbursable <= 0}
-                      required
-                    />
-                    {isAmountExceeded ? (
-                      <p className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
-                        Amount exceeds allowable limit of {formatCurrency(disbursable)}. Random/arbitrary payouts are blocked.
-                      </p>
-                    ) : (
-                      <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
-                        Max allowable disbursement backed by verified bookings is {formatCurrency(disbursable)}.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Disbursement Method Selection */}
-                  <div className="space-y-1.5">
-                    <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                      Disbursement Rail
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setDisbursementType("direct")}
-                        className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-                          disbursementType === "direct"
-                            ? "border-[#FF6900] bg-[#FFF1E6]/50 dark:bg-[#FF6900]/10 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/20"
-                            : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-500 hover:border-neutral-300"
-                        }`}
-                      >
-                        <Building className={`w-4 h-4 shrink-0 ${disbursementType === "direct" ? "text-[#FF6900]" : "text-neutral-400"}`} />
-                        <div>
-                          <div className="text-xs font-bold leading-tight">Direct Transfer</div>
-                          <div className="text-[10px] text-neutral-400">IMPS / NEFT / UPI</div>
+                          {/* Financial Breakdown Table */}
+                          <div className="space-y-1.5 pt-1 text-xs">
+                            <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
+                              <span>Gross Completed Stays:</span>
+                              <span className="font-semibold text-neutral-900 dark:text-neutral-200">
+                                {formatCurrency(Math.round(selectedHost.pendingBalance || 0))}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-neutral-600 dark:text-neutral-400">
+                              <span>Dispute Frozen Hold:</span>
+                              <span className={`font-semibold ${(selectedHost.disputedHold || 0) > 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-500"}`}>
+                                - {formatCurrency(Math.round(selectedHost.disputedHold || 0))}
+                              </span>
+                            </div>
+                            <div className="border-t border-neutral-200 dark:border-neutral-800 pt-1.5 flex justify-between items-center font-bold text-neutral-900 dark:text-white">
+                              <span>Net Allowable Payout:</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                                {formatCurrency(disbursable)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </button>
 
-                      <button
-                        type="button"
-                        onClick={() => setDisbursementType("link")}
-                        className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
-                          disbursementType === "link"
-                            ? "border-[#FF6900] bg-[#FFF1E6]/50 dark:bg-[#FF6900]/10 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/20"
-                            : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-500 hover:border-neutral-300"
-                        }`}
-                      >
-                        <LinkIcon className={`w-4 h-4 shrink-0 ${disbursementType === "link" ? "text-[#FF6900]" : "text-neutral-400"}`} />
-                        <div>
-                          <div className="text-xs font-bold leading-tight">Payout Link</div>
-                          <div className="text-[10px] text-neutral-400">SMS / WhatsApp Link</div>
+                        {/* Settlement Destination Bank / UPI Details */}
+                        <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
+                              <Building className="w-3.5 h-3.5 text-neutral-500" />
+                              Settlement Destination
+                            </span>
+                            {selectedHost.bankDetails?.isVerified && (
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" /> Bank Verified
+                              </span>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 text-xs">
+                            {selectedHost.bankDetails?.accountNumber ? (
+                              <>
+                                <div className="font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                                  {selectedHost.bankDetails.accountNumber}
+                                </div>
+                                <div className="text-neutral-500 dark:text-neutral-400 text-xs">
+                                  {selectedHost.bankDetails.bankName || "Bank Account"} • IFSC: {selectedHost.bankDetails.ifscCode || "N/A"}
+                                </div>
+                                <div className="text-[11px] text-neutral-400">
+                                  Beneficiary: {selectedHost.bankDetails.accountHolderName || selectedHost.name}
+                                </div>
+                              </>
+                            ) : selectedHost.bankDetails?.upiId ? (
+                              <>
+                                <div className="font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                                  {selectedHost.bankDetails.upiId}
+                                </div>
+                                <div className="text-neutral-500 dark:text-neutral-400 text-xs">
+                                  UPI Virtual Payment Address (VPA)
+                                </div>
+                              </>
+                            ) : (
+                              <div className="text-amber-600 dark:text-amber-400 text-xs font-medium">
+                                No bank account or UPI ID registered. Direct transfer will require host bank details.
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Transfer Rail or Link Info */}
-                  {disbursementType === "direct" ? (
-                    <div className="space-y-1.5">
-                      <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                        Transfer Rail (RazorpayX)
-                      </label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {["IMPS", "NEFT", "RTGS", "UPI"].map((m) => (
-                          <button
-                            type="button"
-                            key={m}
-                            onClick={() => setPayoutMode(m)}
-                            className={`py-2 text-center rounded-xl font-bold transition-all ${
-                              payoutMode === m
-                                ? "bg-[#FF6900] text-white shadow-sm"
-                                : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800"
-                            }`}
-                          >
-                            {m}
-                          </button>
-                        ))}
+                        {/* Dispute Warning Banner (if any) */}
+                        {(selectedHost.disputedHold || 0) > 0 && (
+                          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+                            <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                            <div>
+                              <div className="font-bold text-rose-900 dark:text-rose-200">Active Dispute Hold</div>
+                              <p className="text-[11px] text-rose-700 dark:text-rose-300 mt-0.5 leading-relaxed">
+                                ₹{Math.round(selectedHost.disputedHold || 0).toLocaleString()} is frozen under active dispute investigations. Payout cannot exceed verified net balance of ₹{disbursable.toLocaleString()}.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Disbursable Zero Warning */}
+                        {disbursable <= 0 && (
+                          <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
+                            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                            <div>
+                              <div className="font-bold text-amber-900 dark:text-amber-200">Disbursement Blocked</div>
+                              <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
+                                {(selectedHost.pendingBalance || 0) <= 0
+                                  ? "Host has no pending booking earnings. Arbitrary or random disbursements are strictly blocked."
+                                  : "All pending booking funds are frozen under active dispute investigations. Resolve disputes before disbursing."}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* RIGHT COLUMN: Payout Configuration & Controls (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4">
+                        {/* Amount Input Card */}
+                        <div className="p-4 rounded-xl bg-neutral-50/60 dark:bg-neutral-900/40 border border-neutral-200 dark:border-neutral-800 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                              Disbursement Amount (₹ - Round Figure)
+                            </label>
+                            {disbursable > 0 && (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setPayoutAmount(String(disbursable))}
+                                  className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#FF6900]/10 text-[#FF6900] hover:bg-[#FF6900]/20 transition-colors cursor-pointer"
+                                >
+                                  Full (₹{disbursable.toLocaleString()})
+                                </button>
+                                {disbursable >= 200 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPayoutAmount(String(Math.round(disbursable / 2)))}
+                                    className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
+                                  >
+                                    50% (₹{Math.round(disbursable / 2).toLocaleString()})
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="relative">
+                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-bold text-neutral-400">
+                              ₹
+                            </span>
+                            <Input
+                              type="number"
+                              step="1"
+                              value={payoutAmount}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setPayoutAmount(val);
+                              }}
+                              onBlur={() => {
+                                if (payoutAmount && !isNaN(Number(payoutAmount))) {
+                                  setPayoutAmount(String(Math.round(Number(payoutAmount))));
+                                }
+                              }}
+                              placeholder="Enter rounded whole rupee amount"
+                              className={`pl-8 h-11 font-bold text-base bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white ${
+                                isAmountExceeded ? "border-rose-500 focus-visible:ring-rose-500 text-rose-600" : ""
+                              }`}
+                              max={disbursable}
+                              min={1}
+                              disabled={disbursable <= 0}
+                              required
+                            />
+                          </div>
+
+                          {isAmountExceeded ? (
+                            <p className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              Amount exceeds allowable limit of {formatCurrency(disbursable)}. Random/arbitrary payouts are blocked.
+                            </p>
+                          ) : (
+                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                              Maximum allowable round-figure disbursement backed by verified bookings is <strong className="text-neutral-800 dark:text-neutral-200">{formatCurrency(disbursable)}</strong>.
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Transfer Rail Selection */}
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-neutral-800 dark:text-neutral-200 block">
+                            Disbursement Method
+                          </label>
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => setDisbursementType("direct")}
+                              className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
+                                disbursementType === "direct"
+                                  ? "border-[#FF6900] bg-[#FFF1E6]/60 dark:bg-[#FF6900]/15 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/30 shadow-sm"
+                                  : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
+                              }`}
+                            >
+                              <div className={`p-2 rounded-lg shrink-0 ${disbursementType === "direct" ? "bg-[#FF6900] text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500"}`}>
+                                <Building className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-xs font-bold">Direct Transfer</div>
+                                <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">Instant transfer via IMPS/NEFT/UPI</div>
+                              </div>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setDisbursementType("link")}
+                              className={`p-3 rounded-xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
+                                disbursementType === "link"
+                                  ? "border-[#FF6900] bg-[#FFF1E6]/60 dark:bg-[#FF6900]/15 text-neutral-900 dark:text-white ring-1 ring-[#FF6900]/30 shadow-sm"
+                                  : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
+                              }`}
+                            >
+                              <div className={`p-2 rounded-lg shrink-0 ${disbursementType === "link" ? "bg-[#FF6900] text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500"}`}>
+                                <LinkIcon className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-xs font-bold">Payout Link</div>
+                                <div className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">Send link via SMS & WhatsApp</div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Transfer Rail options or Link details */}
+                        {disbursementType === "direct" ? (
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-neutral-800 dark:text-neutral-200 block">
+                              Transfer Rail (RazorpayX)
+                            </label>
+                            <div className="grid grid-cols-4 gap-2">
+                              {["IMPS", "NEFT", "RTGS", "UPI"].map((m) => (
+                                <button
+                                  type="button"
+                                  key={m}
+                                  onClick={() => setPayoutMode(m)}
+                                  className={`py-2 text-center rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                                    payoutMode === m
+                                      ? "bg-[#FF6900] text-white shadow-sm ring-2 ring-[#FF6900]/30"
+                                      : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-neutral-200/60 dark:border-neutral-800"
+                                  }`}
+                                >
+                                  {m}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded-xl bg-orange-50/50 dark:bg-orange-950/20 border border-orange-200/80 dark:border-orange-900/40 flex items-start gap-2.5">
+                            <ExternalLink className="w-4 h-4 text-[#FF6900] shrink-0 mt-0.5" />
+                            <div className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                              <span className="font-bold text-[#FF6900]">Payout Link Dispatch:</span> A secure claiming link will be dispatched to host contact (<span className="font-mono">{selectedHost?.phone || selectedHost?.email || "on file"}</span>). The host selects their preferred bank or UPI ID to receive funds.
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Narration & Admin Audit Notes */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-xs font-bold text-neutral-800 dark:text-neutral-200 block">
+                              Statement Narration
+                            </label>
+                            <Input
+                              value={narration}
+                              onChange={(e) => setNarration(e.target.value)}
+                              placeholder="e.g., Host Settlement"
+                              className="h-9 text-xs bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-xs font-bold text-neutral-800 dark:text-neutral-200 block">
+                              Audit Remark / Ledger Note
+                            </label>
+                            <Input
+                              value={adminNotes}
+                              onChange={(e) => setAdminNotes(e.target.value)}
+                              placeholder="Optional notes for internal ledger"
+                              className="h-9 text-xs bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    <div className="p-3 rounded-xl bg-[#FFF1E6]/40 dark:bg-[#FF6900]/10 border border-[#FF6900]/20 flex items-start gap-2.5">
-                      <ExternalLink className="w-4 h-4 text-[#FF6900] shrink-0 mt-0.5" />
-                      <div className="text-xs text-neutral-700 dark:text-neutral-300">
-                        <span className="font-bold text-[#FF6900]">Payout Link API:</span> RazorpayX will issue a unique payment link sent to the host ({selectedHost?.phone || "registered contact"}), allowing them to claim funds directly into their preferred account.
-                      </div>
+                  </div>
+
+                  {/* MODAL FOOTER */}
+                  <div className="px-6 py-3.5 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-900/80 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                    <div className="text-xs text-neutral-600 dark:text-neutral-400">
+                      Disbursing <strong className="text-neutral-900 dark:text-white font-bold">₹{Math.round(numAmt).toLocaleString()}</strong> to <strong className="text-neutral-900 dark:text-white font-bold">{selectedHost.name}</strong> via <strong className="text-[#FF6900]">{disbursementType === "link" ? "Payout Link" : payoutMode}</strong>
                     </div>
-                  )}
 
-                  {/* Narration */}
-                  <div className="space-y-1.5">
-                    <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                      Statement Narration
-                    </label>
-                    <Input
-                      value={narration}
-                      onChange={(e) => setNarration(e.target.value)}
-                      placeholder="e.g., Host Settlement"
-                      className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
-                    />
+                    <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsModalOpen(false)}
+                        disabled={submitting}
+                        className="h-9 px-4 text-xs font-semibold border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 cursor-pointer"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={isDisburseDisabled}
+                        className="h-9 px-5 text-xs font-bold bg-[#FF6900] hover:bg-[#E05D00] text-white shadow-sm disabled:opacity-40 cursor-pointer"
+                      >
+                        {submitting
+                          ? "Processing..."
+                          : disbursementType === "link"
+                          ? `Dispatch Link (₹${Math.round(numAmt).toLocaleString()})`
+                          : `Disburse ₹${Math.round(numAmt).toLocaleString()}`}
+                      </Button>
+                    </div>
                   </div>
-
-                  {/* Admin Internal Notes */}
-                  <div className="space-y-1.5">
-                    <label className="font-semibold text-neutral-700 dark:text-neutral-300 block">
-                      Internal Admin Notes / Audit Remark
-                    </label>
-                    <Input
-                      value={adminNotes}
-                      onChange={(e) => setAdminNotes(e.target.value)}
-                      placeholder="Optional notes for internal ledger audit"
-                      className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
-                    />
-                  </div>
-
-                  <DialogFooter className="pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsModalOpen(false)}
-                      disabled={submitting}
-                      className="border-neutral-200 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isDisburseDisabled}
-                      className="bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold disabled:opacity-40"
-                    >
-                      {submitting
-                        ? "Processing..."
-                        : disbursementType === "link"
-                        ? `Generate Payout Link (₹${Number(payoutAmount || 0).toLocaleString()})`
-                        : `Disburse ₹${Number(payoutAmount || 0).toLocaleString()}`}
-                    </Button>
-                  </DialogFooter>
                 </form>
               );
             })()}

@@ -43,6 +43,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/toast-provider";
 
 export default function PropertyVerificationShell({
   propertyType = "property",
@@ -58,6 +59,7 @@ export default function PropertyVerificationShell({
   extraDetails,
 }) {
   const router = useRouter();
+  const { addToast } = useToast();
 
   // Active Media state
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -155,10 +157,35 @@ export default function PropertyVerificationShell({
   const platformEarnings = Math.round((basePrice * commissionPercent) / 100);
   const hostPayout = Math.max(0, basePrice - platformEarnings);
 
-  const owner = data.ownerId && typeof data.ownerId === "object" ? data.ownerId : null;
+  const owner =
+    data.owner && typeof data.owner === "object"
+      ? data.owner
+      : data.ownerId && typeof data.ownerId === "object"
+      ? data.ownerId
+      : null;
+  const ownerId =
+    owner?._id ||
+    (typeof data.owner === "string" ? data.owner : null) ||
+    (typeof data.ownerId === "string" ? data.ownerId : null);
+  const isOwnerVerified = Boolean(owner?.isVerified);
   const ownerName = owner?.name || data.ownerName || "Property Host";
   const ownerPhone = owner?.phone || data.ownerPhone || "";
   const ownerEmail = owner?.email || data.ownerEmail || "";
+
+  const handleApproveClick = () => {
+    if (!isOwnerVerified) {
+      addToast({
+        title: "Owner Not Verified",
+        description:
+          "Cannot approve property: Property owner is not verified. Please verify the owner first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (onApprove) {
+      onApprove({ commission: commissionPercent });
+    }
+  };
 
   const locationStr =
     data.location?.addressLine ||
@@ -643,12 +670,39 @@ export default function PropertyVerificationShell({
                 </div>
               )}
 
+              {/* Owner Verification Alert Warning */}
+              {!isOwnerVerified && (
+                <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-300 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-200">
+                    <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Owner Verification Required</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-amber-700 dark:text-amber-300/90">
+                    Cannot approve property: Property owner is not verified. Please verify the owner's KYC and profile first.
+                  </p>
+                  {ownerId && (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/property-owner/Viewdetails/${ownerId}`)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6900] hover:underline cursor-pointer"
+                    >
+                      <span>Open Owner Profile to Verify</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Primary Decision Triggers */}
               <div className="space-y-2 pt-1">
                 <Button
-                  onClick={() => onApprove && onApprove({ commission: commissionPercent })}
+                  onClick={handleApproveClick}
                   disabled={loadingApprove || loadingReject || commissionPercent <= 0}
-                  className="w-full bg-[#FF6900] hover:bg-[#E05D00] text-white font-bold py-2.5 rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                  className={`w-full font-bold py-2.5 rounded-xl shadow-sm transition-all cursor-pointer ${
+                    !isOwnerVerified
+                      ? "bg-amber-600/90 hover:bg-amber-600 text-white"
+                      : "bg-[#FF6900] hover:bg-[#E05D00] text-white"
+                  }`}
                 >
                   {loadingApprove ? (
                     <div className="flex items-center gap-2">
@@ -657,8 +711,16 @@ export default function PropertyVerificationShell({
                     </div>
                   ) : (
                     <div className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Approve & Publish Live</span>
+                      {isOwnerVerified ? (
+                        <CheckCircle2 className="w-4 h-4" />
+                      ) : (
+                        <ShieldAlert className="w-4 h-4" />
+                      )}
+                      <span>
+                        {isOwnerVerified
+                          ? "Approve & Publish Live"
+                          : "Approve (Owner Not Verified)"}
+                      </span>
                     </div>
                   )}
                 </Button>
@@ -684,7 +746,15 @@ export default function PropertyVerificationShell({
                     Host / Owner Profile
                   </h4>
                 </div>
-                <span className="text-[10px] text-neutral-400 font-medium">Registered</span>
+                {isOwnerVerified ? (
+                  <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold text-[10px] flex items-center gap-1 px-2 py-0.5">
+                    <ShieldCheck className="w-3 h-3" /> Verified Host
+                  </Badge>
+                ) : (
+                  <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-bold text-[10px] flex items-center gap-1 px-2 py-0.5 animate-pulse">
+                    <ShieldAlert className="w-3 h-3" /> Not Verified
+                  </Badge>
+                )}
               </div>
 
               <div className="space-y-2.5 text-xs">
@@ -733,6 +803,21 @@ export default function PropertyVerificationShell({
                       <MessageCircle className="w-3.5 h-3.5 fill-current" />
                       <span>Contact Host via WhatsApp</span>
                     </a>
+                  </div>
+                )}
+
+                {/* Direct Link to Owner Details Page */}
+                {ownerId && (
+                  <div className="pt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => router.push(`/property-owner/Viewdetails/${ownerId}`)}
+                      className="w-full text-xs font-bold border-neutral-200 dark:border-neutral-800 hover:text-[#FF6900] hover:border-[#FF6900]/40 flex items-center justify-center gap-1.5"
+                    >
+                      <span>View Host Profile & KYC</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Button>
                   </div>
                 )}
               </div>
