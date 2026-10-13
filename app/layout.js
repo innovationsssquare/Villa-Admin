@@ -27,12 +27,12 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <NextuiProviderWrapper>
-            <ToastProvider>
-            <KeepAlive/>
-            {children}
-            </ToastProvider>
-          </NextuiProviderWrapper>
+          <ToastProvider>
+            <NextuiProviderWrapper>
+              <KeepAlive/>
+              {children}
+            </NextuiProviderWrapper>
+          </ToastProvider>
         </body>
       </html>
     </Providers>

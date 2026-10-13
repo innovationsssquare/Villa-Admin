@@ -6,7 +6,8 @@ import {
   createLocation,
   updateLocation,
   deleteLocation,
-} from "@/lib/Redux/Slices/locationSlice"; 
+  clearLocationError,
+} from "@/lib/Redux/Slices/locationSlice";
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -36,13 +38,27 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card } from "@/components/ui/card";
-import { Pencil, Trash2, Plus, Search, MapPin, X, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Search,
+  MapPin,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import LocationForm from "./LocationForm";
 import { toast } from "sonner";
 
 const LocationTable = () => {
   const dispatch = useDispatch();
-  const { locations, loading } = useSelector((state) => state.location);
+  const { locations, loading, error: reduxError } = useSelector(
+    (state) => state.location
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +66,7 @@ const LocationTable = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Load locations on mount
   useEffect(() => {
@@ -61,11 +78,12 @@ const LocationTable = () => {
   }, [searchQuery]);
 
   // Search filter
-  const filteredLocations = locations.filter(
+  const safeLocations = Array.isArray(locations) ? locations : [];
+  const filteredLocations = safeLocations.filter(
     (location) =>
-      location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      location.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      location.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      location?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      location?.type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      location?.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredLocations.length / itemsPerPage));
@@ -76,39 +94,75 @@ const LocationTable = () => {
 
   // Handle Create
   const handleCreate = async (data) => {
-    const res = await dispatch(createLocation(data));
-    if (res.meta.requestStatus === "fulfilled") {
-      toast.success("Location created successfully");
-      setIsFormOpen(false);
-    } else {
-      toast.error("Failed to create location");
+    try {
+      const res = await dispatch(createLocation(data));
+      if (res.meta.requestStatus === "fulfilled" && res.payload?.success !== false) {
+        toast.success("Location created successfully");
+        setIsFormOpen(false);
+        setEditingLocation(null);
+        return { success: true };
+      } else {
+        const errorMsg =
+          res.payload?.message ||
+          (typeof res.payload === "string" ? res.payload : null) ||
+          res.error?.message ||
+          "Failed to create location";
+        toast.error(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to create location");
+      return { success: false, error: err.message };
     }
   };
 
   // Handle Update
   const handleUpdate = async (data) => {
     if (!editingLocation) return;
-    const res = await dispatch(
-      updateLocation({ id: editingLocation._id, data })
-    );
-    if (res.meta.requestStatus === "fulfilled") {
-      toast.success("Location updated successfully");
-      setIsFormOpen(false);
-      setEditingLocation(null);
-    } else {
-      toast.error("Failed to update location");
+    try {
+      const res = await dispatch(
+        updateLocation({ id: editingLocation._id, data })
+      );
+      if (res.meta.requestStatus === "fulfilled" && res.payload?.success !== false) {
+        toast.success("Location updated successfully");
+        setIsFormOpen(false);
+        setEditingLocation(null);
+        return { success: true };
+      } else {
+        const errorMsg =
+          res.payload?.message ||
+          (typeof res.payload === "string" ? res.payload : null) ||
+          res.error?.message ||
+          "Failed to update location";
+        toast.error(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to update location");
+      return { success: false, error: err.message };
     }
   };
 
   // Handle Delete
   const handleDelete = async (id) => {
-    const res = await dispatch(deleteLocation(id));
-    if (res.meta.requestStatus === "fulfilled") {
-      toast.success("Location deleted successfully");
-    } else {
-      toast.error("Failed to delete location");
+    setIsDeleting(true);
+    try {
+      const res = await dispatch(deleteLocation(id));
+      if (res.meta.requestStatus === "fulfilled" && res.payload?.res?.success !== false) {
+        toast.success("Location deleted successfully");
+      } else {
+        const errorMsg =
+          res.payload?.message ||
+          (typeof res.payload === "string" ? res.payload : null) ||
+          "Failed to delete location";
+        toast.error(errorMsg);
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to delete location");
+    } finally {
+      setIsDeleting(false);
+      setDeletingId(null);
     }
-    setDeletingId(null);
   };
 
   const openEditDialog = (location) => {
@@ -136,6 +190,26 @@ const LocationTable = () => {
 
   return (
     <div className="space-y-4">
+      {/* Redux Error Banner */}
+      {reduxError && (
+        <Alert variant="destructive" className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <AlertDescription className="text-sm font-medium">
+              {reduxError}
+            </AlertDescription>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => dispatch(clearLocationError())}
+            className="h-7 px-2 text-xs"
+          >
+            Dismiss
+          </Button>
+        </Alert>
+      )}
+
       {/* Top bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative flex-1 max-w-sm">
@@ -156,13 +230,28 @@ const LocationTable = () => {
             </button>
           )}
         </div>
-        <Button
-          onClick={() => setIsFormOpen(true)}
-          className="w-full sm:w-auto bg-[#FF6900] text-white hover:bg-[#FF6900] cursor-pointer"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Location
-        </Button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => dispatch(fetchLocations())}
+            disabled={loading}
+            className="h-10 cursor-pointer"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+          <Button
+            onClick={() => {
+              setEditingLocation(null);
+              setIsFormOpen(true);
+            }}
+            className="w-full sm:w-auto bg-[#FF6900] text-white hover:bg-[#FF6900]/90 cursor-pointer h-10 font-semibold"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Location
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -187,79 +276,99 @@ const LocationTable = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                   <span className="loader2"></span>
+                  <TableCell colSpan={5} className="text-center py-12">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="w-6 h-6 animate-spin text-[#FF6900]" />
+                      <span className="text-sm text-muted-foreground">Loading locations...</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : filteredLocations.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground dark:text-neutral-400"
+                    colSpan={5}
+                    className="text-center py-10 text-muted-foreground dark:text-neutral-400"
                   >
                     {searchQuery ? `No locations matching "${searchQuery}"` : "No locations found"}
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedLocations?.map((location) => (
-                  <TableRow
-                    key={location?._id}
-                    className="hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-800 transition-colors"
-                  >
-                    <TableCell className="font-medium text-gray-900 dark:text-white">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-red-500 " />
-                        {location?.name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getTypeBadgeVariant(location?.type)} className={"bg-green-100 dark:bg-green-950/40 border text-green-700 dark:text-green-400 border-green-300 dark:border-green-800/60"}>
-                        {location?.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell font-mono text-sm text-gray-600 dark:text-neutral-400">
-                      {location.coordinates?.[0]?.toFixed(4)},{" "}
-                      {location.coordinates?.[1]?.toFixed(4)}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {location.features?.slice(0, 2).map((feature) => (
-                          <Badge
-                            key={feature}
-                            variant="outline"
-                            className="text-xs"
+                paginatedLocations.map((location) => {
+                  const lng = Number(location?.coordinates?.[0]);
+                  const lat = Number(location?.coordinates?.[1]);
+                  const coordsText =
+                    Number.isFinite(lng) && Number.isFinite(lat)
+                      ? `${lng.toFixed(4)}, ${lat.toFixed(4)}`
+                      : "—";
+
+                  return (
+                    <TableRow
+                      key={location?._id}
+                      className="hover:bg-gray-50/60 dark:hover:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-800 transition-colors"
+                    >
+                      <TableCell className="font-medium text-gray-900 dark:text-white">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-[#FF6900] shrink-0" />
+                          <span className="font-semibold">{location?.name}</span>
+                          {location?.isPopular && (
+                            <Badge variant="secondary" className="text-[10px] bg-orange-100 text-[#FF6900] border-orange-200">
+                              Popular
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={getTypeBadgeVariant(location?.type)}
+                          className="bg-green-100 dark:bg-green-950/40 border text-green-700 dark:text-green-400 border-green-300 dark:border-green-800/60 capitalize"
+                        >
+                          {location?.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell font-mono text-xs text-gray-600 dark:text-neutral-400">
+                        {coordsText}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex flex-wrap gap-1">
+                          {location.features?.slice(0, 2).map((feature) => (
+                            <Badge
+                              key={feature}
+                              variant="outline"
+                              className="text-xs"
+                            >
+                              {feature}
+                            </Badge>
+                          ))}
+                          {location.features?.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{location.features.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditDialog(location)}
+                            className="h-8 w-8 p-0 cursor-pointer"
                           >
-                            {feature}
-                          </Badge>
-                        ))}
-                        {location.features?.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{location.features.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEditDialog(location)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setDeletingId(location._id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeletingId(location._id)}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -304,15 +413,15 @@ const LocationTable = () => {
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={closeFormDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto ">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingLocation ? "Edit Location" : "Add New Location"}
             </DialogTitle>
             <DialogDescription>
               {editingLocation
-                ? "Update the location details below"
-                : "Fill in the details to create a new location"}
+                ? "Update the location coordinates, highlights, and cover image"
+                : "Fill in the details to create a new destination or area"}
             </DialogDescription>
           </DialogHeader>
           <LocationForm
@@ -326,23 +435,36 @@ const LocationTable = () => {
       {/* Delete Dialog */}
       <AlertDialog
         open={deletingId !== null}
-        onOpenChange={() => setDeletingId(null)}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setDeletingId(null);
+        }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Location?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-              location.
+              location and its cover image from the platform.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => deletingId && handleDelete(deletingId)}
-              className="bg-red-500 cursor-pointer hover:bg-red-500/90 text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                if (deletingId) handleDelete(deletingId);
+              }}
+              disabled={isDeleting}
+              className="bg-red-500 cursor-pointer hover:bg-red-600 text-white"
             >
-              Delete
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

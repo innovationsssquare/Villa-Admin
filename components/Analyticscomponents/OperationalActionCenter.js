@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Clock,
   PhoneCall,
+  Building2,
 } from "lucide-react";
 
 export default function OperationalActionCenter({ payoutStats, disputeStats }) {
@@ -158,13 +159,42 @@ export default function OperationalActionCenter({ payoutStats, disputeStats }) {
           <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
         </Link>
 
-        {/* Action 5: Host Inquiries / Leads */}
+        {/* Action 5: Property Approvals */}
         <Link
-          href="/host-inquiries"
-          className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-[#FF6900]/50 bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-[#FFF1E6]/20 dark:hover:bg-neutral-850 transition-all flex items-start justify-between group md:col-span-2"
+          href="/manage-property"
+          className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-[#FF6900]/50 bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-[#FFF1E6]/20 dark:hover:bg-neutral-850 transition-all flex items-start justify-between group"
         >
           <div className="flex items-start gap-3">
             <div className="p-2.5 rounded-xl bg-[#FFF1E6] dark:bg-orange-950/50 text-[#FF6900] group-hover:scale-105 transition-transform shrink-0">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm text-neutral-900 dark:text-white">
+                  Property Submissions & Review
+                </span>
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#FF6900] text-white">
+                  Owner Listings
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                Inspect newly added villas, campsites, cottages, and hotels submitted by hosts for live publishing.
+              </p>
+              <div className="mt-2 text-xs font-semibold text-[#FF6900]">
+                Review Pending Properties →
+              </div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#FF6900] group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+        </Link>
+
+        {/* Action 6: Host Inquiries / Leads */}
+        <Link
+          href="/host-inquiries"
+          className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:border-blue-300 dark:hover:border-blue-700/50 bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-blue-50/20 dark:hover:bg-blue-950/20 transition-all flex items-start justify-between group"
+        >
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform shrink-0">
               <PhoneCall className="w-5 h-5" />
             </div>
             <div>
@@ -172,19 +202,19 @@ export default function OperationalActionCenter({ payoutStats, disputeStats }) {
                 <span className="font-bold text-sm text-neutral-900 dark:text-white">
                   Host Inquiries & Onboarding Leads
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#FF6900] text-white">
-                  Become-a-Host Leads
+                <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-600 text-white">
+                  Leads
                 </span>
               </div>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                Track prospective property owners who submitted their villa, campsite, or cottage for review.
+                Track prospective property owners who submitted their property for platform onboarding.
               </p>
-              <div className="mt-2 text-xs font-semibold text-[#FF6900]">
+              <div className="mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400">
                 Open Host Inquiries Hub →
               </div>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-[#FF6900] group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+          <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
         </Link>
       </div>
     </div>
