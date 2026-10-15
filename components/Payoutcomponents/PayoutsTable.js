@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Send, Building2, Tent, Home, Hotel } from "lucide-react";
+import { Eye, Send, Building2, Tent, Home, Hotel, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import PayoutStatusBadge from "./PayoutStatusBadge";
 
@@ -35,7 +35,7 @@ const formatCurrency = (amount, currency = "INR") => {
   }).format(amount || 0);
 };
 
-const PayoutsTable = ({ payouts, onViewPayout, onRequestPayout }) => {
+const PayoutsTable = ({ payouts, onViewPayout, onRequestPayout, isLoading = false }) => {
   const safePayouts = Array.isArray(payouts) ? payouts : [];
 
   return (
@@ -73,7 +73,19 @@ const PayoutsTable = ({ payouts, onViewPayout, onRequestPayout }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {safePayouts.length === 0 ? (
+          {isLoading ? (
+            <TableRow>
+              <TableCell
+                colSpan={9}
+                className="text-center py-12 text-muted-foreground"
+              >
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-[#ff6900]" />
+                  <span className="text-xs">Loading payouts...</span>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : safePayouts.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={9}

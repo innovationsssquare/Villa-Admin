@@ -47,6 +47,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast-provider";
+import { toast } from "sonner";
 
 export default function HostPayoutsPage() {
   const [activeTab, setActiveTab] = useState("hosts"); // "hosts" | "ledger"
@@ -270,6 +271,10 @@ export default function HostPayoutsPage() {
           });
         }
       } else {
+        const toastId = toast.loading(`Processing transfer of ₹${amt.toLocaleString()}...`, {
+          description: `Disbursing to ${selectedHost.name} via RazorpayX...`,
+        });
+
         const res = await adminExecutePayout({
           ownerId: selectedHost._id,
           amount: amt,
@@ -279,14 +284,23 @@ export default function HostPayoutsPage() {
         });
 
         if (res?.success) {
+          const utr = res.data?.utr || res.data?.payoutId;
+          toast.success("Payout Disbursed Successfully! 🎉", {
+            id: toastId,
+            description: `₹${amt.toLocaleString()} transferred to ${selectedHost.name} (UTR: ${utr})`,
+            duration: 6000,
+          });
           addToast({
             title: "Payout Disbursed Successfully",
-            description: `Disbursed ₹${amt.toLocaleString()} to ${selectedHost.name}. Ref / UTR: ${res.data?.utr || res.data?.payoutId}`,
+            description: `Disbursed ₹${amt.toLocaleString()} to ${selectedHost.name}. Ref / UTR: ${utr}`,
             variant: "success",
           });
           setIsModalOpen(false);
           loadHostsData();
         } else {
+          toast.error(res?.message || "Failed to process RazorpayX transfer.", {
+            id: toastId,
+          });
           addToast({
             title: "Disbursement Failed",
             description: res?.message || "Failed to process RazorpayX transfer.",
@@ -295,6 +309,7 @@ export default function HostPayoutsPage() {
         }
       }
     } catch (err) {
+      toast.error(err.message || "Disbursement Error");
       addToast({
         title: "Disbursement Error",
         description: err.message,

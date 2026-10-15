@@ -358,6 +358,53 @@ const PayoutDetailsModal = ({ payout, isOpen, onClose, onRequestPayout }) => {
             </div>
           </div>
 
+          {/* Completed Transaction Details if available */}
+          {payout?.payoutTransactions && payout.payoutTransactions.length > 0 && (
+            <div className="bg-success/10 border border-success/30 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success" />
+                  <span className="text-sm font-semibold text-foreground">
+                    Payout Disbursement Transaction
+                  </span>
+                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-success/20 text-success font-semibold uppercase">
+                  {payout.payoutTransactions[0]?.status || "Completed"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">UTR / Transaction ID</p>
+                  <p className="font-mono text-xs font-semibold text-foreground mt-0.5">
+                    {payout.payoutTransactions[0]?.transactionId || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Payment Method</p>
+                  <p className="text-xs font-medium text-foreground capitalize mt-0.5">
+                    {payout.payoutTransactions[0]?.paymentMethod?.replace("_", " ") || "Bank Transfer"}
+                  </p>
+                </div>
+                {payout.payoutTransactions[0]?.transactionDate && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Disbursed At</p>
+                    <p className="text-xs font-medium text-foreground mt-0.5">
+                      {format(new Date(payout.payoutTransactions[0].transactionDate), "dd MMM yyyy, hh:mm a")}
+                    </p>
+                  </div>
+                )}
+                {payout.payoutTransactions[0]?.remarks && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Remarks</p>
+                    <p className="text-xs font-medium text-foreground mt-0.5">
+                      {payout.payoutTransactions[0].remarks}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Action Button */}
           {payout?.payoutStatus === "pending" && (
             <div className="pt-4">

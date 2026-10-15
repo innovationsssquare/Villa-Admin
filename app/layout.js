@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NextuiProviderWrapper } from "./providers";
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/lib/Redux/provider";
 import KeepAlive from "@/components/Logincomponents/Keepalive";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
             <NextuiProviderWrapper>
               <KeepAlive/>
               {children}
+              <Toaster richColors position="top-right" />
             </NextuiProviderWrapper>
           </ToastProvider>
         </body>

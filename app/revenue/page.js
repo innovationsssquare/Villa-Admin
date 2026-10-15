@@ -2,28 +2,35 @@
 import { useState, useMemo, useEffect } from "react";
 import { IndianRupee, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { useToast } from "@/components/ui/toast-provider";
 import StatsCard from "@/components/Payoutcomponents/StatsCard";
 import PayoutsFilters from "@/components/Payoutcomponents/PayoutsFilters";
 import PayoutsTable from "@/components/Payoutcomponents/PayoutsTable";
 import PayoutsPagination from "@/components/Payoutcomponents/PayoutsPagination";
 import PayoutDetailsModal from "@/components/Payoutcomponents/PayoutDetailsModal";
 import RequestPayoutModal from "@/components/Payoutcomponents/RequestPayoutModal";
+import PayoutSuccessModal from "@/components/Payoutcomponents/PayoutSuccessModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllpayout } from "@/lib/Redux/Slices/payoutSlice";
-
-
+import { adminExecutePayout } from "@/lib/API/Payout/AdminPayout";
 
 const AdminPayouts = () => {
   const dispatch = useDispatch();
+  const { addToast } = useToast();
   const [filters, setFilters] = useState({ page: 1, limit: 10 });
   const [selectedPayout, setSelectedPayout] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [payoutToRequest, setPayoutToRequest] = useState(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { payouts, loading, error } = useSelector((state) => state.payout);
-  // Filter data based on current filters
+  const [payoutResult, setPayoutResult] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const { payouts, loading, error, pagination, stats: serverStats } = useSelector(
+    (state) => state.payout
+  );
+
+  // Fetch paginated data & overall platform stats on filter/page change
   useEffect(() => {
     dispatch(fetchAllpayout(filters));
   }, [dispatch, filters]);
@@ -32,115 +39,19 @@ const AdminPayouts = () => {
     return Array.isArray(payouts) ? payouts : [];
   }, [payouts]);
 
-  const filteredData = useMemo(() => {
-    let data = [...safePayouts];
-
-    if (filters?.search && filters.search.trim() !== "") {
-      const q = filters.search.toLowerCase().trim();
-      data = data.filter((p) => {
-        const hostName = (
-          p?.hostDetails?.name ||
-          p?.hostName ||
-          p?.owner?.name ||
-          p?.seller?.name ||
-          ""
-        ).toLowerCase();
-        const hostEmail = (
-          p?.hostDetails?.email ||
-          p?.owner?.email ||
-          p?.email ||
-          ""
-        ).toLowerCase();
-        const propertyName = (
-          p?.propertyDetails?.title ||
-          p?.propertyDetails?.name ||
-          p?.propertyName ||
-          p?.property?.title ||
-          p?.property?.name ||
-          ""
-        ).toLowerCase();
-        const payoutId = (p?.payoutId || p?._id || "").toLowerCase();
-        const utr = (
-          p?.transactionDetails?.utr ||
-          p?.utr ||
-          p?.transactionId ||
-          ""
-        ).toLowerCase();
-        const bookingId = (
-          p?.bookingDetails?.bookingId ||
-          p?.bookingId ||
-          ""
-        ).toLowerCase();
-
-        return (
-          hostName.includes(q) ||
-          hostEmail.includes(q) ||
-          propertyName.includes(q) ||
-          payoutId.includes(q) ||
-          utr.includes(q) ||
-          bookingId.includes(q)
-        );
-      });
-    }
-
-    if (filters?.payoutStatus) {
-      data = data.filter((p) => p?.payoutStatus === filters.payoutStatus);
-    }
-    if (filters?.propertyType) {
-      data = data.filter((p) => p?.propertyType === filters.propertyType);
-    }
-    if (filters?.startDate) {
-      data = data.filter(
-        (p) => p?.checkIn && new Date(p.checkIn) >= new Date(filters.startDate)
-      );
-    }
-    if (filters?.endDate) {
-      data = data.filter(
-        (p) => p?.checkOut && new Date(p.checkOut) <= new Date(filters.endDate)
-      );
-    }
-
-    return data;
-  }, [filters, safePayouts]);
-
-  // Calculate stats
+  // Overall database statistics (independent of current page/pagination)
   const stats = useMemo(() => {
-    const allData = safePayouts;
-
-    const totalPending = allData.filter(
-      (p) => p?.payoutStatus === "pending"
-    ).length;
-
-    const totalCompleted = allData.filter(
-      (p) => p?.payoutStatus === "completed"
-    ).length;
-
-    const pendingAmount = allData
-      .filter((p) => p?.payoutStatus === "pending")
-      .reduce((sum, p) => sum + (p?.financials?.netPayout || 0), 0);
-
-    const totalCommission = allData.reduce(
-      (sum, p) => sum + (p?.financials?.commissionAmount || 0),
-      0
-    );
-
     return {
-      totalPending,
-      totalCompleted,
-      pendingAmount,
-      totalCommission,
+      totalPending: serverStats?.totalPending ?? 0,
+      totalCompleted: serverStats?.totalCompleted ?? 0,
+      pendingAmount: serverStats?.pendingAmount ?? 0,
+      totalCommission: serverStats?.totalCommission ?? 0,
+      totalRevenue: serverStats?.totalRevenue ?? 0,
     };
-  }, [safePayouts]);
+  }, [serverStats]);
 
-
-  // Pagination
-  const paginatedData = useMemo(() => {
-    const start = ((filters.page || 1) - 1) * (filters.limit || 10);
-    const end = start + (filters.limit || 10);
-    return filteredData.slice(start, end);
-  }, [filteredData, filters.page, filters.limit]);
-
-  const totalPages = Math.ceil(filteredData.length / (filters.limit || 10));
+  const totalPages = pagination?.totalPages || 1;
+  const totalRecords = pagination?.total ?? safePayouts.length;
 
   const handleViewPayout = (payout) => {
     setSelectedPayout(payout);
@@ -152,16 +63,98 @@ const AdminPayouts = () => {
     setIsRequestModalOpen(true);
   };
 
+  // Live dynamic payout execution via backend & RazorpayX
   const handleConfirmPayout = async (payout) => {
-    setIsProcessing(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsProcessing(false);
-    setIsRequestModalOpen(false);
-    setPayoutToRequest(null);
-    toast.success(
-      `Payout request initiated for ₹${payout.financials.netPayout.toLocaleString()}`
-    );
+    if (!payout) return;
+
+    const netPayout = payout.financials?.netPayout || 0;
+    const hostName = payout.ownerDetails?.name || "Host";
+    const propertyName = payout.propertyName || "Property";
+    const toastId = toast.loading(`Processing payout of ₹${Number(netPayout).toLocaleString("en-IN")}...`, {
+      description: `Disbursing funds to ${hostName} via RazorpayX IMPS...`,
+    });
+
+    try {
+      setIsProcessing(true);
+      const res = await adminExecutePayout({
+        ownerId: payout.ownerId || payout.ownerDetails?._id,
+        payoutId: payout._id,
+        amount: netPayout,
+        mode: "IMPS",
+        narration: `Payout Ref #${payout.bookingReference || payout._id?.slice(-8)}`,
+        adminNotes: `Admin processed payout via RazorpayX for ${propertyName}`,
+      });
+
+      if (res?.success) {
+        const utr = res.data?.utr || `UTR${Date.now()}`;
+        const bankAcc = payout.ownerDetails?.bankAccount;
+        const destinationAccount = bankAcc?.accountNumber
+          ? `•••• ${String(bankAcc.accountNumber).slice(-4)} (${bankAcc.bankName || "Bank"})`
+          : payout.ownerDetails?.upiId || "Registered Account";
+
+        // Store result for the confirmation success alert dialog
+        setPayoutResult({
+          amount: netPayout,
+          utr: utr,
+          payoutId: res.data?.payoutId || payout._id,
+          hostName: hostName,
+          propertyName: propertyName,
+          destinationAccount: destinationAccount,
+          mode: res.data?.mode || "IMPS",
+        });
+
+        // 1. Toast notification (rich sonner notification)
+        toast.success("Payout Disbursed Successfully! 🎉", {
+          id: toastId,
+          description: `₹${Number(netPayout).toLocaleString("en-IN")} transferred to ${hostName} (UTR: ${utr})`,
+          duration: 6000,
+        });
+
+        // 2. Secondary toast provider notification
+        if (addToast) {
+          addToast({
+            title: "Payout Disbursed Successfully! 🎉",
+            description: `₹${Number(netPayout).toLocaleString("en-IN")} disbursed to ${hostName}. UTR: ${utr}`,
+            variant: "success",
+          });
+        }
+
+        // 3. Close the request prompt and trigger the rich Alert Modal
+        setIsRequestModalOpen(false);
+        setIsDetailsModalOpen(false);
+        setPayoutToRequest(null);
+        setSelectedPayout(null);
+        setIsSuccessModalOpen(true);
+
+        // Refresh live data and overall platform statistics
+        dispatch(fetchAllpayout(filters));
+      } else {
+        toast.error(res?.message || "Failed to initiate payout", {
+          id: toastId,
+        });
+        if (addToast) {
+          addToast({
+            title: "Payout Failed",
+            description: res?.message || "Failed to initiate payout via RazorpayX.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Payout execution error:", err);
+      toast.error(err?.message || "An unexpected error occurred while executing payout", {
+        id: toastId,
+      });
+      if (addToast) {
+        addToast({
+          title: "Execution Error",
+          description: err?.message || "An unexpected error occurred while executing payout",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleResetFilters = () => {
@@ -174,7 +167,7 @@ const AdminPayouts = () => {
       currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(amount || 0);
   };
 
   return (
@@ -217,16 +210,17 @@ const AdminPayouts = () => {
 
         {/* Table */}
         <PayoutsTable
-          payouts={paginatedData}
+          payouts={safePayouts}
           onViewPayout={handleViewPayout}
           onRequestPayout={handleRequestPayout}
+          isLoading={loading}
         />
 
         {/* Pagination */}
         <PayoutsPagination
           currentPage={filters.page || 1}
           totalPages={totalPages}
-          totalRecords={filteredData.length}
+          totalRecords={totalRecords}
           limit={filters.limit || 10}
           onPageChange={(page) => setFilters({ ...filters, page })}
           onLimitChange={(limit) => setFilters({ ...filters, limit, page: 1 })}
@@ -252,6 +246,16 @@ const AdminPayouts = () => {
           }}
           onConfirm={handleConfirmPayout}
           isLoading={isProcessing}
+        />
+
+        {/* Payout Disbursed Success Alert Modal */}
+        <PayoutSuccessModal
+          isOpen={isSuccessModalOpen}
+          onClose={() => {
+            setIsSuccessModalOpen(false);
+            setPayoutResult(null);
+          }}
+          payoutResult={payoutResult}
         />
       </div>
     </ScrollArea>
