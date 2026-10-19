@@ -76,7 +76,7 @@ export default function BusinessFinancialTally({ refreshTrigger }) {
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800/80 shadow-xs transition-all mb-6">
-      {/* Top Accent Gradient Border */}
+      {/* Top Accent Gradient Border  */}
       <div className="h-1.5 w-full bg-gradient-to-r from-[#FF6900] via-amber-500 to-emerald-500" />
 
       <div className="p-5 sm:p-6 lg:p-7 space-y-6">
