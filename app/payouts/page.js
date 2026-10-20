@@ -55,9 +55,10 @@ export default function HostPayoutsPage() {
   const [hosts, setHosts] = useState([]);
   const [stats, setStats] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [hostPage, setHostPage] = useState(1);
-  const hostLimit = 10;
+  const hostLimit = 20;
 
   // RazorpayX Live Balance state
   const [razorpayBalance, setRazorpayBalance] = useState(null);
@@ -70,9 +71,21 @@ export default function HostPayoutsPage() {
   const [ledger, setLedger] = useState([]);
   const [ledgerLoading, setLedgerLoading] = useState(false);
   const [ledgerSearch, setLedgerSearch] = useState("");
+  const [debouncedLedgerSearch, setDebouncedLedgerSearch] = useState("");
   const [ledgerStatusFilter, setLedgerStatusFilter] = useState("all");
   const [ledgerPage, setLedgerPage] = useState(1);
-  const ledgerLimit = 10;
+  const ledgerLimit = 20;
+
+  // Debounce search inputs by 400ms to avoid firing requests on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedLedgerSearch(ledgerSearch), 400);
+    return () => clearTimeout(timer);
+  }, [ledgerSearch]);
 
   // Payout Execution Modal state
   const [selectedHost, setSelectedHost] = useState(null);
@@ -104,7 +117,7 @@ export default function HostPayoutsPage() {
     try {
       loadBalanceData();
       setLoading(true);
-      const res = await getAdminPendingHosts({ search, statusFilter });
+      const res = await getAdminPendingHosts({ search: debouncedSearch, statusFilter });
       if (res?.success) {
         setHosts(res.data || []);
         setStats(res.stats || null);
@@ -120,7 +133,7 @@ export default function HostPayoutsPage() {
     try {
       setLedgerLoading(true);
       const res = await getAdminPayoutLedger({
-        search: ledgerSearch,
+        search: debouncedLedgerSearch,
         status: ledgerStatusFilter,
         limit: 100,
       });
@@ -167,11 +180,11 @@ export default function HostPayoutsPage() {
 
   useEffect(() => {
     setHostPage(1);
-  }, [search, statusFilter]);
+  }, [debouncedSearch, statusFilter]);
 
   useEffect(() => {
     setLedgerPage(1);
-  }, [ledgerSearch, ledgerStatusFilter]);
+  }, [debouncedLedgerSearch, ledgerStatusFilter]);
 
   useEffect(() => {
     if (activeTab === "hosts") {
@@ -179,7 +192,7 @@ export default function HostPayoutsPage() {
     } else {
       loadLedgerData();
     }
-  }, [activeTab, search, statusFilter, ledgerSearch, ledgerStatusFilter]);
+  }, [activeTab, debouncedSearch, statusFilter, debouncedLedgerSearch, ledgerStatusFilter]);
 
   const paginatedHosts = hosts.slice((hostPage - 1) * hostLimit, hostPage * hostLimit);
   const totalHostPages = Math.max(1, Math.ceil(hosts.length / hostLimit));

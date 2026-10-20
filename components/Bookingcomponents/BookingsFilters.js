@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +19,27 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 export function BookingsFilters({ filters, onFilterChange, onReset }) {
+  const [searchTerm, setSearchTerm] = useState(filters.search || "");
+
+  useEffect(() => {
+    setSearchTerm(filters.search || "");
+  }, [filters.search]);
+
+  // Debounce search input by 400ms to avoid firing on every keystroke
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchTerm !== (filters.search || "")) {
+        onFilterChange({
+          ...filters,
+          search: searchTerm,
+          page: 1,
+        });
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   const handleChange = (key, value) => {
     onFilterChange({
       ...filters,
@@ -27,14 +49,11 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
   };
 
   const handleSearchChange = (e) => {
-    onFilterChange({
-      ...filters,
-      search: e.target.value,
-      page: 1,
-    });
+    setSearchTerm(e.target.value);
   };
 
   const handleClearSearch = () => {
+    setSearchTerm("");
     onFilterChange({
       ...filters,
       search: "",
@@ -65,11 +84,11 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
             <Input
               type="text"
               placeholder="Guest, phone, email, booking ID, villa..."
-              value={filters.search || ""}
+              value={searchTerm}
               onChange={handleSearchChange}
               className="pl-9 pr-9 h-10 text-sm bg-background dark:bg-neutral-900 border-border dark:border-neutral-800"
             />
-            {filters.search && (
+            {searchTerm && (
               <button
                 type="button"
                 onClick={handleClearSearch}

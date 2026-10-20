@@ -1,4 +1,5 @@
 "use client";
+// Categories and Taxonomy Management
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
