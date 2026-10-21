@@ -114,6 +114,7 @@ export function BookingsFilters({ filters, onFilterChange, onReset }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="cancellation_requested">Cancellation Requests ⚠️</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>

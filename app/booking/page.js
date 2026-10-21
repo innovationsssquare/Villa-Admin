@@ -5,7 +5,9 @@ import {
   CreditCard,
   IndianRupee,
   TrendingUp,
+  AlertTriangle,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BookingsPagination } from "@/components/Bookingcomponents/BookingsPagination";
 import { BookingsTable } from "@/components/Bookingcomponents/BookingsTable";
 import { BookingsFilters } from "@/components/Bookingcomponents/BookingsFilters";
@@ -151,6 +153,11 @@ export default function AdminBookings() {
     };
   }, [safeBookings]);
 
+  const pendingCancellationCount = useMemo(() => {
+    return safeBookings.filter(
+      (b) => b?.status === "cancellation_requested" || b?.cancellation?.requested
+    ).length;
+  }, [safeBookings]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-IN", {
@@ -187,6 +194,15 @@ export default function AdminBookings() {
     setSelectedBooking(null);
   };
 
+  const handleRefresh = () => {
+    dispatch(
+      fetchAllBookings({
+        page: filters.page,
+        limit: filters.limit,
+      })
+    );
+  };
+
   return (
     <ScrollArea className="pb-14 bg-gray-50 dark:bg-[#09090B] h-[calc(100vh-64px)] text-neutral-900 dark:text-neutral-100 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -215,6 +231,33 @@ export default function AdminBookings() {
             icon={CreditCard}
           />
         </div>
+
+        {/* ⚠️ Cancellation Requests Alert Banner */}
+        {pendingCancellationCount > 0 && (
+          <div className="mb-6 bg-amber-500/10 border-2 border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 dark:text-amber-200 shadow-sm animate-in fade-in duration-300">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-500/20 rounded-lg text-amber-600 dark:text-amber-400 shrink-0">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-bold text-sm">
+                  {pendingCancellationCount} Cancellation Request{pendingCancellationCount > 1 ? "s" : ""} Awaiting Admin Decision
+                </p>
+                <p className="text-xs text-amber-800/80 dark:text-amber-300/80">
+                  Guest cancellation requests are halted pending your manual review and refund authorization.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-amber-500/50 hover:bg-amber-500/20 text-xs shrink-0 font-semibold"
+              onClick={() => handleFilterChange({ ...filters, status: "cancellation_requested", page: 1 })}
+            >
+              Filter Cancellation Requests ({pendingCancellationCount})
+            </Button>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="mb-6">
@@ -248,6 +291,7 @@ export default function AdminBookings() {
           booking={selectedBooking}
           open={isModalOpen}
           onClose={handleCloseModal}
+          onRefresh={handleRefresh}
         />
       </div>
     </ScrollArea>
