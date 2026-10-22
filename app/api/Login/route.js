@@ -56,8 +56,15 @@ export async function POST(req) {
     const secret =
       process.env.JWT_SECRECT ||
       process.env.JWT_SECRET ||
-      process.env.NEXTAUTH_SECRET ||
-      "PAVAN2585";
+      process.env.NEXTAUTH_SECRET;
+
+    if (!secret) {
+      console.error("JWT_SECRET or NEXTAUTH_SECRET is not configured on the admin server");
+      return Response.json(
+        { success: false, error: "Server authentication configuration error" },
+        { status: 500 }
+      );
+    }
 
     const token = jwt.sign(
       {
