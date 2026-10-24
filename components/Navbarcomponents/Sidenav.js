@@ -22,6 +22,7 @@ import {
   Scale,
   LifeBuoy,
   Megaphone,
+  Sparkles,
 } from "lucide-react";
 import User from "@/public/Asset/User.png";
 import { usePathname, useRouter } from "next/navigation";
@@ -94,6 +95,11 @@ const Sidenav = () => {
       label: "Announcements",
       icon: Megaphone,
       path: "/announcements",
+    },
+    {
+      label: "Festival & Hero Themes",
+      icon: Sparkles,
+      path: "/hero-banner",
     },
   ];
 

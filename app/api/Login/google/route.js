@@ -16,10 +16,23 @@ export async function POST(req) {
     }
 
     // 1. Verify token with Firebase Admin
-    const decoded = await verifyFirebaseIdToken(idToken);
+    let decoded;
+    try {
+      decoded = await verifyFirebaseIdToken(idToken);
+    } catch (tokenErr) {
+      console.error("Token verification failed:", tokenErr);
+      return Response.json(
+        {
+          success: false,
+          error: tokenErr.message || "Invalid or expired Google token",
+        },
+        { status: 401 }
+      );
+    }
+
     if (!decoded || !decoded.email) {
       return Response.json(
-        { success: false, error: "Invalid or expired Google token" },
+        { success: false, error: "Invalid Google token payload (missing email)" },
         { status: 401 }
       );
     }
