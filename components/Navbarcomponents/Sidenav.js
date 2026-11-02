@@ -23,6 +23,7 @@ import {
   LifeBuoy,
   Megaphone,
   Sparkles,
+  Film,
 } from "lucide-react";
 import User from "@/public/Asset/User.png";
 import { usePathname, useRouter } from "next/navigation";
@@ -63,6 +64,7 @@ const Sidenav = () => {
     { label: "Dashboard", icon: LayoutDashboard, path: "/" },
     { label: "Property Owner", icon: PackageSearch, path: "/property-owner" },
     { label: "Manage Property", icon: Heart, path: "/manage-property" },
+    { label: "Reels & Yield Engine", icon: Film, path: "/reels-promotion" },
     // { label: "Add Property", icon: Heart, path: "/addproperty" },
     { label: "Categories", icon: List, path: "/categories" },
     { label: "All Booking", icon: PackageCheck, path: "/booking" },
